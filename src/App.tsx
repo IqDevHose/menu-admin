@@ -17,7 +17,7 @@ function App() {
       <Sidebar />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/res' element={<Restaurant />} />
+        <Route path='/restaurant' element={<Restaurant />} />
 
 
       </Routes>
