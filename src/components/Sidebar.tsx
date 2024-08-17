@@ -1,4 +1,4 @@
-import { ChartBarStacked, ChefHat, FileQuestion, MessageCircleCode, ShieldBan, ShoppingBasket, Star, SunMoon } from 'lucide-react'
+import { ChartBarStacked, ChefHat, FileQuestion, LayoutDashboard, MessageCircleCode, ShieldBan, ShoppingBasket, Star, SunMoon } from 'lucide-react'
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 
@@ -9,9 +9,9 @@ const Sidebar = () => {
             <aside id="separator-sidebar" className="w-72 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
                 <div className="h-full px-3 py-4 overflow-y-auto bg-gray-100">
                     <ul className="space-y-2 font-medium">
-                        <li>
+                        <li className='mb-3'>
                             <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group border border-b-4 shadow">
-                            <ShieldBan />
+                            <LayoutDashboard />
                                 <span className="ms-3">Admin panal</span>
                             </a>
                         </li>
