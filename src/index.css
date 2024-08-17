@@ -63,9 +63,14 @@
   padding: 0;
   box-sizing: border-box;
 }
+body{
+  width: 100vw;
+}
 #root{
   padding: 0;
   margin: 0;
+  width: 100vw;
+
 }
 @layer base {
   * {
