@@ -1,3 +1,4 @@
+"use client"
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import {
@@ -12,31 +13,45 @@ import {
 
 const Restaurant = () => {
   const query = useQuery({
-    queryKey: ['todos'], queryFn: async () => {
+    queryKey: ['restaurant'], queryFn: async () => {
       const res = await axios.get("http://localhost:3000/restaurant")
-      return res.data
+      return await res.data
     }
   })
 
+  if (query.isPending) {
+    <div>loading...</div>
+  }
+  else if (query.isError) {
+    <div>error</div>
+  }
+  console.log(query.data)
   return (
     <div className=' flex items-start justify-center'>
       <Table>
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="w-[100px]">Name</TableHead>
+            <TableHead>access Code</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Updated At</TableHead>
+            <TableHead>Created At</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
-          </TableRow>
+          {
+            !query.isLoading && query?.data?.map((item: any) => {
+              <TableRow>
+                <TableCell className="font-medium">{item?.name}</TableCell>
+                <TableCell>{item?.accessCode}</TableCell>
+                <TableCell>{item?.description}</TableCell>
+                <TableCell>{item?.updatedAt}</TableCell>
+                <TableCell>{item?.createdAt}</TableCell>
+              </TableRow>
+
+            })
+          }
         </TableBody>
       </Table>
     </div>
