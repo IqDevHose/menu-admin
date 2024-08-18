@@ -8,10 +8,10 @@ import Restaurant from './pages/restaurant'
 import Sidebar from './components/Sidebar'
 import Category from './pages/category'
 import Item from './pages/item'
-import CustomerReview from './pages/customerReview'
 import Rating from './pages/rating'
 import Theme from './pages/theme'
 import Questions from './pages/questions'
+import CustomerReview from './pages/CustomerReview'
 
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
         <Route path='/restaurant' element={<Restaurant />} />
         <Route path='/category' element={<Category />}></Route>
         <Route path='/items' element={<Item />}></Route>
-        <Route path='/customerReview' element={<CustomerReview />}></Route>
+        <Route path='/CustomerReview' element={<CustomerReview />}></Route>
         <Route path='/rating' element={<Rating />}></Route>
         <Route path='/questions' element={<Questions />}></Route>
         <Route path='/theme' element={<Theme />}></Route>
