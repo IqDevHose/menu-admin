@@ -1,15 +1,43 @@
-import { useQuery } from '@tanstack/react-query'
+import Popup from '@/components/Popup'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 import { SquarePen, Trash2 } from 'lucide-react'
-import React from 'react'
+import  { useState } from 'react'
+
 
 const Rating = () => {
+  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const queryClient = useQueryClient();
+  
   const query = useQuery({
     queryKey: ['rating'], queryFn: async () => {
       const rating = await axios.get("http://localhost:3000/rating")
       return rating.data
     }
   })
+
+
+  const mutation = useMutation({
+    mutationFn: async (id) => {
+      await axios.delete(`http://localhost:3000/rating/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rating'] });
+      setShowPopup(false); // Close the popup after successful deletion
+    }
+  });
+
+  const handleDeleteClick = (item: any) => {
+    setSelectedItem(item);
+    setShowPopup(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedItem) {
+      mutation.mutate(selectedItem.id);
+    }
+  };
 
   if (query.isLoading) {
     return <div>Loading...</div>
@@ -68,7 +96,7 @@ const Rating = () => {
                 <button className="font-medium text-blue-600">
                   <SquarePen />
                 </button>
-                <button className="font-medium text-red-600">
+                <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
                   <Trash2 />
                 </button>
               </td>
@@ -76,6 +104,19 @@ const Rating = () => {
           ))}
         </tbody>
       </table>
+      {showPopup && (
+        <Popup
+          onClose={() => setShowPopup(false)}
+          onConfirm={confirmDelete}
+          loading={mutation.isLoading}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItem?.name}?</p>
+        </Popup>
+      )}
     </div>
   )
 }

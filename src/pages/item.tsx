@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { SquarePen, Trash2 } from 'lucide-react';
-import Popup from '@/components/popup';
+import Popup from '@/components/Popup';
 
 
 const Item = () => {
