@@ -1,24 +1,52 @@
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { SquarePen, Trash2 } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { SquarePen, Trash2 } from 'lucide-react';
+import Popup from '@/components/popup';
+
 
 const Item = () => {
+  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const queryClient = useQueryClient();
+
   const query = useQuery({
-    queryKey: ['item'], queryFn: async () => {
-      const item = await axios.get("http://localhost:3000/item")
-      return item.data
+    queryKey: ['item'],
+    queryFn: async () => {
+      const item = await axios.get("http://localhost:3000/item");
+      return item.data;
     }
-  })
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (id) => {
+      await axios.delete(`http://localhost:3000/item/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['item'] });
+      setShowPopup(false); // Close the popup after successful deletion
+    }
+  });
+
+  const handleDeleteClick = (item: any) => {
+    setSelectedItem(item);
+    setShowPopup(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedItem) {
+      mutation.mutate(selectedItem.id);
+    }
+  };
 
   if (query.isLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (query.isError) {
-    return <div>Error</div>
+    return <div>Error</div>;
   }
-  console.log(query.data)
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -29,7 +57,8 @@ const Item = () => {
           </div>
           <input type="text" id="table-search" className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for items" />
         </div>
-        <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5">ِAdd category</button>
+        <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5">Add Item</button>
+
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
@@ -54,8 +83,8 @@ const Item = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
-            <tr className="bg-white border-b hover:bg-gray-50">
+          {query.data?.map((item, index) => (
+            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
                 {index + 1}
               </td>
@@ -69,13 +98,13 @@ const Item = () => {
                 {item?.price}
               </td>
               <td className="px-6 py-4">
-                {item?.price}
+                {item?.categoryName}
               </td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <SquarePen />
                 </button>
-                <button className="font-medium text-red-600">
+                <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
                   <Trash2 />
                 </button>
               </td>
@@ -83,8 +112,22 @@ const Item = () => {
           ))}
         </tbody>
       </table>
-    </div>
-  )
-}
 
-export default Item
+      {showPopup && (
+        <Popup
+          onClose={() => setShowPopup(false)}
+          onConfirm={confirmDelete}
+          loading={mutation.isLoading}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItem?.name}?</p>
+        </Popup>
+      )}
+    </div>
+  );
+};
+
+export default Item;
