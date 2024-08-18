@@ -15,6 +15,8 @@ import Questions from "./pages/Questions/questions";
 import Theme from "./pages/Theme/theme";
 import EditRating from "./pages/Rating/EditRating";
 import EditCustomerReview from "./pages/CustomerReview/EditCustomerReview";
+import EditCategory from "./pages/Category/EditCategory";
+import EditItmes from "./pages/Items/EditItmes";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -30,7 +32,9 @@ function App() {
         <Route path="/edit-rating" element={<EditRating />} />
         <Route path="/edit-customer-review" element={<EditCustomerReview />} />
         <Route path="/category" element={<Category />}></Route>
+        <Route path="/edit-category/:categoryId" element={<EditCategory />}></Route>
         <Route path="/items" element={<Item />}></Route>
+        <Route path="/edit-items" element={<EditItmes />}></Route>
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
         <Route path="/questions" element={<Questions />}></Route>

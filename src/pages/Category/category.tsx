@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 import { SquarePen, Trash2 } from 'lucide-react'
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 type categoryReviewType = {
   id:string
@@ -16,13 +17,13 @@ const Category = () => {
 
   const query = useQuery({
     queryKey: ['category'], queryFn: async () => {
-      const category = await axios.get("http://localhost:3000/category")
+      const category = await axios.get("http://192.168.88.35:3000/category")
       return category.data
     }
   })
   const mutation = useMutation({
     mutationFn: async (id:string) => {
-      await axios.delete(`http://localhost:3000/category/${id}`);
+      await axios.delete(`http://192.168.88.35:3000/category/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['category'] });
@@ -103,7 +104,11 @@ const Category = () => {
             </td>
             <td className="px-6 py-4 flex gap-x-4">
               <button className="font-medium text-blue-600">
-                <SquarePen />
+                  <Link
+                    to={`/edit-category/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}`}
+                  >
+                    <SquarePen />
+                  </Link>
               </button>
               <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
                   <Trash2 />
