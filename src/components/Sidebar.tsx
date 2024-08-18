@@ -6,11 +6,11 @@ const Sidebar = () => {
     return (
         <>
 
-            <aside id="separator-sidebar" className="w-72 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-                <div className="h-full px-3 py-4 overflow-y-auto bg-gray-100">
+            <aside id="separator-sidebar" className="w-80 h-screen " aria-label="Sidebar">
+                <div className="h-full px-3 py-4 overflow-y-auto bg-indigo-100">
                     <ul className="space-y-2 font-medium">
                         <li className='mb-3'>
-                            <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group border border-b-4 shadow">
+                            <a href="#" className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 group border border-b-4 shadow">
                             <LayoutDashboard />
                                 <span className="ms-3">Admin panal</span>
                             </a>
@@ -18,8 +18,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/restaurant'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <ChefHat />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Restaurant</span>
@@ -28,8 +28,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/category'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <ChartBarStacked />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Category</span>
@@ -38,8 +38,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/items'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <ShoppingBasket />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Items</span>
@@ -48,8 +48,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/customerReview'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <MessageCircleCode />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Customer Review</span>
@@ -58,8 +58,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/rating'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <Star />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Rating</span>
@@ -68,8 +68,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/questions'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <FileQuestion />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Questions</span>
@@ -78,8 +78,8 @@ const Sidebar = () => {
                         <li>
                             <NavLink to={'/theme'} className={(navData) =>
                                 navData.isActive
-                                    ? "flex items-center p-2 text-white rounded-lg  bg-gray-500 group"
-                                    : "flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100  group "
+                                    ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
+                                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
                             }>
                                 <SunMoon />
                                 <span className="text-start flex-1 ms-3 whitespace-nowrap">Theme</span>

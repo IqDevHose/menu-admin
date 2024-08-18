@@ -7,6 +7,7 @@ type restaurantType = {
   name: string | null;
   description: string | null;
   accessCode: string | null;
+  image: string | null
 };
 function EditRestaurant() {
   let [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +26,7 @@ function EditRestaurant() {
     },
   });
   const handleSubmit = () => {
-    mutation.mutate({ name, description, accessCode });
+    mutation.mutate({ name, description, accessCode,image:null });
   };
 
   return (

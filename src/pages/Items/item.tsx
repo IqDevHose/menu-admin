@@ -4,6 +4,7 @@ import axios from 'axios';
 import { SquarePen, Trash2 } from 'lucide-react';
 import Popup from '@/components/Popup';
 import { Link } from 'react-router-dom';
+import Spinner from '@/components/Spinner';
 
 type itemReviewType = {
   id: string;
@@ -49,8 +50,10 @@ const Item = () => {
     }
   };
 
-  if (query.isLoading) {
-    return <div>Loading...</div>;
+    if (query.isPending) {
+    return <div className="w-full h-screen flex items-center justify-center">
+      <Spinner />
+    </div>;
   }
 
   if (query.isError) {
@@ -73,9 +76,9 @@ const Item = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               ></path>
             </svg>
           </div>

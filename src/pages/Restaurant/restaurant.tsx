@@ -1,10 +1,10 @@
-"use client";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import  { useState } from 'react'
+import { useState } from 'react'
 import Popup from "@/components/Popup";
+import Spinner from "@/components/Spinner";
 
 type restaurantReviewType = {
   id: string;
@@ -25,7 +25,7 @@ const Restaurant = () => {
     },
   });
   const mutation = useMutation({
-    mutationFn: async (id:string) => {
+    mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/restaurant/${id}`);
     },
     onSuccess: () => {
@@ -45,8 +45,10 @@ const Restaurant = () => {
     }
   };
 
-  if (query.isLoading) {
-    return <div>Loading...</div>;
+  if (query.isPending) {
+    return <div className="w-full h-screen flex items-center justify-center">
+      <Spinner />
+    </div>;
   }
 
   if (query.isError) {
@@ -68,9 +70,9 @@ const Restaurant = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               ></path>
             </svg>
           </div>
@@ -114,7 +116,7 @@ const Restaurant = () => {
         </thead>
         <tbody>
           {query.data?.map((item: any, index: number) => (
-            <tr className="bg-white border-b hover:bg-gray-50 ">
+            <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
               <td className="px-6 py-4">{index + 1}</td>
               <td
                 scope="row"
@@ -128,9 +130,8 @@ const Restaurant = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-restaurant?description=${
-                      item.description === null ? "" : item.description
-                    }&accessCode=${item.accessCode}&name=${item.name}`}
+                    to={`/edit-restaurant?description=${item.description === null ? "" : item.description
+                      }&accessCode=${item.accessCode}&name=${item.name}`}
                   >
                     <SquarePen />
                   </Link>

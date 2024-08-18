@@ -4,6 +4,7 @@ import { SquarePen, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import Popup from '@/components/Popup';
+import Spinner from '@/components/Spinner';
 
 type ratingReviewType = {
   id: string;
@@ -48,8 +49,10 @@ const Rating = () => {
     }
   };
 
-  if (query.isLoading) {
-    return <div>Loading...</div>;
+    if (query.isPending) {
+    return <div className="w-full h-screen flex items-center justify-center">
+      <Spinner />
+    </div>;
   }
 
   if (query.isError) {

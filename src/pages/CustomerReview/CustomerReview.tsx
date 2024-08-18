@@ -2,11 +2,12 @@ import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
 import sad from "../../assets/sad.png";
+import Spinner from "@/components/Spinner";
 
 type customerReviewType = {
   id: string;
@@ -68,8 +69,10 @@ const CustomerReview = () => {
     }
   };
 
-  if (query.isLoading) {
-    return <div>Loading...</div>;
+    if (query.isPending) {
+    return <div className="w-full h-screen flex items-center justify-center">
+      <Spinner />
+    </div>;
   }
 
   if (query.isError) {
