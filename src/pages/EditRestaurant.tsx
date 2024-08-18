@@ -17,6 +17,7 @@ function EditRestaurant() {
   const [accessCode, setAccessCode] = useState<string | null>(
     searchParams.get("accessCode")
   );
+  const [uploadImage, setUploadImage] = useState<string | null>();
   const { restaurantId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
@@ -83,6 +84,24 @@ function EditRestaurant() {
             onChange={(e) => setAccessCode(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter access code"
+          />
+        </div>
+
+        {/* upload image */}
+        <div className="mb-4">
+          <label
+            htmlFor="access-code"
+            className="block text-sm font-medium text-gray-700 "
+          >
+            Upload image
+          </label>
+          <input
+            type="file"
+            id="upload-image"
+            value={uploadImage || ""}
+            onChange={(e) => setUploadImage(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Upload an image"
           />
         </div>
 
