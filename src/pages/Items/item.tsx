@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { SquarePen, Trash2 } from 'lucide-react';
 import Popup from '@/components/Popup';
+import { Link } from 'react-router-dom';
 
 type itemReviewType = {
   id: string;
@@ -22,14 +23,14 @@ const Item = () => {
   const query = useQuery({
     queryKey: ["item"],
     queryFn: async () => {
-      const item = await axios.get("http://localhost:3000/item");
+      const item = await axios.get("http://192.168.88.35:3000/item");
       return item.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id:string) => {
-      await axios.delete(`http://localhost:3000/item/${id}`);
+      await axios.delete(`http://192.168.88.35:3000/item/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["item"] });
@@ -129,7 +130,13 @@ const Item = () => {
               <td className="px-6 py-4">{item?.categoryName}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <SquarePen />
+                  <Link
+                    to={`/edit-items?description=${
+                      item.description === null ? "" : item.description
+                    }&name=${item.name}&price=${item.price}`}
+                  >
+                    <SquarePen />
+                  </Link>
                 </button>
                 <button
                   className="font-medium text-red-600"

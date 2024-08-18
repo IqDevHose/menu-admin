@@ -28,7 +28,7 @@ function App() {
         <Route path="/restaurant" element={<Restaurant />} />
         <Route path="/edit-restaurant" element={<EditRestaurant />} />
         <Route path="/category" element={<Category />}></Route>
-        <Route path="/edit-category" element={<EditCategory />}></Route>
+        <Route path="/edit-category/:categoryId" element={<EditCategory />}></Route>
         <Route path="/items" element={<Item />}></Route>
         <Route path="/edit-items" element={<EditItmes />}></Route>
         <Route path="/customerReview" element={<CustomerReview />}></Route>
