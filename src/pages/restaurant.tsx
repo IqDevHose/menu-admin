@@ -1,15 +1,6 @@
 "use client"
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { SquarePen, Trash2 } from 'lucide-react'
 
 const Restaurant = () => {
@@ -78,7 +69,7 @@ const Restaurant = () => {
                 {item.description}
               </td>
               <td className="px-6 py-4">
-                {item.accesscode}
+                {item.accessCode}
               </td>
               <td className="px-6 py-4">
                 {item.categories.length}
