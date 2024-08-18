@@ -13,6 +13,7 @@ import CustomerReview from "./pages/CustomerReview/CustomerReview";
 import Rating from "./pages/Rating/rating";
 import Questions from "./pages/Questions/questions";
 import Theme from "./pages/Theme/theme";
+import EditQuestion from "./pages/Questions/EditQuestion";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -30,6 +31,7 @@ function App() {
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
         <Route path="/questions" element={<Questions />}></Route>
+        <Route path="/edit-questions/:questionId" element={<EditQuestion />}></Route>
         <Route path="/theme" element={<Theme />}></Route>
       </Routes>
     </div>

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 import { SquarePen, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom';
 
 type questionsReviewType = {
   id: string;
@@ -26,7 +27,7 @@ const Questions = () => {
   })
 
   const mutation = useMutation({
-    mutationFn: async (id:string) => {
+    mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/question/${id}`);
     },
     onSuccess: () => {
@@ -45,7 +46,7 @@ const Questions = () => {
       mutation.mutate(selectedItem.id);
     }
   };
-  
+
 
   if (query.isLoading) {
     return <div>Loading...</div>
@@ -118,7 +119,12 @@ const Questions = () => {
               </td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <SquarePen />
+                  <Link
+                    to={`/edit-questions/${item.id}?description=${item.description === null ? "" : item.description
+                      }&title=${item.title}&enTitle=${item.enTitle}&restaurantId=${item.restaurantId}&answer=${item.answer}`}
+                  >
+                    <SquarePen />
+                  </Link>
                 </button>
                 <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
                   <Trash2 />
