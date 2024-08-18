@@ -3,27 +3,27 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
 import sad from "../../assets/sad.png";
+
 type customerReviewType = {
   id: string;
   name: string;
   comment: string;
   email: string;
 };
+
 const CustomerReview = () => {
-  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedCustomerReview, setSelectedCustomerReview] =
-    useState<customerReviewType | null>(null); // State to manage selected item for deletion
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedCustomerReview, setSelectedCustomerReview] = useState<customerReviewType | null>(null);
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ["customerReview"],
     queryFn: async () => {
-      const customerReview = await axios.get(
-        "http://localhost:3000/customer-review"
-      );
+      const customerReview = await axios.get("http://localhost:3000/customer-review");
       return customerReview.data;
     },
   });
@@ -52,12 +52,12 @@ const CustomerReview = () => {
       await axios.delete(`http://localhost:3000/customer-review/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customer-review"] });
-      setShowPopup(false); // Close the popup after successful deletion
+      queryClient.invalidateQueries({ queryKey: ["customerReview"] });
+      setShowPopup(false);
     },
   });
 
-  const handleDeleteClick = (item: any) => {
+  const handleDeleteClick = (item: customerReviewType) => {
     setSelectedCustomerReview(item);
     setShowPopup(true);
   };
@@ -75,7 +75,7 @@ const CustomerReview = () => {
   if (query.isError) {
     return <div>Error</div>;
   }
-  console.log(query.data);
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -101,66 +101,48 @@ const CustomerReview = () => {
           <input
             type="text"
             id="table-search"
-            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search for items"
           />
         </div>
         <button
           type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
+          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg py-2.5 mb-2 px-5"
         >
           ِAdd category
         </button>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4 ">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3 w-4 ">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Comment
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Avg Rating
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Phone
-            </th>
-            <th scope="col" className="px-6 py-3">
-              email
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Birthday
-            </th>
+            <th scope="col" className="px-6 py-3 w-4">#</th>
+            <th scope="col" className="px-6 py-3 w-4">Name</th>
+            <th scope="col" className="px-6 py-3">Comment</th>
+            <th scope="col" className="px-6 py-3">Avg Rating</th>
+            <th scope="col" className="px-6 py-3">Phone</th>
+            <th scope="col" className="px-6 py-3">Email</th>
+            <th scope="col" className="px-6 py-3">Birthday</th>
             <th scope="col" className="px-6 py-3"></th>
-            {/* <th scope="col" className="px-6 py-3">
-              Action
-            </th> */}
           </tr>
         </thead>
         <tbody>
           {query.data?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
-              <td
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-              >
-                {item.name}
-              </td>
+              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.name}</td>
               <td className="px-6 py-4">{item.comment}</td>
               <td className="px-6 py-4">{summation(item.rating)}</td>
               <td className="px-6 py-4">{item.phone}</td>
               <td className="px-6 py-4">{item.email}</td>
               <td className="px-6 py-4">{item.birthday}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <button className="font-medium text-blue-600">
-                  <SquarePen />
-                </button>
+              <Link
+                to={`/edit-customer-review?id=${item.id}&name=${encodeURIComponent(item.name || '')}&comment=${encodeURIComponent(item.comment || '')}&email=${encodeURIComponent(item.email || '')}`}
+                className="font-medium text-blue-600"
+              >
+                <SquarePen />
+              </Link>
+
                 <button
                   className="font-medium text-red-600"
                   onClick={() => handleDeleteClick(item)}
@@ -188,4 +170,5 @@ const CustomerReview = () => {
     </div>
   );
 };
+
 export default CustomerReview;
