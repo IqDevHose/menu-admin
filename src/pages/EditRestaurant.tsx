@@ -1,0 +1,103 @@
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+
+type restaurantType = {
+  name: string | null;
+  description: string | null;
+  accessCode: string | null;
+};
+function EditRestaurant() {
+  let [searchParams, setSearchParams] = useSearchParams();
+  const [name, setName] = useState<string | null>(searchParams.get("name"));
+  const [description, setDescription] = useState<string | null>(
+    searchParams.get("description")
+  );
+  const [accessCode, setAccessCode] = useState<string | null>(
+    searchParams.get("accessCode")
+  );
+  const { restaurantId } = useParams();
+  const mutation = useMutation({
+    mutationFn: (newEdit: restaurantType) => {
+      return axios.put(`http://localhost:3000/${restaurantId}`, newEdit);
+    },
+  });
+  const handleSubmit = () => {
+    mutation.mutate({ name, description, accessCode });
+  };
+
+  return (
+    <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6">Edit Restaurant</h2>
+
+      <form onSubmit={handleSubmit}>
+        {/* Restaurant Name */}
+        <div className="mb-4">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Restaurant Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name || ""}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Enter restaurant name"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Description
+          </label>
+          <textarea
+            id="description"
+            value={description || ""}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Enter restaurant description"
+          />
+        </div>
+
+        {/* Access Code */}
+        <div className="mb-4">
+          <label
+            htmlFor="access-code"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Access Code
+          </label>
+          <input
+            type="text"
+            id="access-code"
+            value={accessCode || ""}
+            onChange={(e) => setAccessCode(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Enter access code"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default EditRestaurant;
