@@ -26,12 +26,12 @@ const CustomerReview = () => {
     }
     const average = sum / count;
 
-    if (average >= 2) {
-      return <img width={32} height={32} src={happy} alt="happy" />;
+    if (average >= 1.5) {
+      return <img width={24} height={24} src={happy} alt="happy" />;
     } else if (average >= 1) {
-      return <img width={32} height={32} src={satisfied} alt="satisfied" />;
+      return <img width={24} height={24} src={satisfied} alt="satisfied" />;
     } else {
-      return <img width={32} height={32} src={sad} alt="sad" />;
+      return <img width={24} height={24} src={sad} alt="sad" />;
     }
   }
 
