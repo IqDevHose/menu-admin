@@ -12,7 +12,7 @@ import Rating from "./pages/rating";
 import Theme from "./pages/theme";
 import Questions from "./pages/questions";
 import EditRestaurant from "./pages/EditRestaurant";
-import CustomerReview from "./pages/customerReview";
+import CustomerReview from "./pages/CustomerReview";
 
 function App() {
   const [count, setCount] = useState(0);
