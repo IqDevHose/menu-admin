@@ -3,16 +3,16 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import { Button } from "./components/ui/button";
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/home";
-import Restaurant from "./pages/restaurant";
 import Sidebar from "./components/Sidebar";
-import Category from "./pages/category";
-import Item from "./pages/item";
-import Rating from "./pages/rating";
-import Theme from "./pages/theme";
-import Questions from "./pages/questions";
-import EditRestaurant from "./pages/EditRestaurant";
-import CustomerReview from "./pages/CustomerReview";
+import Home from "./pages/Home/home";
+import Restaurant from "./pages/Restaurant/restaurant";
+import EditRestaurant from "./pages/Restaurant/EditRestaurant";
+import Category from "./pages/Category/category";
+import Item from "./pages/Items/item";
+import CustomerReview from "./pages/CustomerReview/CustomerReview";
+import Rating from "./pages/Rating/rating";
+import Questions from "./pages/Questions/questions";
+import Theme from "./pages/Theme/theme";
 
 function App() {
   const [count, setCount] = useState(0);

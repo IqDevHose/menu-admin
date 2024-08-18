@@ -1,21 +1,21 @@
-import Popup from '@/components/Popup';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios'
-import { SquarePen, Trash2 } from 'lucide-react'
-import React, { useState } from 'react';
-import happy from "../assets/smile.png";
-import satisfied from "../assets/neutral.png";
-import sad from "../assets/sad.png";
+import Popup from "@/components/Popup";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { SquarePen, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import happy from "../../assets/smile.png";
+import satisfied from "../../assets/neutral.png";
+import sad from "../../assets/sad.png";
 type customerReviewType = {
-  id:string
-  name:string
-  comment:string
-  email:string
-
-}
+  id: string;
+  name: string;
+  comment: string;
+  email: string;
+};
 const CustomerReview = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedCustomerReview, setSelectedCustomerReview] = useState<customerReviewType | null>(null); // State to manage selected item for deletion
+  const [selectedCustomerReview, setSelectedCustomerReview] =
+    useState<customerReviewType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -48,13 +48,13 @@ const CustomerReview = () => {
   }
 
   const mutation = useMutation({
-    mutationFn: async (id:string) => {
+    mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/customer-review/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-review'] });
+      queryClient.invalidateQueries({ queryKey: ["customer-review"] });
       setShowPopup(false); // Close the popup after successful deletion
-    }
+    },
   });
 
   const handleDeleteClick = (item: any) => {
@@ -67,7 +67,6 @@ const CustomerReview = () => {
       mutation.mutate(selectedCustomerReview.id);
     }
   };
-
 
   if (query.isLoading) {
     return <div>Loading...</div>;
@@ -162,7 +161,10 @@ const CustomerReview = () => {
                 <button className="font-medium text-blue-600">
                   <SquarePen />
                 </button>
-                <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
+                <button
+                  className="font-medium text-red-600"
+                  onClick={() => handleDeleteClick(item)}
+                >
                   <Trash2 />
                 </button>
               </td>
