@@ -4,10 +4,15 @@ import axios from 'axios'
 import { SquarePen, Trash2 } from 'lucide-react'
 import  { useState } from 'react'
 
+type ratingReviewType = {
+  id: string;
+  name: string;
+};
+
 
 const Rating = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const [selectedRating, setselectedRating] = useState<ratingReviewType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
   
   const query = useQuery({
@@ -19,7 +24,7 @@ const Rating = () => {
 
 
   const mutation = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (id:string) => {
       await axios.delete(`http://localhost:3000/rating/${id}`);
     },
     onSuccess: () => {
@@ -29,13 +34,13 @@ const Rating = () => {
   });
 
   const handleDeleteClick = (item: any) => {
-    setSelectedItem(item);
+    setselectedRating(item);
     setShowPopup(true);
   };
 
   const confirmDelete = () => {
-    if (selectedItem) {
-      mutation.mutate(selectedItem.id);
+    if (selectedRating) {
+      mutation.mutate(selectedRating.id);
     }
   };
 
@@ -108,13 +113,13 @@ const Rating = () => {
         <Popup
           onClose={() => setShowPopup(false)}
           onConfirm={confirmDelete}
-          loading={mutation.isLoading}
+          loading={mutation.isPending}
           confirmText="Delete"
           loadingText="Deleting..."
           cancelText="Cancel"
           confirmButtonVariant="red"
         >
-          <p>Are you sure you want to delete {selectedItem?.name}?</p>
+          <p>Are you sure you want to delete {selectedRating?.name}?</p>
         </Popup>
       )}
     </div>

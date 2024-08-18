@@ -6,9 +6,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import  { useState } from 'react'
 import Popup from "@/components/Popup";
 
+type restaurantReviewType = {
+  id: string;
+  name: string;
+};
+
+
 const Restaurant = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<restaurantReviewType | null>(null);  // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -19,7 +25,7 @@ const Restaurant = () => {
     },
   });
   const mutation = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (id:string) => {
       await axios.delete(`http://localhost:3000/restaurant/${id}`);
     },
     onSuccess: () => {
@@ -141,7 +147,7 @@ const Restaurant = () => {
         <Popup
           onClose={() => setShowPopup(false)}
           onConfirm={confirmDelete}
-          loading={mutation.isLoading}
+          loading={mutation.isPending}
           confirmText="Delete"
           loadingText="Deleting..."
           cancelText="Cancel"

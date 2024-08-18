@@ -4,9 +4,18 @@ import axios from 'axios'
 import { SquarePen, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
+type questionsReviewType = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  categoryName: string;
+};
+
+
 const Questions = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<questionsReviewType | null>(null);  // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -17,7 +26,7 @@ const Questions = () => {
   })
 
   const mutation = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (id:string) => {
       await axios.delete(`http://localhost:3000/question/${id}`);
     },
     onSuccess: () => {
@@ -123,7 +132,7 @@ const Questions = () => {
         <Popup
           onClose={() => setShowPopup(false)}
           onConfirm={confirmDelete}
-          loading={mutation.isLoading}
+          loading={mutation.isPending}
           confirmText="Delete"
           loadingText="Deleting..."
           cancelText="Cancel"

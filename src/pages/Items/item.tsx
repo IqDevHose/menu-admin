@@ -4,10 +4,19 @@ import axios from 'axios';
 import { SquarePen, Trash2 } from 'lucide-react';
 import Popup from '@/components/Popup';
 
+type itemReviewType = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  categoryName: string;
+};
+
+
 // todo add type
 const Item = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -105,7 +114,8 @@ const Item = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item, index) => (
+        {query.data?.map((item: itemReviewType, index: number) => (
+
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td
@@ -137,7 +147,7 @@ const Item = () => {
         <Popup
           onClose={() => setShowPopup(false)}
           onConfirm={confirmDelete}
-          loading={mutation.isLoading}
+          loading={mutation.isPending}
           confirmText="Delete"
           loadingText="Deleting..."
           cancelText="Cancel"
