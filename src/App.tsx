@@ -20,6 +20,7 @@ import AddRating from "./pages/Rating/AddRating";
 import AddRestaurant from "./pages/Restaurant/AddRestaurant";
 import AddCategory from "./pages/Category/AddCategory";
 import AddQuestion from "./pages/Questions/AddQuestion";
+import EditTheme from "./pages/Theme/editTheme";
 
 function App() {
   return (
@@ -34,10 +35,10 @@ function App() {
           element={<EditRestaurant />}
         />
         <Route path="/add-restaurant" element={<AddRestaurant />} />
-        <Route path="/edit-rating:ratingId" element={<EditRating />} />
+        <Route path="/edit-rating/:ratingId" element={<EditRating />} />
         <Route path="/add-rating" element={<AddRating />} />
 
-        <Route path="/edit-customer-review/:customer-reviewId" element={<EditCustomerReview />} />
+        <Route path="/edit-customer-review/:customerReviewId" element={<EditCustomerReview />} />
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/category" element={<Category />}></Route>
         <Route
@@ -58,6 +59,7 @@ function App() {
         <Route path="/add-question" element={<AddQuestion />}></Route>
 
         <Route path="/theme" element={<Theme />}></Route>
+        <Route path="/edit-theme/:themeId" element={<EditTheme />}></Route>
       </Routes>
     </div>
   );

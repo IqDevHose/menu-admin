@@ -127,13 +127,12 @@ const Questions = () => {
         </thead>
         <tbody>
           {query.data?.map((item: any, index: number) => (
-            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{index + 1}</td>
-              <td
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-              >
-                {item.resturnat?.name}
+            <tr  key={item.id} className="bg-white border-b hover:bg-gray-50">
+              <td className="px-6 py-4">
+                {index + 1}
+              </td>
+              <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                {item.resturant?.name}
               </td>
               <td className="px-6 py-4">{item.title}</td>
               <td className="px-6 py-4">{item.enTitle}</td>
