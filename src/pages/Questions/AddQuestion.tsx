@@ -17,10 +17,10 @@ function AddQuestion() {
   const [answer, setanswer] = useState<string | null>("");
   const [title, setTitle] = useState<string | null>("");
   const [enTitle, setEnTitle] = useState<string | null>("");
-  const { questionId } = useParams();
+  
   const mutation = useMutation({
     mutationFn: (newQuestion: questionType) => {
-      return axios.post(`http://localhost:3000/${questionId}`, newQuestion);
+      return axios.post(`http://localhost:3000/question`, newQuestion);
     },
   });
   const handleSubmit = () => {

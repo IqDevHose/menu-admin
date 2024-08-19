@@ -14,11 +14,11 @@ function AddCustomerReview() {
   const [comment, setComment] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const navigate = useNavigate();
-  const { customerReviewId } = useParams();
+  
 
   const mutation = useMutation({
     mutationFn: (newReview: customerReviewType) => {
-      return axios.post(`http://localhost:3000/customer-review/${customerReviewId}`, newReview);
+      return axios.post(`http://localhost:3000/customer-review`, newReview);
     },
     onSuccess: () => {
       navigate("/"); // Navigate back to the customer reviews list after successful addition

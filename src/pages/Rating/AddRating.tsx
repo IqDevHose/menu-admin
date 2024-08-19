@@ -14,11 +14,11 @@ function AddRating() {
   const [score, setScore] = useState<number | null>(null);
   const [comment, setComment] = useState<string | null>("");
   const navigate = useNavigate();
-  const { ratingId } = useParams();
+ 
 
   const mutation = useMutation({
     mutationFn: (newRating: ratingType) => {
-      return axios.post(`http://localhost:3000/rating/${ratingId}`, newRating);
+      return axios.post(`http://localhost:3000/rating`, newRating);
     },
     onSuccess: () => {
       navigate("/"); // Navigate back to the ratings list after successful addition
