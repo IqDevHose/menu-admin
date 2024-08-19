@@ -1,35 +1,26 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type itemType = {
   name: string | null;
   description: string | null;
   price: number | null;
   categoryId: string | null;
-  image:string | null;
+  image: string | null;
 };
 
 function EditItem() {
-  let [searchParams, setSearchParams] = useSearchParams();
-
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [description, setDescription] = useState<string | null>(
-    searchParams.get("description")
-  );
-  const [price, setPrice] = useState<number | null>(
-    searchParams.get("price") ? parseFloat(searchParams.get("price")!) : null
-  );
-  const [restaurantId, setRestaurantId] = useState<string | null>(
-    searchParams.get("restaurantId")
-  );
-  const [image, setImage] = useState<string | null>(
-    searchParams.get("image")
-  );
-  const [categoryId, setCategoryId] = useState<string | null>(
-    searchParams.get("categoryId")
-  );
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
+  const [name, setName] = useState<string | null>(record.name);
+  const [description, setDescription] = useState<string | null>(record.description);
+  const [price, setPrice] = useState<number | null>(record.price);
+  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [image, setImage] = useState<string | null>(record.image);
+  const [categoryId, setCategoryId] = useState<string | null>(record.categoryId);
   const { itemId } = useParams();
   const navigate = useNavigate();
 
@@ -73,7 +64,7 @@ function EditItem() {
   });
 
   const handleSubmit = () => {
-    mutation.mutate({ name, description, price, categoryId, image});
+    mutation.mutate({ name, description, price, categoryId, image });
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;

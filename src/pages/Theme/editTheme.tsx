@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react'
+import { useLocation, useParams } from 'react-router-dom';
 
 type themeType = {
   name: string | null;
@@ -10,13 +10,14 @@ type themeType = {
   bg: string | null;
 };
 function EditTheme() {
-
-  let [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
   const { themeId } = useParams();
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [primary, setPrimary] = useState<string | null>(searchParams.get("primary"));
-  const [secondary, setSecondary] = useState<string | null>(searchParams.get("secondary"));
-  const [bg, setBg] = useState<string | null>(searchParams.get("bg"));
+  const [name, setName] = useState<string | null>(record.name);
+  const [primary, setPrimary] = useState<string | null>(record.primary);
+  const [secondary, setSecondary] = useState<string | null>(record.secondary);
+  const [bg, setBg] = useState<string | null>(record.bg);
   const mutation = useMutation({
     mutationFn: (newEdit: themeType) => {
       return axios.put(`http://localhost:3000/theme/${themeId}`, newEdit);

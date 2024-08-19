@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type customerReviewType = {
   id: string;
@@ -14,16 +14,14 @@ type customerReviewType = {
 };
 
 function EditCustomerReview() {
-  const [searchParams] = useSearchParams();
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [comment, setComment] = useState<string | null>(
-    searchParams.get("comment")
-  );
-  const [email, setEmail] = useState<string | null>(searchParams.get("email"));
-  const [phone, setPhone] = useState<string | null>(searchParams.get("phone"));
-  const [birthday, setBirthday] = useState<string | null>(
-    searchParams.get("birthday")
-  );
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
+  const [name, setName] = useState<string | null>(record.name);
+  const [comment, setComment] = useState<string | null>(record.comment);
+  const [email, setEmail] = useState<string | null>(record.email);
+  const [phone, setPhone] = useState<string | null>(record.phone);
+  const [birthday, setBirthday] = useState<string | null>(record.birthday);
   const { customerReviewId } = useParams();
   const navigate = useNavigate();
 

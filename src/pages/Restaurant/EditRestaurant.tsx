@@ -5,7 +5,6 @@ import {
   useLocation,
   useNavigate,
   useParams,
-  useSearchParams,
 } from "react-router-dom";
 
 type restaurantType = {
@@ -15,17 +14,16 @@ type restaurantType = {
   image: string | null;
 };
 function EditRestaurant() {
-  let [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const record = location.state;
   console.log(record);
 
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
+  const [name, setName] = useState<string | null>(record.name);
   const [description, setDescription] = useState<string | null>(
-    searchParams.get("description")
+    record.description
   );
   const [accessCode, setAccessCode] = useState<string | null>(
-    searchParams.get("accessCode")
+    record.accessCode
   );
   const [uploadImage, setUploadImage] = useState<string | null>();
   const { restaurantId } = useParams();

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 type ratingType = {
   score: number | null;
@@ -10,16 +10,12 @@ type ratingType = {
 };
 
 function EditRating() {
-  const [searchParams] = useSearchParams();
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [score, setScore] = useState<number | null>(
-    searchParams.get("score")
-      ? parseInt(searchParams.get("score") as string)
-      : null
-  );
-  const [comment, setComment] = useState<string | null>(
-    searchParams.get("comment")
-  );
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
+  const [name, setName] = useState<string | null>(record.name);
+  const [score, setScore] = useState<number | null>(record.score);
+  const [comment, setComment] = useState<string | null>(record.comment);
   const { ratingId } = useParams();
   const navigate = useNavigate();
 

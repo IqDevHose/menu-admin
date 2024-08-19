@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type questionType = {
   title: string | null;
@@ -12,21 +12,14 @@ type questionType = {
 };
 
 function EditQuestion() {
-  let [searchParams, setSearchParams] = useSearchParams();
-  const [description, setDescription] = useState<string | null>(
-    searchParams.get("description")
-  );
-  const [restaurantId, setrestaurantId] = useState<string | null>(
-    searchParams.get("restaurantId")
-  );
-  const [answer, setAnswer] = useState<string | null>(
-    searchParams.get("answer")
-  );
-  const p = useParams();
-  const [title, setTitle] = useState<string | null>(searchParams.get("title"));
-  const [enTitle, setEnTitle] = useState<string | null>(
-    searchParams.get("enTitle")
-  );
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
+  const [description, setDescription] = useState<string | null>(record.description);
+  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [answer, setAnswer] = useState<string | null>(record.answer);
+  const [title, setTitle] = useState<string | null>(record.title);
+  const [enTitle, setEnTitle] = useState<string | null>(record.enTitle);
   const { questionId } = useParams();
   const navigate = useNavigate();
 

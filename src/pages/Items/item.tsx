@@ -12,7 +12,7 @@ type itemReviewType = {
   description: string;
   price: number;
   categoryName: string;
-  image:string
+  image: string
 };
 
 // todo add type
@@ -137,9 +137,8 @@ const Item = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-items/${item?.name}?description=${
-                      item.description === null ? "" : item.description
-                    }&name=${item.name}&price=${item.price}&image=${item.image}`}
+                    to={`/edit-items/${item?.id}`}
+                    state={item}
                   >
                     <SquarePen />
                   </Link>

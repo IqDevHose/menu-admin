@@ -132,21 +132,7 @@ const theme = () => {
               <td className="px-6 py-4">{item?.bg}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link
-                    to={`/edit-theme/${item.id}?name=${
-                      item?.restaurant?.name === null
-                        ? ""
-                        : item?.restaurant?.name
-                    }&primary=${
-                      item?.primary === null
-                        ? ""
-                        : item?.primary.replace("#", "")
-                    }&secondary=${
-                      item?.secondary === null
-                        ? ""
-                        : item?.secondary.replace("#", "")
-                    }&bg=${item?.bg === null ? "" : item?.bg.replace("#", "")}`}
-                  >
+                  <Link to={`/edit-theme/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>

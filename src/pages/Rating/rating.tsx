@@ -130,14 +130,9 @@ const Rating = () => {
               <td className="px-6 py-4">{item.comment}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <Link
-                  to={`/edit-rating?score=${
-                    item.score !== undefined ? item.score : ""
-                  }&comment=${encodeURIComponent(
-                    item.comment || ""
-                  )}&name=${encodeURIComponent(
-                    item.customerReview.name || ""
-                  )}`}
+                  to={`/edit-rating`}
                   className="font-medium text-blue-600"
+                  state={item}
                 >
                   <SquarePen />
                 </Link>
