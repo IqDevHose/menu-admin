@@ -9,7 +9,6 @@ function AddItem() {
   const [price, setPrice] = useState<number | null>(null);
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
-  const [uploadImage, setUploadImage] = useState<File | null>(null);
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
@@ -18,7 +17,7 @@ function AddItem() {
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/restaurant");
       return response.data;
-    }
+    },
   });
 
   // Fetch categories based on selected restaurant
@@ -33,40 +32,32 @@ function AddItem() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (newItem: FormData) => {
-      console.log("Data being sent to API:", Array.from(newItem.entries())); // Debugging: log the FormData entries
+    mutationFn: async (newItem: any) => {
+      console.log("Data being sent to API:", newItem); // Debugging: log the data being sent
       return await axios.post(`http://localhost:3000/item`, newItem);
     },
     onSuccess: () => {
-      navigate("/item"); // Navigate back to the item list after successful addition
+      navigate("/items"); // Navigate back to the item list after successful addition
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description || "");
-    formData.append("price", price?.toString() || "0");
-    formData.append("restaurantId", restaurantId);
-    formData.append("categoryId", categoryId);
-
-    if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
-
-    // Log the data before submitting to check if it's correctly populated
-    console.log("Form data before sending:", {
+    // Create a simple object for the data
+    const newItem = {
       name,
       description,
-      price,
+      price: price !== null ? price : 0,
       restaurantId,
       categoryId,
-      uploadImage,
-    });
+    };
 
-    mutation.mutate(formData);
+    // Log the data before submitting to check if it's correctly populated
+    console.log("Form data before sending:", newItem);
+
+    // Submit the JSON data using the mutation
+    mutation.mutate(newItem);
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
@@ -193,26 +184,6 @@ function AddItem() {
               </option>
             )}
           </select>
-        </div>
-
-        {/* Upload Image */}
-        <div className="mb-4">
-          <label
-            htmlFor="upload-image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload Image
-          </label>
-          <input
-            type="file"
-            id="upload-image"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                setUploadImage(e.target.files[0]);
-              }
-            }}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
         </div>
 
         {/* Submit Button */}

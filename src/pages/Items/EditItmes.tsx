@@ -1,40 +1,83 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 
-type restaurantType = {
+type itemType = {
   name: string | null;
   description: string | null;
-  accessCode: string | null;
+  price: number | null;
+  restaurantId: string | null;
+  categoryId: string | null;
 };
-function EditItmes() {
+
+function EditItem() {
   let [searchParams, setSearchParams] = useSearchParams();
+
   const [name, setName] = useState<string | null>(searchParams.get("name"));
   const [description, setDescription] = useState<string | null>(
     searchParams.get("description")
   );
-  const [price, setPrice] = useState<string | null>(searchParams.get("price"));
-  const [accessCode, setAccessCode] = useState<string | null>(
-    searchParams.get("accessCode")
+  const [price, setPrice] = useState<number | null>(
+    searchParams.get("price") ? parseFloat(searchParams.get("price")!) : null
   );
-  const [uploadImage, setUploadImage] = useState<string | null>();
+  const [restaurantId, setRestaurantId] = useState<string | null>(
+    searchParams.get("restaurantId")
+  );
+  const [categoryId, setCategoryId] = useState<string | null>(
+    searchParams.get("categoryId")
+  );
   const { itemId } = useParams();
+
+  // Fetch restaurants from the server
+  const { data: restaurants, isLoading: isLoadingRestaurants, isError: isErrorRestaurants } = useQuery({
+    queryKey: ["restaurant"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:3000/restaurant");
+      return response.data;
+    },
+  });
+
+  // Fetch categories based on selected restaurant
+  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useQuery({
+    queryKey: ["categories", restaurantId],
+    queryFn: async () => {
+      if (!restaurantId) return [];
+      const response = await axios.get(`http://localhost:3000/category?restaurantId=${restaurantId}`);
+      return response.data;
+    },
+    enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
+  });
+
   const mutation = useMutation({
-    mutationFn: (newEdit: restaurantType) => {
+    mutationFn: (newEdit: itemType) => {
       return axios.put(`http://localhost:3000/item/${itemId}`, newEdit);
     },
   });
-  const handleSubmit = () => {
-    mutation.mutate({ name, description, accessCode });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const newEdit: itemType = {
+      name,
+      description,
+      price,
+      restaurantId,
+      categoryId,
+    };
+
+    mutation.mutate(newEdit);
   };
+
+  if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
+  if (isErrorRestaurants) return <div>Error loading restaurants</div>;
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Edit Item</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Restaurant Name */}
+        {/* Item Name */}
         <div className="mb-4">
           <label
             htmlFor="name"
@@ -48,10 +91,12 @@ function EditItmes() {
             value={name || ""}
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant name"
+            placeholder="Enter item name"
+            required
           />
         </div>
 
+        {/* Item Price */}
         <div className="mb-4">
           <label
             htmlFor="price"
@@ -60,14 +105,16 @@ function EditItmes() {
             Item Price
           </label>
           <input
-            type="text"
+            type="number"
             id="price"
-            value={price || ""}
-            onChange={(e) => setPrice(e.target.value)}
+            value={price !== null ? price : ""}
+            onChange={(e) => setPrice(parseFloat(e.target.value))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter Price"
+            placeholder="Enter price"
+            required
           />
         </div>
+
         {/* Description */}
         <div className="mb-4">
           <label
@@ -82,26 +129,72 @@ function EditItmes() {
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant description"
+            placeholder="Enter item description"
+            required
           />
         </div>
 
-        {/* upload image */}
+        {/* Restaurant Select */}
         <div className="mb-4">
           <label
-            htmlFor="access-code"
-            className="block text-sm font-medium text-gray-700 "
+            htmlFor="restaurantId"
+            className="block text-sm font-medium text-gray-700"
           >
-            Upload image
+            Restaurant
           </label>
-          <input
-            type="file"
-            id="upload-image"
-            value={uploadImage || ""}
-            onChange={(e) => setUploadImage(e.target.value)}
+          <select
+            id="restaurantId"
+            value={restaurantId || ""}
+            onChange={(e) => {
+              setRestaurantId(e.target.value);
+              setCategoryId(""); // Clear category when changing restaurant
+              refetchCategories();
+            }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Upload an image"
-          />
+            required
+          >
+            <option value="" disabled>
+              Select a restaurant
+            </option>
+            {restaurants.map((restaurant: any) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Category Select */}
+        <div className="mb-4">
+          <label
+            htmlFor="categoryId"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Category
+          </label>
+          <select
+            id="categoryId"
+            value={categoryId || ""}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
+            disabled={!restaurantId || isLoadingCategories}
+          >
+            <option value="" disabled>
+              {isLoadingCategories ? "Loading categories..." : "Select a category"}
+            </option>
+            {categories && categories.length > 0 ? (
+              categories.map((category: any) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                No categories available
+              </option>
+            )}
+          </select>
         </div>
 
         {/* Submit Button */}
@@ -118,4 +211,4 @@ function EditItmes() {
   );
 }
 
-export default EditItmes;
+export default EditItem;
