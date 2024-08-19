@@ -1,10 +1,10 @@
-import Popup from '@/components/Popup'
-import Spinner from '@/components/Spinner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { SquarePen, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Popup from "@/components/Popup";
+import Spinner from "@/components/Spinner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { SquarePen, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 type themeType = {
   id: string;
@@ -16,7 +16,7 @@ type themeType = {
 
 const theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState<themeType | null>(null);  // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -31,9 +31,9 @@ const theme = () => {
       await axios.delete(`http://localhost:3000/theme/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['theme'] });
+      queryClient.invalidateQueries({ queryKey: ["theme"] });
       setShowPopup(false); // Close the popup after successful deletion
-    }
+    },
   });
 
   const handleDeleteClick = (item: any) => {
@@ -48,9 +48,11 @@ const theme = () => {
   };
 
   if (query.isPending) {
-    return <div className="w-full h-screen flex items-center justify-center">
-      <Spinner />
-    </div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (query.isError) {
@@ -88,7 +90,7 @@ const theme = () => {
         </div>
         <button
           type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
+          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
         >
           Add theme
         </button>
@@ -112,8 +114,7 @@ const theme = () => {
               bg color
             </th>
             <th scope="col" className="px-6 py-3"></th>
-            <th scope="col" className="px-6 py-3">
-            </th>
+            <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
@@ -132,12 +133,27 @@ const theme = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-theme/${item.id}?name=${item?.restaurant?.name === null ? "" : item?.restaurant?.name}&primary=${item?.primary === null ? "" : item?.primary.replace('#', '')}&secondary=${item?.secondary === null ? "" : item?.secondary.replace('#', '')}&bg=${item?.bg === null ? "" : item?.bg.replace('#', '')}`}
+                    to={`/edit-theme/${item.id}?name=${
+                      item?.restaurant?.name === null
+                        ? ""
+                        : item?.restaurant?.name
+                    }&primary=${
+                      item?.primary === null
+                        ? ""
+                        : item?.primary.replace("#", "")
+                    }&secondary=${
+                      item?.secondary === null
+                        ? ""
+                        : item?.secondary.replace("#", "")
+                    }&bg=${item?.bg === null ? "" : item?.bg.replace("#", "")}`}
                   >
                     <SquarePen />
                   </Link>
                 </button>
-                <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
+                <button
+                  className="font-medium text-red-600"
+                  onClick={() => handleDeleteClick(item)}
+                >
                   <Trash2 />
                 </button>
               </td>
@@ -159,7 +175,7 @@ const theme = () => {
         </Popup>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default theme
+export default theme;

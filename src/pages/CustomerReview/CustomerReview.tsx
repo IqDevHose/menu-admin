@@ -18,13 +18,16 @@ type customerReviewType = {
 
 const CustomerReview = () => {
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedCustomerReview, setSelectedCustomerReview] = useState<customerReviewType | null>(null);
+  const [selectedCustomerReview, setSelectedCustomerReview] =
+    useState<customerReviewType | null>(null);
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ["customerReview"],
     queryFn: async () => {
-      const customerReview = await axios.get("http://localhost:3000/customer-review");
+      const customerReview = await axios.get(
+        "http://localhost:3000/customer-review"
+      );
       return customerReview.data;
     },
   });
@@ -69,10 +72,12 @@ const CustomerReview = () => {
     }
   };
 
-    if (query.isPending) {
-    return <div className="w-full h-screen flex items-center justify-center">
-      <Spinner />
-    </div>;
+  if (query.isPending) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (query.isError) {
@@ -108,24 +113,39 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
-        <button
-        type="button"
-        className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg py-2.5 mb-2 px-5"
-      >
-        <Link to="/add-customer-review">Add Customer Review</Link>
-      </button>
-
+        <Link to="/add-customer-review">
+          <button
+            type="button"
+            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
+          >
+            Add Customer Review
+          </button>
+        </Link>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4">#</th>
-            <th scope="col" className="px-6 py-3 w-4">Name</th>
-            <th scope="col" className="px-6 py-3">Comment</th>
-            <th scope="col" className="px-6 py-3">Avg Rating</th>
-            <th scope="col" className="px-6 py-3">Phone</th>
-            <th scope="col" className="px-6 py-3">Email</th>
-            <th scope="col" className="px-6 py-3">Birthday</th>
+            <th scope="col" className="px-6 py-3 w-4">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3 w-4">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Comment
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Avg Rating
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Phone
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Email
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Birthday
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -133,19 +153,27 @@ const CustomerReview = () => {
           {query.data?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.name}</td>
+              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                {item.name}
+              </td>
               <td className="px-6 py-4">{item.comment}</td>
               <td className="px-6 py-4">{summation(item.rating)}</td>
               <td className="px-6 py-4">{item.phone}</td>
               <td className="px-6 py-4">{item.email}</td>
               <td className="px-6 py-4">{item.birthday}</td>
               <td className="px-6 py-4 flex gap-x-4">
-              <Link
-                to={`/edit-customer-review?id=${item.id}&name=${encodeURIComponent(item.name || '')}&comment=${encodeURIComponent(item.comment || '')}&email=${encodeURIComponent(item.email || '')}`}
-                className="font-medium text-blue-600"
-              >
-                <SquarePen />
-              </Link>
+                <Link
+                  to={`/edit-customer-review?id=${
+                    item.id
+                  }&name=${encodeURIComponent(
+                    item.name || ""
+                  )}&comment=${encodeURIComponent(
+                    item.comment || ""
+                  )}&email=${encodeURIComponent(item.email || "")}`}
+                  className="font-medium text-blue-600"
+                >
+                  <SquarePen />
+                </Link>
 
                 <button
                   className="font-medium text-red-600"

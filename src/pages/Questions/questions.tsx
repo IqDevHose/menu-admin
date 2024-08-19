@@ -91,12 +91,14 @@ const Questions = () => {
             placeholder="Search for items"
           />
         </div>
-        <button
-          type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
-        >
-          <Link to={"/add-question"}>Add Question</Link>
-        </button>
+        <Link to={"/add-question"}>
+          <button
+            type="button"
+            className="text-white bg-gray-800 hover:bg-gray-900  font-medium rounded-lg  py-2.5  mb-2 px-5"
+          >
+            Add Question
+          </button>
+        </Link>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
@@ -127,11 +129,12 @@ const Questions = () => {
         </thead>
         <tbody>
           {query.data?.map((item: any, index: number) => (
-            <tr  key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">
-                {index + 1}
-              </td>
-              <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+              <td className="px-6 py-4">{index + 1}</td>
+              <td
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+              >
                 {item.resturant?.name}
               </td>
               <td className="px-6 py-4">{item.title}</td>
