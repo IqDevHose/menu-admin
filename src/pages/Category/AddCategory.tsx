@@ -37,7 +37,7 @@ function AddCategory() {
     const newCategory: CreateCategoryDto = {
       name,
       restaurantId,
-      icon: uploadImage || null, // If your backend doesn't handle this, omit this line
+      icon: uploadImage || null, 
     };
 
     mutation.mutate(newCategory);

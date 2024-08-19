@@ -7,7 +7,6 @@ type itemType = {
   name: string | null;
   description: string | null;
   price: number | null;
-  restaurantId: string | null;
   categoryId: string | null;
 };
 
@@ -55,18 +54,8 @@ function EditItem() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const newEdit: itemType = {
-      name,
-      description,
-      price,
-      restaurantId,
-      categoryId,
-    };
-
-    mutation.mutate(newEdit);
+  const handleSubmit = () => {
+    mutation.mutate({ name, description, price, categoryId });
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;

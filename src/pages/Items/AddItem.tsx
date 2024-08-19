@@ -41,23 +41,8 @@ function AddItem() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Create a simple object for the data
-    const newItem = {
-      name,
-      description,
-      price: price !== null ? price : 0,
-      restaurantId,
-      categoryId,
-    };
-
-    // Log the data before submitting to check if it's correctly populated
-    console.log("Form data before sending:", newItem);
-
-    // Submit the JSON data using the mutation
-    mutation.mutate(newItem);
+  const handleSubmit = () => {
+    mutation.mutate({ name, description, price, categoryId });
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
