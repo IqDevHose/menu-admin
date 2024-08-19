@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+
 
 type CreateCategoryDto = {
   name: string;
@@ -13,7 +13,6 @@ function AddCategory() {
   const [name, setName] = useState<string>("");
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [uploadImage, setUploadImage] = useState<File | null>(null);
-  const { categoryId } = useParams();
 
   // Fetch restaurants from the server
   const { data: restaurants, isLoading, isError } = useQuery({
@@ -25,33 +24,27 @@ function AddCategory() {
   });
 
   const mutation = useMutation({
-    mutationFn: (newCategory: FormData) => {
-      return axios.post(`http://localhost:3000/category/${categoryId}`, newCategory, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+    mutationFn: (newCategory: CreateCategoryDto) => {
+      return axios.post(`http://localhost:3000/category`, newCategory
+
+      );
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("restaurantId", restaurantId);
+    const newCategory: CreateCategoryDto = {
+      name,
+      restaurantId,
+      icon: uploadImage || null, // If your backend doesn't handle this, omit this line
+    };
 
-    if (uploadImage) {
-      formData.append("icon", uploadImage);
-    }
-
-    mutation.mutate(formData);
+    mutation.mutate(newCategory);
   };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading restaurants</div>;
-
-  console.log("Fetched restaurants:", restaurants);
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
