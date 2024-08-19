@@ -14,6 +14,8 @@ import EditCustomerReview from "./pages/CustomerReview/EditCustomerReview";
 import EditCategory from "./pages/Category/EditCategory";
 import EditItmes from "./pages/Items/EditItmes";
 import EditQuestion from "./pages/Questions/EditQuestion";
+import AddItem from "./pages/Items/AddItem";
+import AddCustomerReview from "./pages/CustomerReview/AddCustomerReview";
 
 function App() {
 
@@ -27,10 +29,12 @@ function App() {
         <Route path="/edit-restaurant" element={<EditRestaurant />} />
         <Route path="/edit-rating" element={<EditRating />} />
         <Route path="/edit-customer-review" element={<EditCustomerReview />} />
+        <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/category" element={<Category />}></Route>
         <Route path="/edit-category/:categoryId" element={<EditCategory />}></Route>
         <Route path="/items" element={<Item />}></Route>
         <Route path="/edit-items" element={<EditItmes />}></Route>
+        <Route path="/add-item" element={<AddItem />} />
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
         <Route path="/questions" element={<Questions />}></Route>

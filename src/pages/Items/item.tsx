@@ -24,14 +24,14 @@ const Item = () => {
   const query = useQuery({
     queryKey: ["item"],
     queryFn: async () => {
-      const item = await axios.get("http://192.168.88.35:3000/item");
+      const item = await axios.get("http://localhost:3000/item");
       return item.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id:string) => {
-      await axios.delete(`http://192.168.88.35:3000/item/${id}`);
+      await axios.delete(`http://localhost:3000/item/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["item"] });
@@ -90,11 +90,12 @@ const Item = () => {
           />
         </div>
         <button
-          type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
-        >
-          Add Item
-        </button>
+        type="button"
+        className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
+      >
+        <Link to="/add-item">Add Item</Link>
+      </button>
+
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">

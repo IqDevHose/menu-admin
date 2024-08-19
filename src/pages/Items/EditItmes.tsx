@@ -24,7 +24,7 @@ function EditItmes() {
   const { categoryId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
-      return axios.put(`http://192.168.88.35:3000/${categoryId}`, newEdit);
+      return axios.put(`http://localhost:3000/${categoryId}`, newEdit);
     },
   });
   const handleSubmit = () => {
