@@ -8,6 +8,8 @@ type customerReviewType = {
   name: string;
   comment: string;
   email: string;
+  phone: string;
+  birthday: string;
 };
 
 function EditCustomerReview() {
@@ -15,6 +17,8 @@ function EditCustomerReview() {
   const [name, setName] = useState<string | null>(searchParams.get("name"));
   const [comment, setComment] = useState<string | null>(searchParams.get("comment"));
   const [email, setEmail] = useState<string | null>(searchParams.get("email"));
+  const [phone, setPhone] = useState<string | null>(searchParams.get("phone"));
+  const [birthday, setBirthday] = useState<string | null>(searchParams.get("birthday"));
   const { id } = useParams();
 
   const mutation = useMutation({
@@ -23,8 +27,16 @@ function EditCustomerReview() {
     },
   });
 
-  const handleSubmit = () => {
-    mutation.mutate({ id: id as string, name: name as string, comment: comment as string, email: email as string });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({
+      id: id as string,
+      name: name as string,
+      comment: comment as string,
+      email: email as string,
+      phone: phone as string,
+      birthday: birthday as string,
+    });
   };
 
   return (
@@ -43,6 +55,7 @@ function EditCustomerReview() {
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter customer name"
+            required
           />
         </div>
 
@@ -57,6 +70,7 @@ function EditCustomerReview() {
             rows={4}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter comment"
+            required
           />
         </div>
 
@@ -71,6 +85,36 @@ function EditCustomerReview() {
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter customer email"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            Phone
+          </label>
+          <input
+            type="text"
+            id="phone"
+            value={phone || ""}
+            onChange={(e) => setPhone(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Enter customer phone"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+            Birthday
+          </label>
+          <input
+            type="date"
+            id="birthday"
+            value={birthday || ""}
+            onChange={(e) => setBirthday(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
           />
         </div>
 

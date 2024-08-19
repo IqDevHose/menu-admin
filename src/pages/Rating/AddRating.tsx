@@ -1,28 +1,26 @@
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type ratingType = {
+  name: string | null;
   score: number | null;
   comment: string | null;
-  name: string | null;
 };
 
-function EditRating() {
-  const [searchParams] = useSearchParams();
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [score, setScore] = useState<number | null>(
-    searchParams.get("score") ? parseInt(searchParams.get("score") as string) : null
-  );
-  const [comment, setComment] = useState<string | null>(
-    searchParams.get("comment")
-  );
-  const { ratingId } = useParams();
-  
+function AddRating() {
+  const [name, setName] = useState<string | null>("");
+  const [score, setScore] = useState<number | null>(null);
+  const [comment, setComment] = useState<string | null>("");
+  const navigate = useNavigate();
+
   const mutation = useMutation({
-    mutationFn: (newEdit: ratingType) => {
-      return axios.put(`http://localhost:3000/ratings/${ratingId}`, newEdit);
+    mutationFn: (newRating: ratingType) => {
+      return axios.post("http://localhost:3000/rating", newRating);
+    },
+    onSuccess: () => {
+      navigate("/"); // Navigate back to the ratings list after successful addition
     },
   });
 
@@ -33,7 +31,7 @@ function EditRating() {
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Edit Rating</h2>
+      <h2 className="text-2xl font-bold mb-6">Add Rating</h2>
 
       <form onSubmit={handleSubmit}>
         {/* Name */}
@@ -101,7 +99,7 @@ function EditRating() {
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Save Changes
+            Add Rating
           </button>
         </div>
       </form>
@@ -109,4 +107,4 @@ function EditRating() {
   );
 }
 
-export default EditRating;
+export default AddRating;

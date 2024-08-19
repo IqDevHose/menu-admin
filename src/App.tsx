@@ -16,6 +16,7 @@ import EditItmes from "./pages/Items/EditItmes";
 import EditQuestion from "./pages/Questions/EditQuestion";
 import AddItem from "./pages/Items/AddItem";
 import AddCustomerReview from "./pages/CustomerReview/AddCustomerReview";
+import AddRating from "./pages/Rating/AddRating";
 
 function App() {
 
@@ -28,6 +29,8 @@ function App() {
         <Route path="/restaurant" element={<Restaurant />} />
         <Route path="/edit-restaurant" element={<EditRestaurant />} />
         <Route path="/edit-rating" element={<EditRating />} />
+        <Route path="/add-rating" element={<AddRating />} />
+
         <Route path="/edit-customer-review" element={<EditCustomerReview />} />
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/category" element={<Category />}></Route>

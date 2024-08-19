@@ -21,7 +21,7 @@ function AddItem() {
       });
     },
     onSuccess: () => {
-      navigate("/"); // Navigate back to the item list after successful addition
+      navigate("/item"); // Navigate back to the item list after successful addition
     },
   });
 
