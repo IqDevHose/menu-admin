@@ -19,18 +19,18 @@ function EditCustomerReview() {
   const [email, setEmail] = useState<string | null>(searchParams.get("email"));
   const [phone, setPhone] = useState<string | null>(searchParams.get("phone"));
   const [birthday, setBirthday] = useState<string | null>(searchParams.get("birthday"));
-  const { id } = useParams();
+  const { customerReviewId } = useParams();
 
   const mutation = useMutation({
     mutationFn: (updatedReview: customerReviewType) => {
-      return axios.put(`http://localhost:3000/customer-review/${id}`, updatedReview);
+      return axios.put(`http://localhost:3000/customer-review/${customerReviewId}`, updatedReview);
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate({
-      id: id as string,
+      id: customerReviewId as string,
       name: name as string,
       comment: comment as string,
       email: email as string,

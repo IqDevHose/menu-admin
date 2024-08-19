@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type customerReviewType = {
   name: string;
@@ -14,10 +14,11 @@ function AddCustomerReview() {
   const [comment, setComment] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const navigate = useNavigate();
+  const { customerReviewId } = useParams();
 
   const mutation = useMutation({
     mutationFn: (newReview: customerReviewType) => {
-      return axios.post("http://localhost:3000/customer-review", newReview);
+      return axios.post(`http://localhost:3000/customer-review/${customerReviewId}`, newReview);
     },
     onSuccess: () => {
       navigate("/"); // Navigate back to the customer reviews list after successful addition

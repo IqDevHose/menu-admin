@@ -34,10 +34,10 @@ function App() {
           element={<EditRestaurant />}
         />
         <Route path="/add-restaurant" element={<AddRestaurant />} />
-        <Route path="/edit-rating" element={<EditRating />} />
+        <Route path="/edit-rating:ratingId" element={<EditRating />} />
         <Route path="/add-rating" element={<AddRating />} />
 
-        <Route path="/edit-customer-review" element={<EditCustomerReview />} />
+        <Route path="/edit-customer-review/:customer-reviewId" element={<EditCustomerReview />} />
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/category" element={<Category />}></Route>
         <Route

@@ -15,9 +15,7 @@ function AddItem() {
     mutationFn: async (newItem: FormData) => {
       console.log('Data being sent to API:', Array.from(newItem.entries())); // Debugging: log the FormData entries
       return await axios.post("http://localhost:3000/item", newItem, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        
       });
     },
     onSuccess: () => {
