@@ -37,7 +37,7 @@ function App() {
         <Route path="/questions" element={<Questions />}></Route>
         <Route path="/edit-questions/:questionId" element={<EditQuestion />}></Route>
         <Route path="/theme" element={<Theme />}></Route>
-        <Route path="/edit-theme/:restaurantId" element={<EditTheme />}></Route>
+        <Route path="/edit-theme/:themeId" element={<EditTheme />}></Route>
       </Routes>
     </div>
   );

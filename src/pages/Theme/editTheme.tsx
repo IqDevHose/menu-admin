@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom';
 
-type restaurantType = {
+type themeType = {
   name: string | null;
   primary: string | null;
   secondary: string | null;
@@ -12,19 +12,18 @@ type restaurantType = {
 function EditTheme() {
 
   let [searchParams, setSearchParams] = useSearchParams();
-  const { restaurantId } = useParams();
+  const { themeId } = useParams();
   const [name, setName] = useState<string | null>(searchParams.get("name"));
   const [primary, setPrimary] = useState<string | null>(searchParams.get("primary"));
   const [secondary, setSecondary] = useState<string | null>(searchParams.get("secondary"));
-  console.log(searchParams.get("name"), searchParams.get("secondary"), searchParams.get("primary"))
   const [bg, setBg] = useState<string | null>(searchParams.get("bg"));
   const mutation = useMutation({
-    mutationFn: (newEdit: restaurantType) => {
-      return axios.put(`http://localhost:3000/${restaurantId}`, newEdit);
+    mutationFn: (newEdit: themeType) => {
+      return axios.put(`http://localhost:3000/theme/${themeId}`, newEdit);
     },
   });
   const handleSubmit = () => {
-    mutation.mutate({ name, theme: { primary, secondary, bg } });
+    mutation.mutate({ name, primary, secondary, bg });
   };
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">

@@ -6,34 +6,32 @@ import { SquarePen, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-type restaurantType = {
+type themeType = {
   id: string;
   name: string;
-  theme: {
-    primary: string;
-    secondary: string;
-    bg: string;
-  }
+  primary: string;
+  secondary: string;
+  bg: string;
 };
 
 const theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState<restaurantType | null>(null);  // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<themeType | null>(null);  // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["restaurant"],
+    queryKey: ["theme"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
-      return res.data;
+      const theme = await axios.get("http://localhost:3000/theme");
+      return theme.data;
     },
   });
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/restaurant/${id}`);
+      await axios.delete(`http://localhost:3000/theme/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['restaurant'] });
+      queryClient.invalidateQueries({ queryKey: ['theme'] });
       setShowPopup(false); // Close the popup after successful deletion
     }
   });
@@ -126,15 +124,15 @@ const theme = () => {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
               >
-                {item.name}
+                {item?.restaurant?.name}
               </td>
-              <td className="px-6 py-4">{item?.theme?.primary}</td>
-              <td className="px-6 py-4">{item?.theme?.secondary}</td>
-              <td className="px-6 py-4">{item?.theme?.bg}</td>
+              <td className="px-6 py-4">{item?.primary}</td>
+              <td className="px-6 py-4">{item?.secondary}</td>
+              <td className="px-6 py-4">{item?.bg}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-theme/${item.id}?name=${item?.name === null ? "" : item?.name}&primary=${item?.theme?.primary === null ? "" : item?.theme?.primary.replace('#', '')}&secondary=${item?.theme?.secondary === null ? "" : item?.theme?.secondary.replace('#', '')}&bg=${item?.theme?.bg === null ? "" : item?.theme?.bg.replace('#', '')}`}
+                    to={`/edit-theme/${item.id}?name=${item?.restaurant?.name === null ? "" : item?.restaurant?.name}&primary=${item?.primary === null ? "" : item?.primary.replace('#', '')}&secondary=${item?.secondary === null ? "" : item?.secondary.replace('#', '')}&bg=${item?.bg === null ? "" : item?.bg.replace('#', '')}`}
                   >
                     <SquarePen />
                   </Link>
