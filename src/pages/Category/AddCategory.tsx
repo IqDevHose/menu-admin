@@ -1,29 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 type categoryType = {
   name: string | null;
   restaurantId: string | null;
 };
-function EditCategory() {
-  let [searchParams, setSearchParams] = useSearchParams();
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [description, setDescription] = useState<string | null>(
-    searchParams.get("description")
-  );
-  const [restaurantName, setRestaurantName] = useState<string | null>(
-    searchParams.get("restaurantName")
-  );
-  const [restaurantId, setRestaurantId] = useState<string | null>(
-    searchParams.get("restaurantId")
-  );
-  const [uploadImage, setUploadImage] = useState<string | null>();
+function AddCategory() {
+  const [name, setName] = useState<string | null>("");
+  const [restaurantName, setRestaurantName] = useState<string | null>("");
+  const [restaurantId, setRestaurantId] = useState<string | null>("");
+  const [uploadImage, setUploadImage] = useState<string | null>("");
   const { categoryId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: categoryType) => {
-      return axios.put(`http://localhost:3000/category/${categoryId}`, newEdit);
+      return axios.put(`http://localhost:3000/${categoryId}`, newEdit);
     },
   });
   const handleSubmit = () => {
@@ -32,10 +24,10 @@ function EditCategory() {
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Edit Category</h2>
+      <h2 className="text-2xl font-bold mb-6">Add Category</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Restaurant Name */}
+        {/* Category Name */}
         <div className="mb-4">
           <label
             htmlFor="name"
@@ -103,4 +95,4 @@ function EditCategory() {
   );
 }
 
-export default EditCategory;
+export default AddCategory;

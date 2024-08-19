@@ -11,26 +11,16 @@ type questionType = {
   answer: string | null;
 };
 
-function EditQuestion() {
-  let [searchParams, setSearchParams] = useSearchParams();
-  const [description, setDescription] = useState<string | null>(
-    searchParams.get("description")
-  );
-  const [restaurantId, setrestaurantId] = useState<string | null>(
-    searchParams.get("restaurantId")
-  );
-  const [answer, setAnswer] = useState<string | null>(
-    searchParams.get("answer")
-  );
-  const p = useParams();
-  const [title, setTitle] = useState<string | null>(searchParams.get("title"));
-  const [enTitle, setEnTitle] = useState<string | null>(
-    searchParams.get("enTitle")
-  );
+function AddQuestion() {
+  const [description, setDescription] = useState<string | null>("");
+  const [restaurantId, setrestaurantId] = useState<string | null>("");
+  const [answer, setanswer] = useState<string | null>("");
+  const [title, setTitle] = useState<string | null>("");
+  const [enTitle, setEnTitle] = useState<string | null>("");
   const { questionId } = useParams();
   const mutation = useMutation({
-    mutationFn: (newEdit: questionType) => {
-      return axios.put(`http://localhost:3000/question/${questionId}`, newEdit);
+    mutationFn: (newQuestion: questionType) => {
+      return axios.post(`http://localhost:3000/${questionId}`, newQuestion);
     },
   });
   const handleSubmit = () => {
@@ -39,7 +29,7 @@ function EditQuestion() {
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Edit Question</h2>
+      <h2 className="text-2xl font-bold mb-6">Add Question</h2>
 
       <form onSubmit={handleSubmit}>
         {/* title */}
@@ -96,24 +86,6 @@ function EditQuestion() {
           />
         </div>
 
-        {/* Answer */}
-        <div className="mb-4">
-          <label
-            htmlFor="answer"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Answer
-          </label>
-          <input
-            type="text"
-            id="answer"
-            value={answer || ""}
-            onChange={(e) => setAnswer(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter Answer"
-          />
-        </div>
-
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
@@ -128,4 +100,4 @@ function EditQuestion() {
   );
 }
 
-export default EditQuestion;
+export default AddQuestion;

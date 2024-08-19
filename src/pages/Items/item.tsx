@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { SquarePen, Trash2 } from 'lucide-react';
-import Popup from '@/components/Popup';
-import { Link } from 'react-router-dom';
-import Spinner from '@/components/Spinner';
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { SquarePen, Trash2 } from "lucide-react";
+import Popup from "@/components/Popup";
+import { Link } from "react-router-dom";
+import Spinner from "@/components/Spinner";
 
 type itemReviewType = {
   id: string;
@@ -13,7 +13,6 @@ type itemReviewType = {
   price: number;
   categoryName: string;
 };
-
 
 // todo add type
 const Item = () => {
@@ -30,7 +29,7 @@ const Item = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: async (id:string) => {
+    mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/item/${id}`);
     },
     onSuccess: () => {
@@ -50,10 +49,12 @@ const Item = () => {
     }
   };
 
-    if (query.isPending) {
-    return <div className="w-full h-screen flex items-center justify-center">
-      <Spinner />
-    </div>;
+  if (query.isPending) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (query.isError) {
@@ -119,8 +120,7 @@ const Item = () => {
           </tr>
         </thead>
         <tbody>
-        {query.data?.map((item: itemReviewType, index: number) => (
-
+          {query.data?.map((item: itemReviewType, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td
