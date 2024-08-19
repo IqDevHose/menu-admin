@@ -16,6 +16,7 @@ import EditItmes from "./pages/Items/EditItmes";
 import EditQuestion from "./pages/Questions/EditQuestion";
 import AddRestaurant from "./pages/Restaurant/AddRestaurant";
 import AddCategory from "./pages/Category/AddCategory";
+import AddQuestion from "./pages/Questions/AddQuestion";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
           path="/edit-questions/:questionId"
           element={<EditQuestion />}
         ></Route>
+        <Route path="/add-question" element={<AddQuestion />}></Route>
+
         <Route path="/theme" element={<Theme />}></Route>
       </Routes>
     </div>
