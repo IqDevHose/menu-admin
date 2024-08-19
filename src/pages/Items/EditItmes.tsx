@@ -8,6 +8,7 @@ type itemType = {
   description: string | null;
   price: number | null;
   categoryId: string | null;
+  image:string | null;
 };
 
 function EditItem() {
@@ -22,6 +23,9 @@ function EditItem() {
   );
   const [restaurantId, setRestaurantId] = useState<string | null>(
     searchParams.get("restaurantId")
+  );
+  const [image, setImage] = useState<string | null>(
+    searchParams.get("image")
   );
   const [categoryId, setCategoryId] = useState<string | null>(
     searchParams.get("categoryId")
@@ -69,7 +73,7 @@ function EditItem() {
   });
 
   const handleSubmit = () => {
-    mutation.mutate({ name, description, price, categoryId });
+    mutation.mutate({ name, description, price, categoryId, image});
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;

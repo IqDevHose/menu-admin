@@ -42,7 +42,7 @@ function AddItem() {
   });
 
   const handleSubmit = () => {
-    mutation.mutate({ name, description, price, categoryId });
+    mutation.mutate({ name, description, price, image:null, categoryId });
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
