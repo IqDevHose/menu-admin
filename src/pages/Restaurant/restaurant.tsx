@@ -136,6 +136,7 @@ const Restaurant = () => {
                     to={`/edit-restaurant/${item.id}?description=${
                       item.description === null ? "" : item.description
                     }&accessCode=${item.accessCode}&name=${item.name}`}
+                    state={item}
                   >
                     <SquarePen />
                   </Link>

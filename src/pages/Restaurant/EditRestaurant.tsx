@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 type restaurantType = {
   name: string | null;
@@ -11,6 +11,10 @@ type restaurantType = {
 };
 function EditRestaurant() {
   let [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const record = location.state;
+  console.log(record);
+  
   const [name, setName] = useState<string | null>(searchParams.get("name"));
   const [description, setDescription] = useState<string | null>(
     searchParams.get("description")
