@@ -10,12 +10,11 @@ function AddItem() {
   const [categoryId, setCategoryId] = useState<string>(""); // Ensure this is populated
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const navigate = useNavigate();
-  const { itemId } = useParams();
 
   const mutation = useMutation({
     mutationFn: async (newItem: FormData) => {
       console.log("Data being sent to API:", Array.from(newItem.entries())); // Debugging: log the FormData entries
-      return await axios.post(`http://localhost:3000/item/${itemId}`, newItem);
+      return await axios.post(`http://localhost:3000/item`, newItem);
     },
     onSuccess: () => {
       navigate("/item"); // Navigate back to the item list after successful addition
