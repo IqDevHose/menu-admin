@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -10,6 +10,7 @@ type customerReviewType = {
   email: string;
   phone: string;
   birthday: string;
+  resturantId: string;
 };
 
 function EditCustomerReview() {
@@ -20,6 +21,17 @@ function EditCustomerReview() {
   const [phone, setPhone] = useState<string | null>(searchParams.get("phone"));
   const [birthday, setBirthday] = useState<string | null>(searchParams.get("birthday"));
   const { customerReviewId } = useParams();
+
+  const query = useQuery({
+    queryKey: ["customerReview"],
+    queryFn: async () => {
+      const customerReview = await axios.get(
+        `http://localhost:3000/customer-review/${customerReviewId}`
+      );
+      console.log(customerReview.data);
+      return customerReview.data;
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: (updatedReview: customerReviewType) => {
@@ -36,6 +48,7 @@ function EditCustomerReview() {
       email: email as string,
       phone: phone as string,
       birthday: birthday as string,
+      resturantId: query.data.resturant.id
     });
   };
 
@@ -117,6 +130,22 @@ function EditCustomerReview() {
             required
           />
         </div>
+
+        <div className="mb-4">
+          <label htmlFor="restaurant" className="block text-sm font-medium text-gray-700">
+            restaurant
+          </label>
+          <input
+            type="text"
+            id="restaurant"
+            disabled
+            value={query?.data?.resturant?.name}
+            className="mt-1 block w-full rounded-md text-gray-400 bg-gray-50 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
+            placeholder={query?.data?.resturant?.name}
+          />
+        </div>
+
 
         <div className="flex justify-end">
           <button

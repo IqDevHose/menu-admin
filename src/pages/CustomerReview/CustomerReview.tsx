@@ -28,6 +28,7 @@ const CustomerReview = () => {
       const customerReview = await axios.get(
         "http://localhost:3000/customer-review"
       );
+      console.log(typeof (customerReview.data))
       return customerReview.data;
     },
   });
@@ -150,7 +151,7 @@ const CustomerReview = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
+          {Array.isArray(query.data) && query?.data?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -163,13 +164,8 @@ const CustomerReview = () => {
               <td className="px-6 py-4">{item.birthday}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <Link
-                  to={`/edit-customer-review?id=${
-                    item.id
-                  }&name=${encodeURIComponent(
-                    item.name || ""
-                  )}&comment=${encodeURIComponent(
-                    item.comment || ""
-                  )}&email=${encodeURIComponent(item.email || "")}`}
+                  to={`/edit-customer-review/${item.id}?id=${item.id
+                    }&name=${item.name === null ? "" : item.name}&comment=${item.comment === null ? "" : item.comment}&email=${item.email === null ? "" : item.email}&phone=${item.phone === null ? "" : item.phone}&birthday=${item.birthday === null ? "" : item.birthday}`}
                   className="font-medium text-blue-600"
                 >
                   <SquarePen />
