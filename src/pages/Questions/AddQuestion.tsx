@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type questionType = {
   title: string | null;
@@ -17,9 +17,14 @@ function AddQuestion() {
   const [answer, setanswer] = useState<string | null>("");
   const [title, setTitle] = useState<string | null>("");
   const [enTitle, setEnTitle] = useState<string | null>("");
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: (newQuestion: questionType) => {
       return axios.post(`http://localhost:3000/question`, newQuestion);
+    },
+    onSuccess: () => {
+      navigate("/question"); // Navigate back to the item list after successful addition
     },
   });
   const handleSubmit = () => {

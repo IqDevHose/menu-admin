@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type itemType = {
   name: string | null;
@@ -27,9 +27,14 @@ function EditItem() {
     searchParams.get("categoryId")
   );
   const { itemId } = useParams();
+  const navigate = useNavigate();
 
   // Fetch restaurants from the server
-  const { data: restaurants, isLoading: isLoadingRestaurants, isError: isErrorRestaurants } = useQuery({
+  const {
+    data: restaurants,
+    isLoading: isLoadingRestaurants,
+    isError: isErrorRestaurants,
+  } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/restaurant");
@@ -38,11 +43,17 @@ function EditItem() {
   });
 
   // Fetch categories based on selected restaurant
-  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useQuery({
+  const {
+    data: categories,
+    isLoading: isLoadingCategories,
+    refetch: refetchCategories,
+  } = useQuery({
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
       if (!restaurantId) return [];
-      const response = await axios.get(`http://localhost:3000/category?restaurantId=${restaurantId}`);
+      const response = await axios.get(
+        `http://localhost:3000/category?restaurantId=${restaurantId}`
+      );
       return response.data;
     },
     enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
@@ -51,6 +62,9 @@ function EditItem() {
   const mutation = useMutation({
     mutationFn: (newEdit: itemType) => {
       return axios.put(`http://localhost:3000/item/${itemId}`, newEdit);
+    },
+    onSuccess: () => {
+      navigate("/items"); // Navigate back to the item list after successful addition
     },
   });
 
@@ -170,7 +184,9 @@ function EditItem() {
             disabled={!restaurantId || isLoadingCategories}
           >
             <option value="" disabled>
-              {isLoadingCategories ? "Loading categories..." : "Select a category"}
+              {isLoadingCategories
+                ? "Loading categories..."
+                : "Select a category"}
             </option>
             {categories && categories.length > 0 ? (
               categories.map((category: any) => (
