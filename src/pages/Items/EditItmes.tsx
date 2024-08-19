@@ -14,9 +14,7 @@ function EditItmes() {
   const [description, setDescription] = useState<string | null>(
     searchParams.get("description")
   );
-  const [price, setPrice] = useState<string | null>(
-    searchParams.get("price")
-  );
+  const [price, setPrice] = useState<string | null>(searchParams.get("price"));
   const [accessCode, setAccessCode] = useState<string | null>(
     searchParams.get("accessCode")
   );
@@ -24,7 +22,7 @@ function EditItmes() {
   const { categoryId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
-      return axios.put(`http://192.168.88.35:3000/${categoryId}`, newEdit);
+      return axios.put(`http://localhost:3000/item/${categoryId}`, newEdit);
     },
   });
   const handleSubmit = () => {
@@ -59,7 +57,7 @@ function EditItmes() {
             htmlFor="price"
             className="block text-sm font-medium text-gray-700"
           >
-            Item Price 
+            Item Price
           </label>
           <input
             type="text"
@@ -120,4 +118,4 @@ function EditItmes() {
   );
 }
 
-export default EditItmes
+export default EditItmes;

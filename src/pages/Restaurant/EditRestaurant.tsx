@@ -7,7 +7,7 @@ type restaurantType = {
   name: string | null;
   description: string | null;
   accessCode: string | null;
-  image: string | null
+  image: string | null;
 };
 function EditRestaurant() {
   let [searchParams, setSearchParams] = useSearchParams();
@@ -22,11 +22,14 @@ function EditRestaurant() {
   const { restaurantId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
-      return axios.put(`http://localhost:3000/${restaurantId}`, newEdit);
+      return axios.put(
+        `http://localhost:3000/restaurant/${restaurantId}`,
+        newEdit
+      );
     },
   });
   const handleSubmit = () => {
-    mutation.mutate({ name, description, accessCode,image:null });
+    mutation.mutate({ name, description, accessCode, image: null });
   };
 
   return (

@@ -30,7 +30,7 @@ function EditQuestion() {
   const { questionId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: questionType) => {
-      return axios.put(`http://localhost:3000/${questionId}`, newEdit);
+      return axios.put(`http://localhost:3000/question/${questionId}`, newEdit);
     },
   });
   const handleSubmit = () => {
