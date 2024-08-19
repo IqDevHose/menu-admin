@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function AddItem() {
   const [name, setName] = useState<string>("");
@@ -10,15 +10,12 @@ function AddItem() {
   const [categoryId, setCategoryId] = useState<string>(""); // Ensure this is populated
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const navigate = useNavigate();
+  const { itemId } = useParams();
 
   const mutation = useMutation({
     mutationFn: async (newItem: FormData) => {
-      console.log('Data being sent to API:', Array.from(newItem.entries())); // Debugging: log the FormData entries
-      return await axios.post("http://localhost:3000/item", newItem, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      console.log("Data being sent to API:", Array.from(newItem.entries())); // Debugging: log the FormData entries
+      return await axios.post(`http://localhost:3000/item/${itemId}`, newItem);
     },
     onSuccess: () => {
       navigate("/item"); // Navigate back to the item list after successful addition
@@ -39,12 +36,12 @@ function AddItem() {
     }
 
     // Log the data before submitting to check if it's correctly populated
-    console.log('Form data before sending:', {
+    console.log("Form data before sending:", {
       name,
       description,
       price,
       categoryId,
-      uploadImage
+      uploadImage,
     });
 
     mutation.mutate(formData);
@@ -56,7 +53,10 @@ function AddItem() {
       <form onSubmit={handleSubmit}>
         {/* Item Name */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Item Name
           </label>
           <input
@@ -72,7 +72,10 @@ function AddItem() {
 
         {/* Item Price */}
         <div className="mb-4">
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="price"
+            className="block text-sm font-medium text-gray-700"
+          >
             Item Price
           </label>
           <input
@@ -88,7 +91,10 @@ function AddItem() {
 
         {/* Description */}
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             Description
           </label>
           <textarea
@@ -104,7 +110,10 @@ function AddItem() {
 
         {/* Category ID */}
         <div className="mb-4">
-          <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="categoryId"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category ID
           </label>
           <input
@@ -120,7 +129,10 @@ function AddItem() {
 
         {/* Upload Image */}
         <div className="mb-4">
-          <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
+          >
             Upload Image
           </label>
           <input

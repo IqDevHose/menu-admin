@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/restaurant" element={<Restaurant />} />
         <Route
-          path="/edit-restaurant:restaurantId"
+          path="/edit-restaurant/:restaurantId"
           element={<EditRestaurant />}
         />
         <Route path="/add-restaurant" element={<AddRestaurant />} />
@@ -46,7 +46,7 @@ function App() {
         ></Route>
         <Route path="/add-category" element={<AddCategory />}></Route>
         <Route path="/items" element={<Item />}></Route>
-        <Route path="/edit-items" element={<EditItmes />}></Route>
+        <Route path="/edit-items/:itemId" element={<EditItmes />}></Route>
         <Route path="/add-item" element={<AddItem />} />
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
