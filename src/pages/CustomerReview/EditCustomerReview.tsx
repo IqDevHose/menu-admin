@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type customerReviewType = {
   id: string;
@@ -16,11 +16,16 @@ type customerReviewType = {
 function EditCustomerReview() {
   const [searchParams] = useSearchParams();
   const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [comment, setComment] = useState<string | null>(searchParams.get("comment"));
+  const [comment, setComment] = useState<string | null>(
+    searchParams.get("comment")
+  );
   const [email, setEmail] = useState<string | null>(searchParams.get("email"));
   const [phone, setPhone] = useState<string | null>(searchParams.get("phone"));
-  const [birthday, setBirthday] = useState<string | null>(searchParams.get("birthday"));
+  const [birthday, setBirthday] = useState<string | null>(
+    searchParams.get("birthday")
+  );
   const { customerReviewId } = useParams();
+  const navigate = useNavigate();
 
   const query = useQuery({
     queryKey: ["customerReview"],
@@ -35,7 +40,13 @@ function EditCustomerReview() {
 
   const mutation = useMutation({
     mutationFn: (updatedReview: customerReviewType) => {
-      return axios.put(`http://localhost:3000/customer-review/${customerReviewId}`, updatedReview);
+      return axios.put(
+        `http://localhost:3000/customer-review/${customerReviewId}`,
+        updatedReview
+      );
+    },
+    onSuccess: () => {
+      navigate("/customerReview"); // Navigate back to the item list after successful addition
     },
   });
 
@@ -58,7 +69,10 @@ function EditCustomerReview() {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <input
@@ -73,7 +87,10 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="comment"
+            className="block text-sm font-medium text-gray-700"
+          >
             Comment
           </label>
           <textarea
@@ -88,7 +105,10 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input
@@ -103,7 +123,10 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700"
+          >
             Phone
           </label>
           <input
@@ -118,7 +141,10 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="birthday"
+            className="block text-sm font-medium text-gray-700"
+          >
             Birthday
           </label>
           <input

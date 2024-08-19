@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type questionType = {
   title: string | null;
@@ -28,9 +28,14 @@ function EditQuestion() {
     searchParams.get("enTitle")
   );
   const { questionId } = useParams();
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: (newEdit: questionType) => {
       return axios.put(`http://localhost:3000/question/${questionId}`, newEdit);
+    },
+    onSuccess: () => {
+      navigate("/question"); // Navigate back to the item list after successful addition
     },
   });
   const handleSubmit = () => {

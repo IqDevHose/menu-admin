@@ -9,7 +9,7 @@ type customerReviewType = {
   email: string;
   birthday: string;
   phone: string;
-  resaurantId: string;
+  resaurantId: string | undefined;
 };
 
 function AddCustomerReview() {
@@ -35,7 +35,7 @@ function AddCustomerReview() {
       return axios.post(`http://localhost:3000/customer-review`, newReview);
     },
     onSuccess: () => {
-      navigate("/"); // Navigate back to the customer reviews list after successful addition
+      navigate("/customerReview"); // Navigate back to the customer reviews list after successful addition
     },
   });
 
@@ -50,7 +50,10 @@ function AddCustomerReview() {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <input
@@ -65,7 +68,10 @@ function AddCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="comment"
+            className="block text-sm font-medium text-gray-700"
+          >
             Comment
           </label>
           <textarea
@@ -80,7 +86,10 @@ function AddCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input

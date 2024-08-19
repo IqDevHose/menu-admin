@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 type CreateCategoryDto = {
   name: string;
@@ -13,9 +13,14 @@ function AddCategory() {
   const [name, setName] = useState<string>("");
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const navigate = useNavigate();
 
   // Fetch restaurants from the server
-  const { data: restaurants, isLoading, isError } = useQuery({
+  const {
+    data: restaurants,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/restaurant");
@@ -25,9 +30,10 @@ function AddCategory() {
 
   const mutation = useMutation({
     mutationFn: (newCategory: CreateCategoryDto) => {
-      return axios.post(`http://localhost:3000/category`, newCategory
-
-      );
+      return axios.post(`http://localhost:3000/category`, newCategory);
+    },
+    onSuccess: () => {
+      navigate("/category"); // Navigate back to the item list after successful addition
     },
   });
 
@@ -37,7 +43,7 @@ function AddCategory() {
     const newCategory: CreateCategoryDto = {
       name,
       restaurantId,
-      icon: uploadImage || null, // If your backend doesn't handle this, omit this line
+      icon: uploadImage || null,
     };
 
     mutation.mutate(newCategory);

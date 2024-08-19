@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type ratingType = {
   score: number | null;
@@ -13,16 +13,22 @@ function EditRating() {
   const [searchParams] = useSearchParams();
   const [name, setName] = useState<string | null>(searchParams.get("name"));
   const [score, setScore] = useState<number | null>(
-    searchParams.get("score") ? parseInt(searchParams.get("score") as string) : null
+    searchParams.get("score")
+      ? parseInt(searchParams.get("score") as string)
+      : null
   );
   const [comment, setComment] = useState<string | null>(
     searchParams.get("comment")
   );
   const { ratingId } = useParams();
-  
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: (newEdit: ratingType) => {
       return axios.put(`http://localhost:3000/ratings/${ratingId}`, newEdit);
+    },
+    onSuccess: () => {
+      navigate("/rating"); // Navigate back to the ratings list after successful addition
     },
   });
 
