@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type categoryType = {
   name: string | null;
@@ -18,9 +18,14 @@ function EditCategory() {
   );
   const [uploadImage, setUploadImage] = useState<string | null>(null); // Base64 encoded string
   const { categoryId } = useParams();
+  const navigate = useNavigate();
 
   // Fetch restaurants from the server
-  const { data: restaurants, isLoading, isError } = useQuery({
+  const {
+    data: restaurants,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/restaurant");
@@ -32,6 +37,9 @@ function EditCategory() {
     mutationFn: (newEdit: categoryType) => {
       return axios.put(`http://localhost:3000/category/${categoryId}`, newEdit);
     },
+    onSuccess: () => {
+      navigate("/category");
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,13 +48,11 @@ function EditCategory() {
     const newEdit: categoryType = {
       name,
       restaurantId,
-      icon: uploadImage || null, 
+      icon: uploadImage || null,
     };
 
     mutation.mutate(newEdit);
   };
-
- 
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading restaurants</div>;
@@ -106,8 +112,6 @@ function EditCategory() {
             )}
           </select>
         </div>
-
-      
 
         {/* Submit Button */}
         <div className="flex justify-end">

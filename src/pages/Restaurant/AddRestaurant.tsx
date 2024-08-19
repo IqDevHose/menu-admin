@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type restaurantType = {
   name: string | null;
@@ -14,9 +14,14 @@ function AddRestaurant() {
   const [description, setDescription] = useState<string | null>("");
   const [accessCode, setAccessCode] = useState<string | null>("");
   const [uploadImage, setUploadImage] = useState<string | null>();
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: (newRest: restaurantType) => {
       return axios.post(`http://localhost:3000/restaurant`, newRest);
+    },
+    onSuccess: () => {
+      navigate("/restaurant");
     },
   });
   const handleSubmit = () => {
