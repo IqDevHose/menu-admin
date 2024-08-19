@@ -136,7 +136,7 @@ const Item = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-items?description=${
+                    to={`/edit-items/${item?.name}?description=${
                       item.description === null ? "" : item.description
                     }&name=${item.name}&price=${item.price}`}
                   >

@@ -1,15 +1,36 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AddItem() {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number | null>(null);
-  const [categoryId, setCategoryId] = useState<string>(""); // Ensure this is populated
+  const [restaurantId, setRestaurantId] = useState<string>("");
+  const [categoryId, setCategoryId] = useState<string>("");
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const navigate = useNavigate();
+
+  // Fetch restaurants from the server
+  const { data: restaurants, isLoading: isLoadingRestaurants } = useQuery({
+    queryKey: ["restaurant"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:3000/restaurant");
+      return response.data;
+    }
+  });
+
+  // Fetch categories based on selected restaurant
+  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useQuery({
+    queryKey: ["categories", restaurantId],
+    queryFn: async () => {
+      if (!restaurantId) return [];
+      const response = await axios.get(`http://localhost:3000/category?restaurantId=${restaurantId}`);
+      return response.data;
+    },
+    enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
+  });
 
   const mutation = useMutation({
     mutationFn: async (newItem: FormData) => {
@@ -28,6 +49,7 @@ function AddItem() {
     formData.append("name", name);
     formData.append("description", description || "");
     formData.append("price", price?.toString() || "0");
+    formData.append("restaurantId", restaurantId);
     formData.append("categoryId", categoryId);
 
     if (uploadImage) {
@@ -39,12 +61,15 @@ function AddItem() {
       name,
       description,
       price,
+      restaurantId,
       categoryId,
       uploadImage,
     });
 
     mutation.mutate(formData);
   };
+
+  if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -107,23 +132,67 @@ function AddItem() {
           />
         </div>
 
-        {/* Category ID */}
+        {/* Restaurant Select */}
+        <div className="mb-4">
+          <label
+            htmlFor="restaurantId"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Restaurant
+          </label>
+          <select
+            id="restaurantId"
+            value={restaurantId}
+            onChange={(e) => {
+              setRestaurantId(e.target.value);
+              setCategoryId(""); // Clear category when changing restaurant
+              refetchCategories();
+            }}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
+          >
+            <option value="" disabled>
+              Select a restaurant
+            </option>
+            {restaurants.map((restaurant: any) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Category Select */}
         <div className="mb-4">
           <label
             htmlFor="categoryId"
             className="block text-sm font-medium text-gray-700"
           >
-            Category ID
+            Category
           </label>
-          <input
-            type="text"
+          <select
             id="categoryId"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)} // Bind the value to state
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter category ID"
             required
-          />
+            disabled={!restaurantId || isLoadingCategories}
+          >
+            <option value="" disabled>
+              {isLoadingCategories ? "Loading categories..." : "Select a category"}
+            </option>
+            {categories && categories.length > 0 ? (
+              categories.map((category: any) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                No categories available
+              </option>
+            )}
+          </select>
         </div>
 
         {/* Upload Image */}

@@ -1,29 +1,57 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-type categoryType = {
-  name: string | null;
-  restaurantId: string | null;
+type CreateCategoryDto = {
+  name: string;
+  icon?: File | null;
+  restaurantId: string;
 };
+
 function AddCategory() {
-  const [name, setName] = useState<string | null>("");
-  const [restaurantName, setRestaurantName] = useState<string | null>("");
-  const [restaurantId, setRestaurantId] = useState<string | null>("");
-  const [uploadImage, setUploadImage] = useState<string | null>("");
+  const [name, setName] = useState<string>("");
+  const [restaurantId, setRestaurantId] = useState<string>("");
+  const [uploadImage, setUploadImage] = useState<File | null>(null);
   const { categoryId } = useParams();
-  const mutation = useMutation({
-    mutationFn: (newEdit: categoryType) => {
-      return axios.post(
-        `http://localhost:3000/category/${categoryId}`,
-        newEdit
-      );
+
+  // Fetch restaurants from the server
+  const { data: restaurants, isLoading, isError } = useQuery({
+    queryKey: ["restaurant"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:3000/restaurant");
+      return response.data;
     },
   });
-  const handleSubmit = () => {
-    mutation.mutate({ name, restaurantId });
+
+  const mutation = useMutation({
+    mutationFn: (newCategory: FormData) => {
+      return axios.post(`http://localhost:3000/category/${categoryId}`, newCategory, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("restaurantId", restaurantId);
+
+    if (uploadImage) {
+      formData.append("icon", uploadImage);
+    }
+
+    mutation.mutate(formData);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading restaurants</div>;
+
+  console.log("Fetched restaurants:", restaurants);
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -41,44 +69,62 @@ function AddCategory() {
           <input
             type="text"
             id="name"
-            value={name || ""}
+            value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant name"
+            placeholder="Enter category name"
+            required
           />
         </div>
 
-        {/* Restaurant Name */}
+        {/* Restaurant Select */}
         <div className="mb-4">
           <label
-            htmlFor="restaurantName"
+            htmlFor="restaurantId"
             className="block text-sm font-medium text-gray-700"
           >
-            Restaurant Name
+            Restaurant
           </label>
-          <input
-            type="text"
-            id="restaurantName"
-            value={restaurantName || ""}
-            onChange={(e) => setRestaurantName(e.target.value)}
+          <select
+            id="restaurantId"
+            value={restaurantId}
+            onChange={(e) => setRestaurantId(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant name"
-          />
+            required
+          >
+            <option value="" disabled>
+              Select a restaurant
+            </option>
+            {restaurants && restaurants.length > 0 ? (
+              restaurants.map((restaurant: any) => (
+                <option key={restaurant.id} value={restaurant.id}>
+                  {restaurant.name}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                No restaurants available
+              </option>
+            )}
+          </select>
         </div>
 
-        {/* upload image */}
+        {/* Upload Image */}
         <div className="mb-4">
           <label
-            htmlFor="access-code"
-            className="block text-sm font-medium text-gray-700 "
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
           >
-            Upload image
+            Upload Image
           </label>
           <input
             type="file"
             id="upload-image"
-            value={uploadImage || ""}
-            onChange={(e) => setUploadImage(e.target.value)}
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                setUploadImage(e.target.files[0]);
+              }
+            }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Upload an image"
           />
