@@ -1,8 +1,8 @@
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 
@@ -11,10 +11,11 @@ type restaurantReviewType = {
   name: string;
 };
 
-
 const Restaurant = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
-  const [selectedItem, setSelectedItem] = useState<restaurantReviewType | null>(null);  // State to manage selected item for deletion
+  const [selectedItem, setSelectedItem] = useState<restaurantReviewType | null>(
+    null
+  ); // State to manage selected item for deletion
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -29,9 +30,9 @@ const Restaurant = () => {
       await axios.delete(`http://localhost:3000/restaurant/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['restaurant'] });
+      queryClient.invalidateQueries({ queryKey: ["restaurant"] });
       setShowPopup(false); // Close the popup after successful deletion
-    }
+    },
   });
 
   const handleDeleteClick = (item: any) => {
@@ -46,9 +47,11 @@ const Restaurant = () => {
   };
 
   if (query.isPending) {
-    return <div className="w-full h-screen flex items-center justify-center">
-      <Spinner />
-    </div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (query.isError) {
@@ -87,7 +90,7 @@ const Restaurant = () => {
           type="button"
           className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg  py-2.5  mb-2 px-5"
         >
-          ِAdd category
+          <Link to={"/add-restaurant"}>Add Restaurant</Link>
         </button>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -130,13 +133,17 @@ const Restaurant = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-restaurant?description=${item.description === null ? "" : item.description
-                      }&accessCode=${item.accessCode}&name=${item.name}`}
+                    to={`/edit-restaurant?description=${
+                      item.description === null ? "" : item.description
+                    }&accessCode=${item.accessCode}&name=${item.name}`}
                   >
                     <SquarePen />
                   </Link>
                 </button>
-                <button className="font-medium text-red-600" onClick={() => handleDeleteClick(item)}>
+                <button
+                  className="font-medium text-red-600"
+                  onClick={() => handleDeleteClick(item)}
+                >
                   <Trash2 />
                 </button>
               </td>
