@@ -14,6 +14,7 @@ import EditCustomerReview from "./pages/CustomerReview/EditCustomerReview";
 import EditCategory from "./pages/Category/EditCategory";
 import EditItmes from "./pages/Items/EditItmes";
 import EditQuestion from "./pages/Questions/EditQuestion";
+import EditTheme from "./pages/Theme/editTheme";
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/questions" element={<Questions />}></Route>
         <Route path="/edit-questions/:questionId" element={<EditQuestion />}></Route>
         <Route path="/theme" element={<Theme />}></Route>
+        <Route path="/edit-theme/:restaurantId" element={<EditTheme />}></Route>
       </Routes>
     </div>
   );

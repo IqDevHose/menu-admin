@@ -17,13 +17,13 @@ const Category = () => {
 
   const query = useQuery({
     queryKey: ['category'], queryFn: async () => {
-      const category = await axios.get("http://192.168.88.35:3000/category")
+      const category = await axios.get("http://localhost:3000/category")
       return category.data
     }
   })
   const mutation = useMutation({
     mutationFn: async (id:string) => {
-      await axios.delete(`http://192.168.88.35:3000/category/${id}`);
+      await axios.delete(`http://localhost:3000/category/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['category'] });

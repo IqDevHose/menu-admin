@@ -24,14 +24,14 @@ const Item = () => {
   const query = useQuery({
     queryKey: ["item"],
     queryFn: async () => {
-      const item = await axios.get("http://192.168.88.35:3000/item");
+      const item = await axios.get("http://localhost:3000/item");
       return item.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id:string) => {
-      await axios.delete(`http://192.168.88.35:3000/item/${id}`);
+      await axios.delete(`http://localhost:3000/item/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["item"] });
