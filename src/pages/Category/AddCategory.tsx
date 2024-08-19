@@ -15,7 +15,10 @@ function AddCategory() {
   const { categoryId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: categoryType) => {
-      return axios.put(`http://localhost:3000/category/${categoryId}`, newEdit);
+      return axios.post(
+        `http://localhost:3000/category/${categoryId}`,
+        newEdit
+      );
     },
   });
   const handleSubmit = () => {

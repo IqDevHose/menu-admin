@@ -14,10 +14,9 @@ function AddRestaurant() {
   const [description, setDescription] = useState<string | null>("");
   const [accessCode, setAccessCode] = useState<string | null>("");
   const [uploadImage, setUploadImage] = useState<string | null>();
-  const { restaurantId } = useParams();
   const mutation = useMutation({
     mutationFn: (newRest: restaurantType) => {
-      return axios.post(`http://localhost:3000/${restaurantId}`, newRest);
+      return axios.post(`http://localhost:3000/restaurant`, newRest);
     },
   });
   const handleSubmit = () => {

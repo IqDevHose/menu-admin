@@ -19,10 +19,10 @@ function EditItmes() {
     searchParams.get("accessCode")
   );
   const [uploadImage, setUploadImage] = useState<string | null>();
-  const { categoryId } = useParams();
+  const { itemId } = useParams();
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
-      return axios.put(`http://localhost:3000/item/${categoryId}`, newEdit);
+      return axios.put(`http://localhost:3000/item/${itemId}`, newEdit);
     },
   });
   const handleSubmit = () => {
