@@ -174,7 +174,7 @@ const CustomerReview = () => {
                 <td className="px-6 py-4">{item.birthday}</td>
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
-                    to={`/edit-customer-review/$`}
+                    to={`/edit-customer-review/${item.id}`}
                     className="font-medium text-blue-600"
                     state={item}
                   >
