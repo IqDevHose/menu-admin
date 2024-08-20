@@ -95,12 +95,14 @@ const theme = () => {
             placeholder="Search for items"
           />
         </div>
-        <button
-          type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
-        >
-          Add theme
-        </button>
+        <Link to="/add-theme">
+          <button
+            type="button"
+            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
+          >
+            Add theme
+          </button>
+        </Link>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
