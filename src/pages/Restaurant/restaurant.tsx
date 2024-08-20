@@ -6,6 +6,7 @@ import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
+import Pagination from "@/components/Pagination"; 
 
 type restaurantReviewType = {
   id: string;
@@ -18,15 +19,21 @@ const Restaurant = () => {
     null
   ); // State to manage selected item for deletion
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
+
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["restaurant"],
+    queryKey: ["restaurant", currentPage],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axios.get(
+        `http://localhost:3000/restaurant?page=${currentPage}`
+      );
       return res.data;
     },
   });
+
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/restaurant/${id}`);
@@ -49,9 +56,16 @@ const Restaurant = () => {
   };
 
   // Filter the data based on the search query
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items.filter((item: any) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -161,6 +175,14 @@ const Restaurant = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

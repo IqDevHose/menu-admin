@@ -9,6 +9,7 @@ import satisfied from "../../assets/neutral.png";
 import sad from "../../assets/sad.png";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
 
 type customerReviewType = {
   id: string;
@@ -22,16 +23,17 @@ const CustomerReview = () => {
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
 
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["customerReview"],
+    queryKey: ["customerReview", currentPage],
     queryFn: async () => {
       const customerReview = await axios.get(
-        "http://localhost:3000/customer-review"
+        `http://localhost:3000/customer-review?page=${currentPage}`
       );
-      console.log(typeof customerReview.data);
       return customerReview.data;
     },
   });
@@ -75,10 +77,18 @@ const CustomerReview = () => {
       mutation.mutate(selectedCustomerReview.id);
     }
   };
+
   // Filter the data based on the search query
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items.filter((item: any) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -160,10 +170,12 @@ const CustomerReview = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(query.data) &&
+          {Array.isArray(query.data.items) &&
             filteredData?.map((item: any, index: number) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">{index + 1}</td>
+                <td className="px-6 py-4">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>
                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                   {highlightText(item.name || "", searchQuery)}
                 </td>
@@ -192,6 +204,14 @@ const CustomerReview = () => {
             ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

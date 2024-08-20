@@ -1,5 +1,6 @@
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
 import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,12 +22,16 @@ const Questions = () => {
     null
   ); // State to manage selected item for deletion
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["questions"],
+    queryKey: ["questions", currentPage],
     queryFn: async () => {
-      const questions = await axios.get("http://localhost:3000/question");
+      const questions = await axios.get(
+        `http://localhost:3000/question?page=${currentPage}`
+      );
       return questions.data;
     },
   });
@@ -36,7 +41,7 @@ const Questions = () => {
       await axios.delete(`http://localhost:3000/question/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["question"] });
+      queryClient.invalidateQueries({ queryKey: ["questions"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
   });
@@ -52,9 +57,16 @@ const Questions = () => {
     }
   };
 
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items?.filter((item: any) =>
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -67,7 +79,7 @@ const Questions = () => {
   if (query.isError) {
     return <div>Error</div>;
   }
-  console.log(query.data);
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -130,15 +142,14 @@ const Questions = () => {
               Answer
             </th>
             <th scope="col" className="px-6 py-3"></th>
-            {/* <th scope="col" className="px-6 py-3">
-              Action
-            </th> */}
           </tr>
         </thead>
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{index + 1}</td>
+              <td className="px-6 py-4">
+                {(currentPage - 1) * itemsPerPage + index + 1}
+              </td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
@@ -166,6 +177,14 @@ const Questions = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

@@ -6,6 +6,8 @@ import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
+
 type itemReviewType = {
   id: string;
   name: string;
@@ -21,12 +23,17 @@ const Item = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null); // State to manage selected item for deletion
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
+
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["item"],
+    queryKey: ["item", currentPage],
     queryFn: async () => {
-      const item = await axios.get("http://localhost:3000/item");
+      const item = await axios.get(
+        `http://localhost:3000/item?page=${currentPage}`
+      );
       return item.data;
     },
   });
@@ -52,9 +59,16 @@ const Item = () => {
     }
   };
 
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items.filter((item: any) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -132,7 +146,9 @@ const Item = () => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{index + 1}</td>
+              <td className="px-6 py-4">
+                {(currentPage - 1) * itemsPerPage + index + 1}
+              </td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
@@ -159,6 +175,13 @@ const Item = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
       {showPopup && (
         <Popup

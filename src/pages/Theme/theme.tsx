@@ -1,5 +1,6 @@
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
 import { highlightText } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,18 +16,24 @@ type themeType = {
   bg: string;
 };
 
-const theme = () => {
+const Theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
+
   const query = useQuery({
-    queryKey: ["theme"],
+    queryKey: ["theme", currentPage],
     queryFn: async () => {
-      const theme = await axios.get("http://localhost:3000/theme");
+      const theme = await axios.get(
+        `http://localhost:3000/theme?page=${currentPage}`
+      );
       return theme.data;
     },
   });
+
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/theme/${id}`);
@@ -48,9 +55,16 @@ const theme = () => {
     }
   };
 
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items?.filter((item: any) =>
     item?.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -63,7 +77,7 @@ const theme = () => {
   if (query.isError) {
     return <div>Error</div>;
   }
-  console.log(query.data);
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -129,7 +143,9 @@ const theme = () => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
-              <td className="px-6 py-4">{index + 1}</td>
+              <td className="px-6 py-4">
+                {(currentPage - 1) * itemsPerPage + index + 1}
+              </td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
@@ -173,6 +189,14 @@ const theme = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
@@ -190,4 +214,4 @@ const theme = () => {
   );
 };
 
-export default theme;
+export default Theme;

@@ -6,6 +6,7 @@ import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
 
 type ratingReviewType = {
   id: string;
@@ -22,13 +23,17 @@ const Rating = () => {
     null
   );
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
 
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["rating"],
+    queryKey: ["rating", currentPage],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/rating");
+      const res = await axios.get(
+        `http://localhost:3000/rating?page=${currentPage}`
+      );
       return res.data;
     },
   });
@@ -54,9 +59,16 @@ const Rating = () => {
     }
   };
 
-  const filteredData = query.data?.filter((item: any) =>
+  const filteredData = query.data?.items.filter((item: any) =>
     item.customerReview?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return (
@@ -131,7 +143,9 @@ const Rating = () => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{index + 1}</td>
+              <td className="px-6 py-4">
+                {(currentPage - 1) * itemsPerPage + index + 1}
+              </td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                 {highlightText(item.customerReview?.name || "", searchQuery)}
               </td>
@@ -156,6 +170,14 @@ const Rating = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

@@ -5,6 +5,8 @@ import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/Pagination"
+
 
 type categoryReviewType = {
   id: string;
@@ -16,16 +18,21 @@ const Category = () => {
   const [selectedCategory, setSelectedCategory] =
     useState<categoryReviewType | null>(null); // State to manage selected item for deletion
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
 
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["category"],
+    queryKey: ["category", currentPage],
     queryFn: async () => {
-      const category = await axios.get("http://localhost:3000/category");
+      const category = await axios.get(
+        `http://localhost:3000/category?page=${currentPage}`
+      );
       return category.data;
     },
   });
+
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/category/${id}`);
@@ -47,9 +54,17 @@ const Category = () => {
     }
   };
 
-  const filteredData = query.data?.filter((item: any) =>
+  // Filter data based on the search query
+  const filteredData = query.data?.items.filter((item: any) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (query.isPending) {
     return <div>Loading...</div>;
@@ -115,9 +130,6 @@ const Category = () => {
               Restaurant
             </th>
             <th scope="col" className="px-6 py-3"></th>
-            {/* <th scope="col" className="px-6 py-3">
-              Action
-            </th> */}
           </tr>
         </thead>
         <tbody>
@@ -151,6 +163,14 @@ const Category = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Use the Pagination component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
