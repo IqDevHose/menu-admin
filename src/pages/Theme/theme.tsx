@@ -1,5 +1,6 @@
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import { highlightText } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -18,7 +19,7 @@ const theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
-
+  const [searchQuery, setSearchQuery] = useState("");
   const query = useQuery({
     queryKey: ["theme"],
     queryFn: async () => {
@@ -46,6 +47,10 @@ const theme = () => {
       mutation.mutate(selectedItem.id);
     }
   };
+
+  const filteredData = query.data?.filter((item: any) =>
+    item?.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (query.isPending) {
     return (
@@ -85,6 +90,8 @@ const theme = () => {
             type="text"
             id="table-search"
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search for items"
           />
         </div>
@@ -118,14 +125,14 @@ const theme = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
+          {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
               <td className="px-6 py-4">{index + 1}</td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
               >
-                {item?.restaurant?.name}
+                {highlightText(item?.restaurant?.name || "", searchQuery)}
               </td>
               <td className="px-6 py-4">
                 <label
