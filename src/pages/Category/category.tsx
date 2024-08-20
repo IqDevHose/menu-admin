@@ -6,6 +6,7 @@ import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination"
+import Spinner from "@/components/Spinner";
 
 
 type categoryReviewType = {
@@ -67,7 +68,11 @@ const Category = () => {
   };
 
   if (query.isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (query.isError) {
@@ -164,12 +169,13 @@ const Category = () => {
         </tbody>
       </table>
 
-      {/* Use the Pagination component */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+            <div className="flex justify-center items-center mt-10">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       {showPopup && (
         <Popup

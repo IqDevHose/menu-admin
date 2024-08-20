@@ -177,11 +177,13 @@ const Restaurant = () => {
       </table>
 
       {/* Use the Pagination component */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+            <div className="flex justify-center items-center mt-10">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       {showPopup && (
         <Popup

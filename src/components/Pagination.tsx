@@ -12,7 +12,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex justify-between items-center mt-4">
+    <div className="flex gap-2 items-center mt-7">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -21,7 +21,7 @@ const Pagination: React.FC<PaginationProps> = ({
         Previous
       </button>
       <span className="text-gray-700">
-        Page {currentPage} of {totalPages}
+        {currentPage} of {totalPages}
       </span>
       <button
         onClick={() => onPageChange(currentPage + 1)}
