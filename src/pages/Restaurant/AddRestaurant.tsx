@@ -1,12 +1,24 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ActionMeta, MultiValue, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
+
+type CategoryOption = {
+  value: string;
+  label: string;
+};
+
+type categoryType = {
+  name: string;
+  icon?: string | null;
+};
+
 type restaurantType = {
   name: string | null;
   icon: string | null;
-  categories: string[] | null;
+  categories: categoryType[] | null;
   description: string | null;
   accessCode: string | null;
   primary: string | null;
@@ -21,6 +33,7 @@ function AddRestaurant() {
   const [uploadImage, setUploadImage] = useState<string | null>();
   const [primary, setPrimary] = useState<string | null>("");
   const [secondary, setSecondary] = useState<string | null>("");
+  const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
   const [bg, setBg] = useState<string | null>("");
   const navigate = useNavigate();
 
@@ -35,14 +48,34 @@ function AddRestaurant() {
     mutationFn: (newRest: restaurantType) => {
       return axios.post(`http://localhost:3000/restaurant`, newRest);
     },
+    onError: (e)=>{
+      console.log(e)
+    },
     onSuccess: () => {
       navigate("/restaurant"); // Navigate back to the item list after successful addition
     },
   });
-  const handleSubmit = () => {
+  const handleChange = (
+    newValue: MultiValue<CategoryOption> | SingleValue<CategoryOption> | null,
+    actionMeta: ActionMeta<CategoryOption>
+  ) => {
+    if (newValue) {
+      // Type assertion to handle MultiValue, which is the case when isMulti is true
+      const selectedCategories = (newValue as MultiValue<CategoryOption>).map((option) => ({
+        name: option.value,
+        icon: null,
+      }));
+      setCategoriesData(selectedCategories);
+    } else {
+      // If no value is selected (null), reset categoriesData
+      setCategoriesData([]);
+    }
+  };
+  const handleSubmit = (e:FormEvent) => {
+    e.preventDefault()
     mutation.mutate({
       name,
-      categories,
+      categories: categoriesData,
       icon: null,
       description,
       accessCode,
@@ -85,6 +118,7 @@ function AddRestaurant() {
             Category Name
           </label>
           <CreatableSelect
+            onChange={handleChange}
             isMulti
             isClearable
             options={categories?.items?.map((category: any) => ({
@@ -92,28 +126,9 @@ function AddRestaurant() {
               label: category.name,
             }))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          ></CreatableSelect>
+          />
         </div>
 
-        {/* Category Name */}
-        {/* <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Category Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={category || ""}
-            onChange={(e) => setCategory(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant name"
-          />
-        </div> */}
-
-        {/* Primary Color */}
         <div className="mb-4">
           <label
             htmlFor="primary"

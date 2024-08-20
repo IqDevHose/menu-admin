@@ -1,3 +1,4 @@
+import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -49,7 +50,14 @@ function AddCategory() {
     mutation.mutate(newCategory);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+    if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   if (isError) return <div>Error loading restaurants</div>;
 
   return (
@@ -94,8 +102,8 @@ function AddCategory() {
             <option value="" disabled>
               Select a restaurant
             </option>
-            {restaurants && restaurants.length > 0 ? (
-              restaurants.map((restaurant: any) => (
+            {restaurants && restaurants.items.length > 0 ? (
+              restaurants?.items?.map((restaurant: any) => (
                 <option key={restaurant.id} value={restaurant.id}>
                   {restaurant.name}
                 </option>
