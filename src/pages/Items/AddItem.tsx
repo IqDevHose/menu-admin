@@ -26,7 +26,9 @@ function AddItem() {
     queryFn: async () => {
       if (!restaurantId) return [];
       const response = await axios.get(`http://localhost:3000/category?restaurantId=${restaurantId}`);
+      // console.log(response.data)
       return response.data;
+
     },
     enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
   });
@@ -157,9 +159,10 @@ function AddItem() {
             <option value="" disabled>
               {isLoadingCategories ? "Loading categories..." : "Select a category"}
             </option>
-            {categories && categories.length > 0 ? (
-              categories.map((category: any) => (
+            {categories && categories.items.length > 0 ? (
+              categories.items.map((category: any) => (
                 <option key={category.id} value={category.id}>
+                 {console.log(category)}
                   {category.name}
                 </option>
               ))

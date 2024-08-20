@@ -1,13 +1,12 @@
-import Popup from "@/components/Popup";
-import { highlightText } from "@/utils/utils";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import { useState } from "react";
+import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
-import Pagination from "../../components/Pagination"
+import Pagination from "../../components/Pagination";
 import Spinner from "@/components/Spinner";
-
+import { highlightText } from "@/utils/utils";
 
 type categoryReviewType = {
   id: string;
@@ -15,21 +14,37 @@ type categoryReviewType = {
 };
 
 const Category = () => {
-  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [showPopup, setShowPopup] = useState(false);
   const [selectedCategory, setSelectedCategory] =
-    useState<categoryReviewType | null>(null); // State to manage selected item for deletion
-  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
-  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
-  const itemsPerPage = 10; // Set the number of items per page
+    useState<categoryReviewType | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRestaurant, setSelectedRestaurant] = useState(""); // State to manage selected restaurant
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["category", currentPage],
+  // Fetch restaurants
+  const { data: restaurants } = useQuery({
+    queryKey: ["restaurants"],
     queryFn: async () => {
-      const category = await axios.get(
-        `http://localhost:3000/category?page=${currentPage}`
-      );
+      const res = await axios.get("http://localhost:3000/restaurant");
+      return res.data;
+    },
+  });
+
+  // Fetch categories based on selected restaurant
+  const query = useQuery({
+    queryKey: ["category", currentPage, selectedRestaurant],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", String(currentPage));
+      if (selectedRestaurant) {
+        params.append("restaurantId", selectedRestaurant);
+      }
+      const category = await axios.get(`http://localhost:3000/category`, {
+        params,
+      });
       return category.data;
     },
   });
@@ -40,7 +55,7 @@ const Category = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
-      setShowPopup(false); // Close the popup after successful deletion
+      setShowPopup(false);
     },
   });
 
@@ -60,12 +75,15 @@ const Category = () => {
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate the total number of pages
   const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedRestaurant]);
 
   if (query.isPending) {
     return (
@@ -82,9 +100,9 @@ const Category = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
-        <label htmlFor="table-search" className="sr-only">
-          Search
-        </label>
+      
+
+        {/* Search Bar */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
             <svg
@@ -104,16 +122,30 @@ const Category = () => {
           <input
             type="text"
             id="table-search"
-            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search for items"
-            value={searchQuery} // Bind the input to searchQuery state
-            onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+          {/* Restaurant Filter */}
+          <select
+          value={selectedRestaurant}
+          onChange={(e) => setSelectedRestaurant(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg"
+        >
+          <option value="">All Restaurants</option>
+          {restaurants?.items.map((restaurant: any) => (
+            <option key={restaurant.id} value={restaurant.id}>
+              {restaurant.name}
+            </option>
+          ))}
+        </select>
+
         <Link to={"/add-category"}>
           <button
             type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg  py-2.5  mb-2 px-5"
+            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
           >
             Add Category
           </button>
@@ -169,7 +201,7 @@ const Category = () => {
         </tbody>
       </table>
 
-            <div className="flex justify-center items-center mt-10">
+      <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

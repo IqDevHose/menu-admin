@@ -192,8 +192,8 @@ function EditItem() {
                 ? "Loading categories..."
                 : "Select a category"}
             </option>
-            {categories && categories.length > 0 ? (
-              categories.map((category: any) => (
+            {categories && categories.items.length > 0 ? (
+              categories.items.map((category: any) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
