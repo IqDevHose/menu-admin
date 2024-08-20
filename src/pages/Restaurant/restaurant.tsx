@@ -6,7 +6,7 @@ import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
-import Pagination from "@/components/Pagination"; 
+import Pagination from "@/components/Pagination";
 
 type restaurantReviewType = {
   id: string;
@@ -177,7 +177,7 @@ const Restaurant = () => {
       </table>
 
       {/* Use the Pagination component */}
-            <div className="flex justify-center items-center mt-10">
+      <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
