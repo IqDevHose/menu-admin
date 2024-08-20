@@ -1,4 +1,5 @@
 import Popup from "@/components/Popup";
+import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -14,6 +15,8 @@ const Category = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const [selectedCategory, setSelectedCategory] =
     useState<categoryReviewType | null>(null); // State to manage selected item for deletion
+  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -43,6 +46,10 @@ const Category = () => {
       mutation.mutate(selectedCategory.id);
     }
   };
+
+  const filteredData = query.data?.filter((item: any) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (query.isPending) {
     return <div>Loading...</div>;
@@ -77,8 +84,10 @@ const Category = () => {
           <input
             type="text"
             id="table-search"
-            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Search for items"
+            value={searchQuery} // Bind the input to searchQuery state
+            onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
           />
         </div>
         <Link to={"/add-category"}>
@@ -112,14 +121,14 @@ const Category = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
+          {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
               >
-                {item.name}
+                {highlightText(item.name, searchQuery)}
               </td>
               <td className="px-6 py-4">{item.items.length}</td>
               <td className="px-6 py-4">{item.resturnat.name}</td>

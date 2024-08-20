@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import { highlightText } from "@/utils/utils";
 
 type restaurantReviewType = {
   id: string;
@@ -16,6 +17,7 @@ const Restaurant = () => {
   const [selectedItem, setSelectedItem] = useState<restaurantReviewType | null>(
     null
   ); // State to manage selected item for deletion
+  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -46,6 +48,11 @@ const Restaurant = () => {
     }
   };
 
+  // Filter the data based on the search query
+  const filteredData = query.data?.filter((item: any) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -57,6 +64,7 @@ const Restaurant = () => {
   if (query.isError) {
     return <div>Error</div>;
   }
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -82,8 +90,10 @@ const Restaurant = () => {
           <input
             type="text"
             id="table-search"
-            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
+            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search for items"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <Link to={"/add-restaurant"}>
@@ -114,20 +124,17 @@ const Restaurant = () => {
               Categories No.
             </th>
             <th scope="col" className="px-6 py-3"></th>
-            {/* <th scope="col" className="px-6 py-3">
-              Action
-            </th> */}
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
+          {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
               <td className="px-6 py-4">{index + 1}</td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
               >
-                {item.name}
+                {highlightText(item.name, searchQuery)}
               </td>
               <td className="px-6 py-4">{item.description}</td>
               <td className="px-6 py-4">{item.accessCode}</td>

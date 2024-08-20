@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom';
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 
 type themeType = {
   name: string | null;
@@ -53,54 +53,84 @@ function EditTheme() {
         <div className="mb-4">
           <label
             htmlFor="primary"
-            className="block text-sm font-medium text-gray-700"
+            className="block mb-1 text-sm font-medium text-gray-700"
           >
             Primary Color
           </label>
-          <input
-            type="text"
-            id="primary"
-            value={primary || ""}
-            onChange={(e) => setPrimary(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter primary color"
-          />
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="primary"
+              value={primary || ""}
+              onChange={(e) => setPrimary(e.target.value)}
+              className={` block  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter primary color"
+            />
+            <input
+              type="text"
+              id="primary"
+              value={primary || ""}
+              onChange={(e) => setPrimary(e.target.value)}
+              className={` block border-none  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter primary color"
+            />
+          </div>
         </div>
 
         {/* Secondary Color */}
         <div className="mb-4">
           <label
             htmlFor="secondary"
-            className="block text-sm font-medium text-gray-700"
+            className="block mb-1 text-sm font-medium text-gray-700"
           >
             Secondary Color
           </label>
-          <input
-            type="text"
-            id="secondary"
-            value={secondary || ""}
-            onChange={(e) => setSecondary(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter secondary color"
-          />
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="secondary"
+              value={secondary || ""}
+              onChange={(e) => setSecondary(e.target.value)}
+              className={` block  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter secondary color"
+            />
+            <input
+              type="text"
+              id="secondary"
+              value={secondary || ""}
+              onChange={(e) => setSecondary(e.target.value)}
+              className={` block border-none  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter secondary color"
+            />
+          </div>
         </div>
 
         {/* Background Color */}
         <div className="mb-4">
           <label
             htmlFor="bg"
-            className="block text-sm font-medium text-gray-700"
+            className="block mb-1 text-sm font-medium text-gray-700"
           >
             Background Color
           </label>
-          <input
-            type="text"
-            id="bg"
-            value={bg || ""}
-            onChange={(e) => setBg(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter background color"
-          />
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="bg"
+              value={bg || ""}
+              onChange={(e) => setBg(e.target.value)}
+              className={` block border-none  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter background color"
+            />
+            <input
+              type="text"
+              id="bg"
+              value={bg || ""}
+              onChange={(e) => setBg(e.target.value)}
+              className={` block border-none  h-10 bg-transparent rounded-md sm:text-sm`}
+              placeholder="Enter background color"
+            />
+          </div>
         </div>
 
         {/* Submit Button */}
@@ -114,7 +144,7 @@ function EditTheme() {
         </div>
       </form>
     </div>
-  )
+  );
 }
 
-export default EditTheme
+export default EditTheme;

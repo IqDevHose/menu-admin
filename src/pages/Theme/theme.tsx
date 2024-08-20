@@ -127,8 +127,25 @@ const theme = () => {
               >
                 {item?.restaurant?.name}
               </td>
-              <td className="px-6 py-4">{item?.primary}</td>
-              <td className="px-6 py-4">{item?.secondary}</td>
+              <td className="px-6 py-4">
+                <label
+                  htmlFor=""
+                  className={`${
+                    item?.primary ? "bg-[" + item?.primary + "]" : ""
+                  } text-white px-2 py-1 rounded-full`}
+                >
+                  {item?.primary}
+                </label>
+              </td>
+              <td className="px-6 py-4">
+                <label
+                  className={`${
+                    item?.secondary ? "bg-[" + item?.secondary + "]" : ""
+                  } text-white px-2 py-1 rounded-full`}
+                >
+                  {item?.secondary}
+                </label>
+              </td>
               <td className="px-6 py-4">{item?.bg}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">

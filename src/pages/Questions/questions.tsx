@@ -1,5 +1,6 @@
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -19,6 +20,7 @@ const Questions = () => {
   const [selectedItem, setSelectedItem] = useState<questionsReviewType | null>(
     null
   ); // State to manage selected item for deletion
+  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -49,6 +51,10 @@ const Questions = () => {
       mutation.mutate(selectedItem.id);
     }
   };
+
+  const filteredData = query.data?.filter((item: any) =>
+    item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (query.isPending) {
     return (
@@ -89,6 +95,8 @@ const Questions = () => {
             id="table-search"
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Search for items"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <Link to={"/add-question"}>
@@ -128,14 +136,14 @@ const Questions = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: any, index: number) => (
+          {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
               >
-                {item.resturant?.name}
+                {highlightText(item.resturant?.name || "", searchQuery)}
               </td>
               <td className="px-6 py-4">{item.title}</td>
               <td className="px-6 py-4">{item.enTitle}</td>
@@ -143,10 +151,7 @@ const Questions = () => {
               <td className="px-6 py-4">{item?.answer}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link
-                    to={`/edit-questions/${item.id}`}
-                    state={item}
-                  >
+                  <Link to={`/edit-questions/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>

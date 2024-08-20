@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
+import { highlightText } from "@/utils/utils";
 
 type ratingReviewType = {
   id: string;
@@ -20,6 +21,8 @@ const Rating = () => {
   const [selectedRating, setSelectedRating] = useState<ratingReviewType | null>(
     null
   );
+  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -50,6 +53,10 @@ const Rating = () => {
       mutation.mutate(selectedRating.id);
     }
   };
+
+  const filteredData = query.data?.filter((item: any) =>
+    item.customerReview?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (query.isPending) {
     return (
@@ -90,6 +97,8 @@ const Rating = () => {
             id="table-search"
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search for items"
+            value={searchQuery} // Bind the input to searchQuery state
+            onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
           />
         </div>
         <Link to="/add-rating">
@@ -120,11 +129,11 @@ const Rating = () => {
           </tr>
         </thead>
         <tbody>
-          {query.data?.map((item: ratingReviewType, index: number) => (
+          {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{index + 1}</td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {item.customerReview.name}
+                {highlightText(item.customerReview?.name || "", searchQuery)}
               </td>
               <td className="px-6 py-4">{item.score}</td>
               <td className="px-6 py-4">{item.comment}</td>

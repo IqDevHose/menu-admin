@@ -8,6 +8,7 @@ import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
 import sad from "../../assets/sad.png";
 import Spinner from "@/components/Spinner";
+import { highlightText } from "@/utils/utils";
 
 type customerReviewType = {
   id: string;
@@ -20,6 +21,8 @@ const CustomerReview = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -28,7 +31,7 @@ const CustomerReview = () => {
       const customerReview = await axios.get(
         "http://localhost:3000/customer-review"
       );
-      console.log(typeof (customerReview.data))
+      console.log(typeof customerReview.data);
       return customerReview.data;
     },
   });
@@ -72,6 +75,10 @@ const CustomerReview = () => {
       mutation.mutate(selectedCustomerReview.id);
     }
   };
+  // Filter the data based on the search query
+  const filteredData = query.data?.filter((item: any) =>
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (query.isPending) {
     return (
@@ -111,6 +118,8 @@ const CustomerReview = () => {
             type="text"
             id="table-search"
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search for items"
           />
         </div>
@@ -151,34 +160,36 @@ const CustomerReview = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(query.data) && query?.data?.map((item: any, index: number) => (
-            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{index + 1}</td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {item.name}
-              </td>
-              <td className="px-6 py-4">{item.comment}</td>
-              <td className="px-6 py-4">{summation(item.rating)}</td>
-              <td className="px-6 py-4">{item.phone}</td>
-              <td className="px-6 py-4">{item.email}</td>
-              <td className="px-6 py-4">{item.birthday}</td>
-              <td className="px-6 py-4 flex gap-x-4">
-                <Link
-                  to={`/edit-customer-review/$`} className="font-medium text-blue-600"
-                  state={item}
-                >
-                  <SquarePen />
-                </Link>
+          {Array.isArray(query.data) &&
+            filteredData?.map((item: any, index: number) => (
+              <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                <td className="px-6 py-4">{index + 1}</td>
+                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {highlightText(item.name || "", searchQuery)}
+                </td>
+                <td className="px-6 py-4">{item.comment}</td>
+                <td className="px-6 py-4">{summation(item.rating)}</td>
+                <td className="px-6 py-4">{item.phone}</td>
+                <td className="px-6 py-4">{item.email}</td>
+                <td className="px-6 py-4">{item.birthday}</td>
+                <td className="px-6 py-4 flex gap-x-4">
+                  <Link
+                    to={`/edit-customer-review/$`}
+                    className="font-medium text-blue-600"
+                    state={item}
+                  >
+                    <SquarePen />
+                  </Link>
 
-                <button
-                  className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(item)}
-                >
-                  <Trash2 />
-                </button>
-              </td>
-            </tr>
-          ))}
+                  <button
+                    className="font-medium text-red-600"
+                    onClick={() => handleDeleteClick(item)}
+                  >
+                    <Trash2 />
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
       {showPopup && (
