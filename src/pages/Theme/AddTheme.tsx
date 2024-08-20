@@ -1,49 +1,85 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
 
 type themeType = {
-  name: string | null;
   primary: string | null;
   secondary: string | null;
   bg: string | null;
+  restaurantId: string | null;
 };
 function AddTheme() {
-  const [name, setName] = useState<string | null>("");
+  // const [name, setName] = useState<string | null>("");
+  const [restaurantId, setRestaurantId] = useState<string | null>("");
   const [primary, setPrimary] = useState<string | null>("");
   const [secondary, setSecondary] = useState<string | null>("");
   const [bg, setBg] = useState<string | null>("");
+
+  const {
+    data: restaurants,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["restaurant"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:3000/restaurant");
+      return response.data;
+    },
+  });
+
   const mutation = useMutation({
     mutationFn: (newTheme: themeType) => {
       return axios.post(`http://localhost:3000/theme`, newTheme);
     },
   });
   const handleSubmit = () => {
-    mutation.mutate({ name, primary, secondary, bg });
+    const newTheme: themeType = {
+      restaurantId,
+      primary,
+      secondary,
+      bg,
+    };
+    mutation.mutate(newTheme);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading restaurants</div>;
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Edit Theme</h2>
+      <h2 className="text-2xl font-bold mb-6">Add Theme</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Restaurant Name */}
+        {/* Restaurant Select */}
         <div className="mb-4">
           <label
-            htmlFor="name"
+            htmlFor="restaurantId"
             className="block text-sm font-medium text-gray-700"
           >
-            Restaurant Name
+            Restaurant
           </label>
-          <input
-            type="text"
-            id="name"
-            value={name || ""}
-            onChange={(e) => setName(e.target.value)}
+          <select
+            id="restaurantId"
+            value={restaurantId || ""}
+            onChange={(e) => setRestaurantId(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter restaurant name"
-          />
+            required
+          >
+            <option value="" disabled>
+              Select a restaurant
+            </option>
+            {restaurants && restaurants.length > 0 ? (
+              restaurants.map((restaurant: any) => (
+                <option key={restaurant.id} value={restaurant.id}>
+                  {restaurant.name}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                No restaurants available
+              </option>
+            )}
+          </select>
         </div>
 
         {/* Primary Color */}
