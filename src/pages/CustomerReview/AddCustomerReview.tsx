@@ -20,7 +20,7 @@ function AddCustomerReview() {
   const [phone, setPhone] = useState<string>("");
   const { resaurantId } = useParams();
   const navigate = useNavigate();
-  
+
   const query = useQuery({
     queryKey: ["resaurant"],
     queryFn: async () => {

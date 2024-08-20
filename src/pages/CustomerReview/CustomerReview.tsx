@@ -11,6 +11,7 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 
+
 type customerReviewType = {
   id: string;
   name: string;
@@ -44,20 +45,20 @@ const CustomerReview = () => {
 
     for (let index = 0; index < arr.length; index++) {
       sum += arr[index].score;
-      console.log("score: ",arr[index].score)
+      console.log("score: ", arr[index].score)
       count += 1;
     }
-    console.log("count: ",count)
+    console.log("count: ", count)
     const average = sum / count;
-    console.log("avg:",average)
+    console.log("avg:", average)
     // return average
     if (average >= 1.5) {
       return <img title={`${average}`} width={24} height={24} src={happy} alt="happy" />;
     } else if (average >= 1) {
       return <img title={`${average}`} width={24} height={24} src={satisfied} alt="satisfied" />;
-    } else if ( isNaN(average)) {
+    } else if (isNaN(average)) {
       return <img title={`${average}`} width={24} height={24} src={happy} alt="happy" />;
-    } 
+    }
     else {
       return <img title={`${average}`} width={24} height={24} src={sad} alt="sad" />;
     }
@@ -186,7 +187,9 @@ const CustomerReview = () => {
                   {highlightText(item.name || "", searchQuery)}
                 </td>
                 <td className="px-6 py-4">{item.comment}</td>
-                <td className="px-6 py-4" >{summation(item.rating)}</td>
+                <td className="px-6 py-4" >
+                  {summation(item.rating)}
+                </td>
                 <td className="px-6 py-4">{item.phone}</td>
                 <td className="px-6 py-4">{item.email}</td>
                 <td className="px-6 py-4">{item.birthday}</td>
