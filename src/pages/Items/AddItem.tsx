@@ -130,7 +130,7 @@ function AddItem() {
             <option value="" disabled>
               Select a restaurant
             </option>
-            {restaurants.map((restaurant: any) => (
+            {restaurants?.items?.map((restaurant: any) => (
               <option key={restaurant.id} value={restaurant.id}>
                 {restaurant.name}
               </option>

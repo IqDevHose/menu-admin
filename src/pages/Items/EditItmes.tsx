@@ -21,6 +21,7 @@ function EditItem() {
   const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
   const [image, setImage] = useState<string | null>(record.image);
   const [categoryId, setCategoryId] = useState<string | null>(record.categoryId);
+
   const { itemId } = useParams();
   const navigate = useNavigate();
 
@@ -45,11 +46,19 @@ function EditItem() {
   } = useQuery({
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
-      if (!restaurantId) return [];
-      const response = await axios.get(
-        `http://localhost:3000/category?restaurantId=${restaurantId}`
-      );
-      return response.data;
+      if(restaurantId){
+        const response = await axios.get(
+          `http://localhost:3000/category?restaurantId=${restaurantId}`
+        );
+        return response.data;
+
+      }
+      else{
+        const response = await axios.get(
+          `http://localhost:3000/category`
+        );
+        return response.data;
+      }
     },
     enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
   });
@@ -154,7 +163,7 @@ function EditItem() {
             <option value="" disabled>
               Select a restaurant
             </option>
-            {restaurants.map((restaurant: any) => (
+            {restaurants.items.map((restaurant: any) => (
               <option key={restaurant.id} value={restaurant.id}>
                 {restaurant.name}
               </option>

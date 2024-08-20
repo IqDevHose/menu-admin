@@ -155,18 +155,16 @@ const Theme = () => {
               <td className="px-6 py-4">
                 <label
                   htmlFor=""
-                  className={`${
-                    item?.primary ? "bg-[" + item?.primary + "]" : ""
-                  } text-white px-2 py-1 rounded-full`}
+                  className={`${item?.primary ? "bg-[" + item?.primary + "]" : ""
+                    } text-white px-2 py-1 rounded-full`}
                 >
                   {item?.primary}
                 </label>
               </td>
               <td className="px-6 py-4">
                 <label
-                  className={`${
-                    item?.secondary ? "bg-[" + item?.secondary + "]" : ""
-                  } text-white px-2 py-1 rounded-full`}
+                  className={`${item?.secondary ? "bg-[" + item?.secondary + "]" : ""
+                    } text-white px-2 py-1 rounded-full`}
                 >
                   {item?.secondary}
                 </label>
@@ -190,8 +188,7 @@ const Theme = () => {
         </tbody>
       </table>
 
-      {/* Use the Pagination component */}
-            <div className="flex justify-center items-center mt-10">
+      <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
