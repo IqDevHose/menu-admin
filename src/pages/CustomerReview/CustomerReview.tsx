@@ -1,8 +1,8 @@
+import React, { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
@@ -10,16 +10,19 @@ import sad from "../../assets/sad.png";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
-
+import RatingPopup from "@/components/RatingPopup";
 
 type customerReviewType = {
   id: string;
   name: string;
   comment: string;
   email: string;
+  blue: string;
 };
 
 const CustomerReview = () => {
+  const [showChildPopup, setShowChildPopup] = useState(false);
+  const [selectedChildData, setSelectedChildData] = useState<any[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
@@ -35,33 +38,74 @@ const CustomerReview = () => {
       const customerReview = await axios.get(
         `http://localhost:3000/customer-review?page=${currentPage}`
       );
+      console.log(customerReview.data.items);
       return customerReview.data;
     },
   });
 
-  function summation(arr: { score: number }[]) {
-    console.log(arr)
+  function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
     let count = 0;
 
-    for (let index = 0; index < arr.length; index++) {
-      sum += arr[index].score;
-      console.log("score: ", arr[index].score)
+    for (let index = 0; index < ratings.length; index++) {
+      sum += ratings[index].score;
       count += 1;
     }
-    console.log("count: ", count)
     const average = sum / count;
-    console.log("avg:", average)
-    // return average
+
+    const handleIconClick = () => {
+      setSelectedChildData(ratings); // Pass the entire rating array to the popup
+      setShowChildPopup(true);
+    };
+
     if (average >= 1.5) {
-      return <img title={`${average}`} width={24} height={24} src={happy} alt="happy" />;
+      return (
+        <img
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={happy}
+          alt="happy"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
+        />
+      );
     } else if (average >= 1) {
-      return <img title={`${average}`} width={24} height={24} src={satisfied} alt="satisfied" />;
+      return (
+        <img
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={satisfied}
+          alt="satisfied"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
+        />
+      );
     } else if (isNaN(average)) {
-      return <img title={`${average}`} width={24} height={24} src={happy} alt="happy" />;
-    }
-    else {
-      return <img title={`${average}`} width={24} height={24} src={sad} alt="sad" />;
+      return (
+        <img
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={happy}
+          alt="happy"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
+        />
+      );
+    } else {
+      return (
+        <img
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={sad}
+          alt="sad"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
+        />
+      );
     }
   }
 
@@ -153,27 +197,13 @@ const CustomerReview = () => {
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Comment
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Avg Rating
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Phone
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Email
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Birthday
-            </th>
+            <th scope="col" className="px-6 py-3 w-4">#</th>
+            <th scope="col" className="px-6 py-3 w-4">Name</th>
+            <th scope="col" className="px-6 py-3">Comment</th>
+            <th scope="col" className="px-6 py-3">Avg Rating</th>
+            <th scope="col" className="px-6 py-3">Phone</th>
+            <th scope="col" className="px-6 py-3">Email</th>
+            <th scope="col" className="px-6 py-3">Birthday</th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -188,7 +218,7 @@ const CustomerReview = () => {
                   {highlightText(item.name || "", searchQuery)}
                 </td>
                 <td className="px-6 py-4">{item.comment}</td>
-                <td className="px-6 py-4" >
+                <td className="px-6 py-4">
                   {summation(item.rating)}
                 </td>
                 <td className="px-6 py-4">{item.phone}</td>
@@ -222,6 +252,20 @@ const CustomerReview = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showChildPopup && (
+      <Popup
+        onClose={() => setShowChildPopup(false)}
+        loading={query.isLoading}
+        confirmText="Close"
+        showOneBtn={true}  // This ensures only one button is shown
+        onConfirm={() => setShowChildPopup(false)}  // The close functionality
+        confirmButtonVariant="red"  // You can choose the variant
+      >
+        <RatingPopup data={selectedChildData} />
+      </Popup>
+    )}
+
 
       {showPopup && (
         <Popup
