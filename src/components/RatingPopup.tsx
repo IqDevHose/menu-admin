@@ -10,12 +10,46 @@ const RatingPopup = ({ data }: { data: any[] }) => {
   }
 
   const getIcon = (score: number) => {
-    if (score >= 1.5) {
-      return <img title={`${score}`} width={24} height={24} src={happy} alt="happy" />;
-    } else if (score >= 1) {
-      return <img title={`${score}`} width={24} height={24} src={satisfied} alt="satisfied" />;
-    } else {
-      return <img title={`${score}`} width={24} height={24} src={sad} alt="sad" />;
+    if (score >= 2.5) {
+      return (
+        <img
+          title={`${score}`}
+          width={24}
+          height={24}
+          src={happy}
+          alt="happy"
+        />
+      );
+    } else if (score > 1 && score <= 2.5) {
+      return (
+        <img
+          title={`${score}`}
+          width={24}
+          height={24}
+          src={satisfied}
+          alt="satisfied"
+        />
+      );
+    } else if (isNaN(score)) {
+      return (
+        <img
+          title={`${score}`}
+          width={24}
+          height={24}
+          src={happy}
+          alt="happy"
+        />
+      );
+    } else if (score <= 1) {
+      return (
+        <img
+          title={`${score}`}
+          width={24}
+          height={24}
+          src={sad}
+          alt="sad"
+        />
+      );
     }
   };
 

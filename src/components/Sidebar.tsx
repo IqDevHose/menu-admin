@@ -10,10 +10,10 @@ const Sidebar = () => {
                 <div className="h-full px-3 py-4 overflow-y-auto bg-indigo-100">
                     <ul className="space-y-2 font-medium">
                         <li className='mb-3'>
-                            <a href="#" className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 group border border-b-4 shadow">
+                            <NavLink to={'/'} className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 group border border-b-4 shadow">
                             <LayoutDashboard />
                                 <span className="ms-3">Admin panal</span>
-                            </a>
+                            </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/restaurant'} className={(navData) =>

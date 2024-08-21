@@ -58,7 +58,7 @@ const CustomerReview = () => {
       setShowChildPopup(true);
     };
 
-    if (average >= 1.5) {
+    if (average >= 2.5) {
       return (
         <img
           title={`${average}`}
@@ -70,7 +70,7 @@ const CustomerReview = () => {
           style={{ cursor: "pointer" }}
         />
       );
-    } else if (average >= 1) {
+    } else if (average > 1 && average <= 2.5) {
       return (
         <img
           title={`${average}`}
@@ -94,7 +94,7 @@ const CustomerReview = () => {
           style={{ cursor: "pointer" }}
         />
       );
-    } else {
+    } else if(average <= 1) {
       return (
         <img
           title={`${average}`}
