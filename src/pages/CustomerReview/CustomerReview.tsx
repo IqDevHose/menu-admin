@@ -40,6 +40,7 @@ const CustomerReview = () => {
   });
 
   function summation(arr: { score: number }[]) {
+    console.log(arr)
     let sum = 0;
     let count = 0;
 

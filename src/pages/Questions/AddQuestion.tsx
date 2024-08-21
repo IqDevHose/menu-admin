@@ -78,7 +78,7 @@ function AddQuestion() {
             htmlFor="entitle"
             className="block text-sm font-medium text-gray-700"
           >
-            enTitle
+            English Title
           </label>
           <input
             type="text"

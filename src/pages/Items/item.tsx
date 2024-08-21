@@ -225,7 +225,7 @@ const Item = () => {
               <td className="px-6 py-4">{item?.price}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <Link to={`/edit-items/${item?.id}`} state={item}>
-                  <SquarePen />
+                  <SquarePen className="text-blue-600"/>
                 </Link>
                 <button
                   className="font-medium text-red-600"
