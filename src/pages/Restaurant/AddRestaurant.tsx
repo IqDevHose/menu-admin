@@ -48,8 +48,8 @@ function AddRestaurant() {
     mutationFn: (newRest: restaurantType) => {
       return axios.post(`http://localhost:3000/restaurant`, newRest);
     },
-    onError: (e)=>{
-      console.log(e)
+    onError: (e) => {
+      console.log(e);
     },
     onSuccess: () => {
       navigate("/restaurant"); // Navigate back to the item list after successful addition
@@ -61,18 +61,20 @@ function AddRestaurant() {
   ) => {
     if (newValue) {
       // Type assertion to handle MultiValue, which is the case when isMulti is true
-      const selectedCategories = (newValue as MultiValue<CategoryOption>).map((option) => ({
-        name: option.value,
-        icon: null,
-      }));
+      const selectedCategories = (newValue as MultiValue<CategoryOption>).map(
+        (option) => ({
+          name: option.value,
+          icon: null,
+        })
+      );
       setCategoriesData(selectedCategories);
     } else {
       // If no value is selected (null), reset categoriesData
       setCategoriesData([]);
     }
   };
-  const handleSubmit = (e:FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
     mutation.mutate({
       name,
       categories: categoriesData,
@@ -87,10 +89,10 @@ function AddRestaurant() {
   };
 
   return (
-    <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md overflow-auto">
       <h2 className="text-2xl font-bold mb-6">Add Restaurant</h2>
 
-      <form>
+      <form className="">
         {/* Restaurant Name */}
         <div className="mb-4">
           <label
