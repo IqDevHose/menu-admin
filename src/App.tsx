@@ -29,7 +29,9 @@ function App() {
       <Sidebar />
 
       <Routes>
+        
         <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/restaurant" element={<Restaurant />} />
         <Route
           path="/edit-restaurant/:restaurantId"
