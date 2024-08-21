@@ -119,7 +119,7 @@ const Item = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
           <div className="relative">
@@ -180,17 +180,16 @@ const Item = () => {
             ))}
           </select>
         </div>
-        <div className="flex justify">
-          <Link to="/add-item">
-            <button
-              type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="hidden lg:inline">Add Item</span>
-              <span className="inline lg:hidden">+</span>
-            </button>
-          </Link>
-        </div>
+
+        <Link to="/add-item">
+          <button
+            type="button"
+            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+          >
+            <span className="hidden xl:inline">Add Item</span>
+            <span className="inline xl:hidden">+</span>
+          </button>
+        </Link>
       </div>
 
       {/* Items Table */}
@@ -225,7 +224,7 @@ const Item = () => {
               <td className="px-6 py-4">{item?.price}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <Link to={`/edit-items/${item?.id}`} state={item}>
-                  <SquarePen className="text-blue-600"/>
+                  <SquarePen className="text-blue-600" />
                 </Link>
                 <button
                   className="font-medium text-red-600"
