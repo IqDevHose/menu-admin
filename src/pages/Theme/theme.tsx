@@ -82,8 +82,8 @@ const handleSelectItem = (id: string) => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
   };
-
   if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">

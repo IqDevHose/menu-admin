@@ -98,6 +98,7 @@ const Category = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
   };
 
   useEffect(() => {

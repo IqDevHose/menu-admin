@@ -123,6 +123,7 @@ const handleSelectItem = (id: string) => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
   };
 
   if (isLoading) {

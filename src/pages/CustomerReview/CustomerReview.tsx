@@ -141,6 +141,7 @@ const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
 const handlePageChange = (newPage: number) => {
   setCurrentPage(newPage);
+  setSelectedItems([]);
 };
   // Handle select all checkbox
 const handleSelectAll = () => {

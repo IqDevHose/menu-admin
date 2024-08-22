@@ -87,6 +87,7 @@ const Rating = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
   };
 
   if (query.isPending) {
