@@ -25,6 +25,7 @@ const Item = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
@@ -80,6 +81,26 @@ const Item = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axios.delete(`http://localhost:3000/item/delete-many`, {
+        data: selectedItemsIds
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  }
     // Handle select all checkbox
 const handleSelectAll = () => {
   if (selectedItems.length === filteredData.length) {
@@ -202,6 +223,18 @@ const handleSelectItem = (id: string) => {
           </select>
         </div>
 
+        <div className="flex gap-x-2">
+        {
+          selectedItems.length > 0 && ( 
+          <button
+            type="button"
+            className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            onClick={handleDeleteMany}
+          >
+           Delete {selectedItems.length} 
+          </button>
+          )
+        }
         <Link to="/add-item">
           <button
             type="button"
@@ -211,6 +244,7 @@ const handleSelectItem = (id: string) => {
             <span className="inline xl:hidden">+</span>
           </button>
         </Link>
+        </div>
       </div>
 
       {/* Items Table */}
@@ -281,6 +315,20 @@ const handleSelectItem = (id: string) => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItems && selectedItems.length + " item/s"}?</p>
+        </Popup>
+      )}
 
       {/* Delete Confirmation Popup */}
       {showPopup && (

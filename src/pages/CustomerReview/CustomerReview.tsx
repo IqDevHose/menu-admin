@@ -22,6 +22,7 @@ type customerReviewType = {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedChildData, setSelectedChildData] = useState<any[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
@@ -43,6 +44,28 @@ const CustomerReview = () => {
       return customerReview.data;
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axios.delete(`http://localhost:3000/customer-review/delete-many`, {
+        data: selectedItemsIds
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  }
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
+
 
   function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
@@ -205,6 +228,18 @@ if (query.isPending) {
             placeholder="Search for items"
           />
         </div>
+        <div className="flex gap-x-2">
+        {
+          selectedItems.length > 0 && ( 
+          <button
+            type="button"
+            className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            onClick={handleDeleteMany}
+          >
+           Delete {selectedItems.length} 
+          </button>
+          )
+        }
         <Link to="/add-customer-review">
           <button
             type="button"
@@ -213,6 +248,7 @@ if (query.isPending) {
             Add Customer Review
           </button>
         </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -300,6 +336,19 @@ if (query.isPending) {
       </Popup>
     )}
 
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItems && selectedItems.length + " review/s"}?</p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup

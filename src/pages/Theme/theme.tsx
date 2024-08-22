@@ -24,6 +24,7 @@ const Theme = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const itemsPerPage = 10; // Set the number of items per page
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
 
   const query = useQuery({
     queryKey: ["theme", currentPage],
@@ -44,6 +45,27 @@ const Theme = () => {
       setShowPopup(false); // Close the popup after successful deletion
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axios.delete(`http://localhost:3000/theme/delete-many`, {
+        data: selectedItemsIds
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  }
 
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
@@ -127,6 +149,18 @@ const handleSelectItem = (id: string) => {
             placeholder="Search for items"
           />
         </div>
+        <div className="flex gap-x-2">
+        {
+          selectedItems.length > 0 && ( 
+          <button
+            type="button"
+            className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            onClick={handleDeleteMany}
+          >
+           Delete {selectedItems.length} 
+          </button>
+          )
+        }
         <Link to="/add-theme">
           <button
             type="button"
@@ -135,6 +169,7 @@ const handleSelectItem = (id: string) => {
             Add theme
           </button>
         </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -235,6 +270,19 @@ const handleSelectItem = (id: string) => {
         />
       </div>
 
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItems && selectedItems.length + " theme/s"}?</p>
+        </Popup>
+      )}
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

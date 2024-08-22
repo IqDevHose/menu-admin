@@ -24,6 +24,7 @@ const Questions = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const itemsPerPage = 10; // Set the number of items per page
   const queryClient = useQueryClient();
 
@@ -46,6 +47,28 @@ const Questions = () => {
       setShowPopup(false); // Close the popup after successful deletion
     },
   });
+
+
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axios.delete(`http://localhost:3000/question/delete-many`, {
+        data: selectedItemsIds
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  }
 
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
@@ -131,6 +154,19 @@ const handleSelectItem = (id: string) => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
+        <div className="flex gap-x-2">
+        {
+          selectedItems.length > 0 && ( 
+          <button
+            type="button"
+            className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            onClick={handleDeleteMany}
+          >
+           Delete {selectedItems.length} 
+          </button>
+          )
+        }
         <Link to={"/add-question"}>
           <button
             type="button"
@@ -139,6 +175,7 @@ const handleSelectItem = (id: string) => {
             Add Question
           </button>
         </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
@@ -220,6 +257,20 @@ const handleSelectItem = (id: string) => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedItems && selectedItems.length + " question/s"}?</p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup

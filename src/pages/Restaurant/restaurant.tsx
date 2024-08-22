@@ -48,7 +48,6 @@ const Restaurant = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds)
       return axios.delete(`http://localhost:3000/restaurant/delete-many`, {
         data: selectedItemsIds
       });
@@ -59,21 +58,26 @@ const Restaurant = () => {
     },
   });
 
-  const handleDeleteClick = (item: any) => {
-    setSelectedItem(item);
-    setShowPopup(true);
-  };
-
   const confirmDeleteMany = () => {
     if (selectedItems) {
       deleteMutation.mutate(selectedItems);
     }
   };
+
+  const handleDeleteClick = (item: any) => {
+    setSelectedItem(item);
+    setShowPopup(true);
+  };
+
   const confirmDelete = () => {
     if (selectedItem) {
       mutation.mutate(selectedItem.id);
     }
   };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  }
 
   // Filter the data based on the search query
   const filteredData = query.data?.items.filter((item: any) =>
@@ -107,9 +111,6 @@ const Restaurant = () => {
     );
   };
 
-  const handleDeleteMany = () => {
-    setShowDeleteManyPopup(true);
-  }
 
   if (query.isPending) {
     return (
