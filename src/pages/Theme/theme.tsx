@@ -20,6 +20,7 @@ const Theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
+  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const itemsPerPage = 10; // Set the number of items per page
@@ -58,7 +59,24 @@ const Theme = () => {
   const filteredData = query.data?.items?.filter((item: any) =>
     item?.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+ // Handle select all checkbox
+ const handleSelectAll = () => {
+  if (selectedItems.length === filteredData.length) {
+    setSelectedItems([]);
+  } else {
+    const allIds = filteredData.map((item: any) => item.id);
+    setSelectedItems(allIds);
+  }
+};
 
+// Handle individual row checkbox
+const handleSelectItem = (id: string) => {
+  setSelectedItems((prevSelectedItems) =>
+    prevSelectedItems.includes(id)
+      ? prevSelectedItems.filter((itemId) => itemId !== id)
+      : [...prevSelectedItems, id]
+  );
+};
   // Calculate the total number of pages
   const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
@@ -121,6 +139,13 @@ const Theme = () => {
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
+          <th scope="col" className="px-6 py-3 w-4">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === filteredData?.length}
+                onChange={handleSelectAll}
+              />
+            </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
             </th>
@@ -143,6 +168,13 @@ const Theme = () => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
+                 <td className="px-6 py-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(item.id)}
+                  onChange={() => handleSelectItem(item.id)}
+                />
+              </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
