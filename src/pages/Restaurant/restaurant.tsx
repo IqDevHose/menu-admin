@@ -66,6 +66,7 @@ const Restaurant = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
   };
 
   // Handle select all checkbox
