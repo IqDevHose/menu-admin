@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BarChart,
   Bar,
@@ -14,9 +13,33 @@ import {
 } from 'recharts';
 import { Card, Row, Col, Statistic, Divider, List, Avatar } from 'antd';
 import Spinner from '@/components/Spinner';
-
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+type CustomerReviewType = {
+  name:string
+  comment: string
+}
 const Home = () => {
   // Mocked data for statistics
+  const query = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: async () => {
+      const customerReview = await axios.get(
+        `http://localhost:3000/dashboard`
+      );
+      return customerReview.data;
+    },
+  });
+  const customerReviewQuery = useQuery({
+    queryKey: ["customerReview"],
+    queryFn: async () => {
+      const customerReview = await axios.get(
+        `http://localhost:3000/customer-review`
+      );
+      return customerReview.data;
+    },
+  });
   const statsData = {
     totalReviews: 250,
     avgRatingPerRestaurant: [
@@ -36,8 +59,7 @@ const Home = () => {
     totalItems: 300,
   };
 
-  const isLoading = false;
-  const isError = false;
+
 
   // Extract data from the response
   const {
@@ -51,7 +73,7 @@ const Home = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-  if (isLoading) {
+  if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -59,7 +81,7 @@ const Home = () => {
     );
   }
 
-  if (isError || !statsData) {
+  if (query.isError || !statsData) {
     return <div>Error loading statistics.</div>;
   }
 
@@ -71,22 +93,22 @@ const Home = () => {
           {/* Total Reviews, Ratings, Categories, Items */}
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
-              <Statistic title="Total Reviews" value={totalReviews} valueStyle={{ color: '#3f8600' }} />
+              <Statistic title="Total Reviews" value={query.data.totalCustomerReview} valueStyle={{ color: '#3f8600' }} />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
-              <Statistic title="Total Ratings" value={totalRatings} valueStyle={{ color: '#3f8600' }} />
+              <Statistic title="Total Ratings" value={query.data.totalRatings} valueStyle={{ color: '#3f8600' }} />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
-              <Statistic title="Total Categories" value={totalCategories} valueStyle={{ color: '#3f8600' }} />
+              <Statistic title="Total Categories" value={query.data.totalCategories} valueStyle={{ color: '#3f8600' }} />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
-              <Statistic title="Total Items" value={totalItems} valueStyle={{ color: '#3f8600' }} />
+              <Statistic title="Total Items" value={query.data.totalItems} valueStyle={{ color: '#3f8600' }} />
             </Card>
           </Col>
         </Row>
@@ -157,16 +179,12 @@ const Home = () => {
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
-            dataSource={[
-              { title: 'John Doe reviewed Pizza Palace', avatar: 'https://via.placeholder.com/40' },
-              { title: 'Jane Smith rated Taco Town', avatar: 'https://via.placeholder.com/40' },
-              { title: 'Sam Green added a review for Burger Barn', avatar: 'https://via.placeholder.com/40' },
-            ]}
+            dataSource={customerReviewQuery?.data?.items?.slice(0,4) as CustomerReviewType[] }
             renderItem={(item) => (
               <List.Item>
                 <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={item.title}
+                  avatar={<Avatar src={item.name} />}
+                  title={item.name + ": " +item.comment}
                 />
               </List.Item>
             )}
@@ -176,15 +194,15 @@ const Home = () => {
         <Card title="Quick Links" className="mb-6">
           <List
             dataSource={[
-              'View All Reviews',
-              'Manage Categories',
-              'Add New Item',
-              'View Analytics',
+              { title: 'View all Restaurant', link: '/restaurant' },
+              { title: 'View All Reviews', link: '/customerReview' },
+              { title: 'Manage Categories', link: '/category' },
+              { title: 'Manage Items', link: '/items' },
             ]}
             renderItem={(item) => (
               <List.Item>
                 <List.Item.Meta
-                  title={<a href="#">{item}</a>}
+                  title={<Link to={item.link}>{item.title}</Link>}
                 />
               </List.Item>
             )}

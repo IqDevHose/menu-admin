@@ -154,22 +154,29 @@ const Theme = () => {
               </td>
               <td className="px-6 py-4">
                 <label
+                style={{backgroundColor:item?.primary}}
                   htmlFor=""
-                  className={`${item?.primary ? "bg-[" + item?.primary + "]" : ""
-                    } text-white px-2 py-1 rounded-full`}
+                  className={`text-gray-400 px-2 py-1 rounded border`}
                 >
-                  {item?.primary}
                 </label>
+                  {item?.primary}
               </td>
               <td className="px-6 py-4">
                 <label
-                  className={`${item?.secondary ? "bg-[" + item?.secondary + "]" : ""
-                    } text-white px-2 py-1 rounded-full`}
+                style={{backgroundColor:item?.secondary}}
+                  className={`text-gray-400 px-2 py-1 rounded border`}
                 >
-                  {item?.secondary}
                 </label>
+                  {item?.secondary}
               </td>
-              <td className="px-6 py-4">{item?.bg}</td>
+              <td className="px-6 py-4 text-gray-400 border">
+              <label
+                style={{backgroundColor:item?.bg}}
+                  className={`text-white px-2 py-1 rounded border`}
+                >
+                </label>
+                  {item?.bg}
+              </td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link to={`/edit-theme/${item.id}`} state={item}>

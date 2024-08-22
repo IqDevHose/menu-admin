@@ -10,7 +10,10 @@ const Sidebar = () => {
                 <div className="h-full px-3 py-4 overflow-y-auto bg-indigo-100">
                     <ul className="space-y-2 font-medium">
                         <li className='mb-3'>
-                            <NavLink to={'/'} className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 group border border-b-4 shadow">
+                            <NavLink to={'/'} className={(navData) =>
+                                navData.isActive ? 
+                                "flex items-center p-2 text-white rounded-lg bg-indigo-800 "
+                                :"flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 shadow"}>
                             <LayoutDashboard />
                                 <span className="ms-3">Admin panal</span>
                             </NavLink>
