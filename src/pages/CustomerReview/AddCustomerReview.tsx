@@ -13,12 +13,14 @@ type customerReviewType = {
 };
 
 function AddCustomerReview() {
+  const [resturantId, setResturantId] = useState<string>("");
+
   const [name, setName] = useState<string>("");
   const [comment, setComment] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [birthday, setBirthday] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const { resaurantId } = useParams();
+ 
   const navigate = useNavigate();
 
   const query = useQuery({
@@ -41,7 +43,7 @@ function AddCustomerReview() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ name, comment, email, birthday, phone, resaurantId });
+    mutation.mutate({ name, comment, email, birthday, phone, resturantId }); 
   };
 
   return (
@@ -140,6 +142,7 @@ function AddCustomerReview() {
           <select
             id="resaurant"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+           onChange={e=>setResturantId(e.target.value)}
             required
           >
             {query.data?.items.map((resaurant: any) => (

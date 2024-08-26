@@ -23,6 +23,8 @@ import AddQuestion from "./pages/Questions/AddQuestion";
 import EditTheme from "./pages/Theme/editTheme";
 import AddTheme from "./pages/Theme/AddTheme";
 import DeletedItems from "./pages/Items/Deleteditems";
+import DeletedReview from "./pages/CustomerReview/DeletedReview";
+import DeletedRating from "./pages/Rating/DeletedRating";
 
 function App() {
   return (
@@ -41,12 +43,14 @@ function App() {
         <Route path="/add-restaurant" element={<AddRestaurant />} />
         <Route path="/edit-rating/:ratingId" element={<EditRating />} />
         <Route path="/add-rating" element={<AddRating />} />
+        <Route path="/deleted-rating" element={<DeletedRating />} />
 
         <Route
           path="/edit-customer-review/:customerReviewId"
           element={<EditCustomerReview />}
         />
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
+        <Route path="/deleted-customer-review" element={<DeletedReview />} />
         <Route path="/category" element={<Category />}></Route>
         <Route
           path="/edit-category/:categoryId"
@@ -60,6 +64,7 @@ function App() {
         
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
+        
         <Route path="/questions" element={<Questions />}></Route>
         <Route
           path="/edit-questions/:questionId"

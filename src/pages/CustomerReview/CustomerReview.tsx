@@ -22,6 +22,9 @@ type customerReviewType = {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<customerReviewType | null>(
+    null
+  );
   const [selectedChildData, setSelectedChildData] = useState<any[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
@@ -205,14 +208,24 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
-        <Link to="/add-customer-review">
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
-          >
-            Add Customer Review
-          </button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/add-customer-review">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
+            >
+              Add Customer Review
+            </button>
+          </Link>
+          <Link to="/deleted-customer-review">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
+              >
+             trash
+            </button>
+          </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -299,19 +312,20 @@ const CustomerReview = () => {
         />
       </div>
 
-      {showChildPopup && (
+      {/* Delete Confirmation Popup */}
+      {showPopup && (
         <Popup
-          onClose={() => setShowChildPopup(false)}
-          loading={query.isLoading}
-          confirmText="Close"
-          showOneBtn={true} // This ensures only one button is shown
-          onConfirm={() => setShowChildPopup(false)} // The close functionality
-          confirmButtonVariant="red" // You can choose the variant
+          onClose={() => setShowPopup(false)}
+          onConfirm={confirmDelete}
+          loading={mutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
         >
-          <RatingPopup data={selectedChildData} />
+          <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
-
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
