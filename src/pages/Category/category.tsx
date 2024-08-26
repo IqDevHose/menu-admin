@@ -161,24 +161,27 @@ const Category = () => {
             ))}
           </select>
         </div>{" "}
-        <Link to={"/add-category"}>
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
-          >
-            <span className="hidden lg:inline">Add Category</span>
-            <span className="inline lg:hidden">+</span>
-          </button>
-        </Link>
-        <Link to={"/deleted-category"}>
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
-          >
-            <span className="hidden lg:inline">Trash</span>
-            
-          </button>
-        </Link>
+        <div className="gap-4 flex justify-center">
+          <Link to={"/add-category"}>
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
+            >
+              <span className="hidden xl:inline">Add Category</span>
+              <span className="inline xl:hidden">+</span>
+            </button>
+          </Link>
+          <Link to={"/deleted-category"}>
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
+            >
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
+            </button>
+          </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">

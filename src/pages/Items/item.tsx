@@ -201,25 +201,27 @@ const Item = () => {
             ))}
           </select>
         </div>
-
-        <Link to="/add-item">
-          <button
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="hidden xl:inline">Add Item</span>
-            <span className="inline xl:hidden">+</span>
-          </button>
-        </Link>
-        <Link to="/deleted-items">
-          <button
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="hidden xl:inline">Trash</span>
-            
-          </button>
-        </Link>
+        <div className="gap-4 flex justify-center">
+          <Link to="/add-item">
+            <button
+              type="button"
+              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+            >
+              <span className="hidden xl:inline">Add Item</span>
+              <span className="inline xl:hidden">+</span>
+            </button>
+          </Link>
+          <Link to="/deleted-items">
+            <button
+              type="button"
+              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+            >
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* Items Table */}

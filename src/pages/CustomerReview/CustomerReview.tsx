@@ -208,21 +208,24 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="gap-4 flex justify-center">
           <Link to="/add-customer-review">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
             >
-              Add Customer Review
+              <span className="hidden xl:inline">Add Customer Review</span>
+              <span className="inline xl:hidden">+</span>
             </button>
           </Link>
           <Link to="/deleted-customer-review">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
-              >
-             trash
+            >
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
             </button>
           </Link>
         </div>

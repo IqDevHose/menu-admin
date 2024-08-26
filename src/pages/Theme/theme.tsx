@@ -127,22 +127,27 @@ const Theme = () => {
             placeholder="Search for items"
           />
         </div>
-        <Link to="/add-theme">
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
-          >
-            Add theme
-          </button>
-        </Link>
-        <Link to="/deleted-theme">
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
-          >
-            Trash
-          </button>
-        </Link>
+        <div className="gap-4 flex justify-center">
+          <Link to="/add-theme">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
+            >
+              <span className="hidden xl:inline">Add theme</span>
+              <span className="inline xl:hidden">+</span>
+            </button>
+          </Link>
+          <Link to="/deleted-theme">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
+            >
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
+            </button>
+          </Link>
+        </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">

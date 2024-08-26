@@ -133,23 +133,26 @@ const Rating = () => {
             onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
           />
         </div>
-        <div className="flex items-center gap-2">
-        <Link to="/add-rating">
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
-          >
-            Add Rating
-          </button>
-        </Link>
-        <Link to="/deleted-rating">
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
-          >
-            trash
-          </button>
-        </Link>
+        <div className="gap-4 flex justify-center">
+          <Link to="/add-rating">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
+            >
+              <span className="hidden xl:inline">Add Rating</span>
+              <span className="inline xl:hidden">+</span>
+            </button>
+          </Link>
+          <Link to="/deleted-rating">
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
+            >
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
+            </button>
+          </Link>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">

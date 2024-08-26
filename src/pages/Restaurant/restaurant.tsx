@@ -170,7 +170,8 @@ const Restaurant = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
             >
-              Add Restaurant
+              <span className="hidden xl:inline">Add Restaurant</span>
+              <span className="inline xl:hidden">+</span>
             </button>
           </Link>
           <Link to={"/deleted-restaurant"}>
@@ -178,7 +179,9 @@ const Restaurant = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
             >
-              Trash
+              <span className="flex gap-1 ">
+                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              </span>
             </button>
           </Link>
         </div>
