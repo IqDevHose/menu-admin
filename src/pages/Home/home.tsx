@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -11,35 +12,51 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Card, Row, Col, Statistic, Divider, List, Avatar } from 'antd';
+import { Card, Row, Col, Statistic, Divider, List, Avatar, Select } from 'antd'; // Import Select from Ant Design
 import Spinner from '@/components/Spinner';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+
 type CustomerReviewType = {
-  name:string
-  comment: string
-}
+  name: string;
+  comment: string;
+};
+
 const Home = () => {
-  // Mocked data for statistics
+  // Fetching data using useQuery
   const query = useQuery({
-    queryKey: ["dashboard"],
+    queryKey: ['dashboard'],
     queryFn: async () => {
-      const customerReview = await axios.get(
-        `http://localhost:3000/dashboard`
-      );
+      const customerReview = await axios.get(`http://localhost:3000/dashboard`);
       return customerReview.data;
     },
   });
+
   const customerReviewQuery = useQuery({
-    queryKey: ["customerReview"],
+    queryKey: ['customerReview'],
     queryFn: async () => {
-      const customerReview = await axios.get(
-        `http://localhost:3000/customer-review`
-      );
+      const customerReview = await axios.get(`http://localhost:3000/customer-review`);
       return customerReview.data;
     },
   });
+
+  // Fetch restaurant list for selection
+  const restaurantQuery = useQuery({
+    queryKey: ['restaurants'],
+    queryFn: async () => {
+      const response = await axios.get(`http://localhost:3000/restaurant`);
+      return response.data;
+    },
+  });
+
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>(undefined);
+
+  const handleRestaurantChange = (value: string) => {
+    setSelectedRestaurant(value);
+    // Add any additional logic you want to perform when a restaurant is selected
+  };
+
   const statsData = {
     totalReviews: 250,
     avgRatingPerRestaurant: [
@@ -59,8 +76,6 @@ const Home = () => {
     totalItems: 300,
   };
 
-
-
   // Extract data from the response
   const {
     totalReviews,
@@ -73,7 +88,7 @@ const Home = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-  if (query.isPending) {
+  if (query.isPending || restaurantQuery.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -81,19 +96,42 @@ const Home = () => {
     );
   }
 
-  if (query.isError || !statsData) {
+  if (query.isError || !statsData || restaurantQuery.isError) {
     return <div>Error loading statistics.</div>;
   }
 
   return (
     <div className="p-8 w-full overflow-hidden bg-white min-h-screen flex">
       <div className="flex-1">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
+      <div className="flex items-center space-x-4 mb-6">
+      <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+      {/* Restaurant Selection */}
+      <Select
+        placeholder="Select a restaurant"
+        style={{ width: 200 }}
+        onChange={handleRestaurantChange}
+        value={selectedRestaurant}
+      >
+        <Select.Option key="all" value="all">
+          All Restaurants
+        </Select.Option>
+        {restaurantQuery.data.items.map((restaurant: { id: string; name: string }) => (
+          <Select.Option key={restaurant.id} value={restaurant.id}>
+            {restaurant.name}
+          </Select.Option>
+        ))}
+      </Select>
+
+        </div>
         <Row gutter={24}>
           {/* Total Reviews, Ratings, Categories, Items */}
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
-              <Statistic title="Total Reviews" value={query.data.totalCustomerReview} valueStyle={{ color: '#3f8600' }} />
+              <Statistic
+                title="Total Reviews"
+                value={query.data.totalCustomerReview}
+                valueStyle={{ color: '#3f8600' }}
+              />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
@@ -179,13 +217,10 @@ const Home = () => {
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
-            dataSource={customerReviewQuery?.data?.items?.slice(0,4) as CustomerReviewType[] }
+            dataSource={customerReviewQuery?.data?.items?.slice(0, 4) as CustomerReviewType[]}
             renderItem={(item) => (
               <List.Item>
-                <List.Item.Meta
-                  avatar={<Avatar src={item.name} />}
-                  title={item.name + ": " +item.comment}
-                />
+                <List.Item.Meta avatar={<Avatar src={item.name} />} title={item.name + ": " + item.comment} />
               </List.Item>
             )}
           />
@@ -201,9 +236,7 @@ const Home = () => {
             ]}
             renderItem={(item) => (
               <List.Item>
-                <List.Item.Meta
-                  title={<Link to={item.link}>{item.title}</Link>}
-                />
+                <List.Item.Meta title={<Link to={item.link}>{item.title}</Link>} />
               </List.Item>
             )}
           />
