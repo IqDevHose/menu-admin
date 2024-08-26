@@ -26,6 +26,7 @@ import DeletedItems from "./pages/Items/Deleteditems";
 import DeletedCategories from "./pages/Category/DeletedCategory";
 import DeletedQuestions from "./pages/Questions/DeletedQuestion";
 import DeletedThemes from "./pages/Theme/DeletedTheme";
+import DeletedRestaurant from "./pages/Restaurant/DeletedRestaurant";
 
 function App() {
   return (
@@ -33,7 +34,6 @@ function App() {
       <Sidebar />
 
       <Routes>
-        
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/restaurant" element={<Restaurant />} />
@@ -42,6 +42,7 @@ function App() {
           element={<EditRestaurant />}
         />
         <Route path="/add-restaurant" element={<AddRestaurant />} />
+        <Route path="/deleted-restaurant" element={<DeletedRestaurant />} />
         <Route path="/edit-rating/:ratingId" element={<EditRating />} />
         <Route path="/add-rating" element={<AddRating />} />
 
@@ -62,7 +63,7 @@ function App() {
         <Route path="/edit-items/:itemId" element={<EditItmes />}></Route>
         <Route path="/add-item" element={<AddItem />} />
         <Route path="/deleted-items" element={<DeletedItems />} />
-        
+
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
         <Route path="/questions" element={<Questions />}></Route>
