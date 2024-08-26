@@ -17,32 +17,34 @@ type itemReviewType = {
   image: string;
 };
 
-const Item = () => {
-  const [showPopup, setShowPopup] = useState(false);
+const DeletedItems = () => {
+  const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
+  const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
 
-  // Fetch items based on current page, category, and restaurant filters
+  // Fetch deleted items based on current page, category, and restaurant filters
   const {
     data: itemsData,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["items", currentPage, selectedCategory, selectedRestaurant],
+    queryKey: ["findAll-deleted", currentPage, selectedCategory, selectedRestaurant],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", String(currentPage));
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      const item = await axios.get(`http://localhost:3000/item`, { params });
+      // Fetching deleted items from the server
+      const item = await axios.get(`http://localhost:3000/item/findAll-deleted`, { params });
       return item.data;
     },
   });
@@ -51,13 +53,13 @@ const Item = () => {
   const { data: categories } = useQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
-      if (!selectedRestaurant) return []; // Return empty array if no restaurant is selected
+      if (!selectedRestaurant) return [];
       const res = await axios.get(
         `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
       );
       return res.data;
     },
-    enabled: !!selectedRestaurant, // Only fetch categories when a restaurant is selected
+    enabled: !!selectedRestaurant,
   });
 
   // Fetch restaurants
@@ -69,49 +71,48 @@ const Item = () => {
     },
   });
 
-  // Handle item deletion
-  const mutation = useMutation({
+  // Handle item restoration
+  const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
+      await axios.put(`http://localhost:3000/item/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      setShowPopup(false);
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
+      setShowRestorePopup(false); // Close the restore popup after success
     },
   });
 
-  // // Handle select all checkbox
-  // const handleSelectAll = () => {
-  //   if (selectedItems.length === filteredData.length) {
-  //     setSelectedItems([]);
-  //   } else {
-  //     const allIds = filteredData.map((item: any) => item.id);
-  //     setSelectedItems(allIds);
-  //   }
-  // };
+  // Handle item final deletion
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`http://localhost:3000/item/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["deletedItems"] });
+      setShowDeletePopup(false); // Close the delete popup after success
+    },
+  });
 
-  // // Handle individual row checkbox
-  // const handleSelectItem = (id: string) => {
-  //   setSelectedItems((prevSelectedItems) =>
-  //     prevSelectedItems.includes(id)
-  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
-  //       : [...prevSelectedItems, id]
-  //   );
-  // };
-
-  // Reset the current page to 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, selectedRestaurant]);
+  // Handle restore and delete operations
+  const handleRestoreClick = (item: itemReviewType) => {
+    setSelectedItem(item);
+    setShowRestorePopup(true); // Show restore popup
+  };
 
   const handleDeleteClick = (item: itemReviewType) => {
     setSelectedItem(item);
-    setShowPopup(true);
+    setShowDeletePopup(true); // Show delete popup
+  };
+
+  const confirmRestore = () => {
+    if (selectedItem) {
+      restoreMutation.mutate(selectedItem.id);
+    }
   };
 
   const confirmDelete = () => {
     if (selectedItem) {
-      mutation.mutate(selectedItem.id);
+      deleteMutation.mutate(selectedItem.id);
     }
   };
 
@@ -140,7 +141,7 @@ const Item = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex justify-between ">
+      <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
           <div className="relative">
@@ -174,7 +175,7 @@ const Item = () => {
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg"
-            disabled={!selectedRestaurant} // Disable category filter until a restaurant is selected
+            disabled={!selectedRestaurant}
           >
             <option value="">All Categories</option>
             {categories?.items?.map((category: any) => (
@@ -189,7 +190,7 @@ const Item = () => {
             value={selectedRestaurant}
             onChange={(e) => {
               setSelectedRestaurant(e.target.value);
-              setSelectedCategory(""); // Reset the category when a new restaurant is selected
+              setSelectedCategory("");
             }}
             className="p-2 border border-gray-300 rounded-lg"
           >
@@ -201,63 +202,24 @@ const Item = () => {
             ))}
           </select>
         </div>
-
-        <Link to="/add-item">
-          <button
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="hidden xl:inline">Add Item</span>
-            <span className="inline xl:hidden">+</span>
-          </button>
-        </Link>
-        <Link to="/deleted-items">
-          <button
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="hidden xl:inline">Deleted</span>
-            
-          </button>
-        </Link>
       </div>
 
       {/* Items Table */}
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              /> */}
-            </th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Description
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
+            <th scope="col" className="px-6 py-3 w-4"></th>
+            <th scope="col" className="px-6 py-3">#</th>
+            <th scope="col" className="px-6 py-3">Name</th>
+            <th scope="col" className="px-6 py-3">Description</th>
+            <th scope="col" className="px-6 py-3">Price</th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">
-                {/* <input
-                  type="checkbox"
-                  checked={selectedItems.includes(item.id)}
-                  onChange={() => handleSelectItem(item.id)}
-                /> */}
-              </td>
+              <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
@@ -270,6 +232,12 @@ const Item = () => {
                 <Link to={`/edit-items/${item?.id}`} state={item}>
                   <SquarePen className="text-blue-600" />
                 </Link>
+                <button
+                  className="font-medium text-green-600"
+                  onClick={() => handleRestoreClick(item)}
+                >
+                  Restore
+                </button>
                 <button
                   className="font-medium text-red-600"
                   onClick={() => handleDeleteClick(item)}
@@ -291,12 +259,27 @@ const Item = () => {
         />
       </div>
 
-      {/* Delete Confirmation Popup */}
-      {showPopup && (
+      {/* Restore Confirmation Popup */}
+      {showRestorePopup && (
         <Popup
-          onClose={() => setShowPopup(false)}
+          onClose={() => setShowRestorePopup(false)}
+          onConfirm={confirmRestore}
+          loading={restoreMutation.isPending}
+          confirmText="Restore"
+          loadingText="Restoring..."
+          cancelText="Cancel"
+          
+        >
+          <p>Are you sure you want to restore {selectedItem?.name}?</p>
+        </Popup>
+      )}
+
+      {/* Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <Popup
+          onClose={() => setShowDeletePopup(false)}
           onConfirm={confirmDelete}
-          loading={mutation.isPending}
+          loading={deleteMutation.isPending}
           confirmText="Delete"
           loadingText="Deleting..."
           cancelText="Cancel"
@@ -309,4 +292,4 @@ const Item = () => {
   );
 };
 
-export default Item;
+export default DeletedItems;

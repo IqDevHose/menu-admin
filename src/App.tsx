@@ -22,6 +22,7 @@ import AddCategory from "./pages/Category/AddCategory";
 import AddQuestion from "./pages/Questions/AddQuestion";
 import EditTheme from "./pages/Theme/editTheme";
 import AddTheme from "./pages/Theme/AddTheme";
+import DeletedItems from "./pages/Items/Deleteditems";
 
 function App() {
   return (
@@ -55,6 +56,8 @@ function App() {
         <Route path="/items" element={<Item />}></Route>
         <Route path="/edit-items/:itemId" element={<EditItmes />}></Route>
         <Route path="/add-item" element={<AddItem />} />
+        <Route path="/deleted-items" element={<DeletedItems />} />
+        
         <Route path="/customerReview" element={<CustomerReview />}></Route>
         <Route path="/rating" element={<Rating />}></Route>
         <Route path="/questions" element={<Questions />}></Route>
