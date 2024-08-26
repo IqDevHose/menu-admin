@@ -23,6 +23,9 @@ import AddQuestion from "./pages/Questions/AddQuestion";
 import EditTheme from "./pages/Theme/editTheme";
 import AddTheme from "./pages/Theme/AddTheme";
 import DeletedItems from "./pages/Items/Deleteditems";
+import DeletedCategories from "./pages/Category/DeletedCategory";
+import DeletedQuestions from "./pages/Questions/DeletedQuestion";
+import DeletedThemes from "./pages/Theme/DeletedTheme";
 
 function App() {
   return (
@@ -52,7 +55,9 @@ function App() {
           path="/edit-category/:categoryId"
           element={<EditCategory />}
         ></Route>
+        
         <Route path="/add-category" element={<AddCategory />}></Route>
+        <Route path="/deleted-category" element={<DeletedCategories />}></Route>
         <Route path="/items" element={<Item />}></Route>
         <Route path="/edit-items/:itemId" element={<EditItmes />}></Route>
         <Route path="/add-item" element={<AddItem />} />
@@ -66,9 +71,10 @@ function App() {
           element={<EditQuestion />}
         ></Route>
         <Route path="/add-question" element={<AddQuestion />}></Route>
-
+        <Route path="/deleted-question" element={<DeletedQuestions/>}></Route>
         <Route path="/theme" element={<Theme />}></Route>
         <Route path="/add-theme" element={<AddTheme />}></Route>
+        <Route path="/deleted-theme" element={<DeletedThemes />}></Route>
         <Route path="/edit-theme/:themeId" element={<EditTheme />}></Route>
       </Routes>
     </div>

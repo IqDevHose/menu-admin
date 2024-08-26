@@ -8,13 +8,13 @@ type questionType = {
   enTitle: string | null;
   description: string | null;
   restaurantId: string | null;
-  answer: string | null;
+  answers: string | null;
 };
 
 function AddQuestion() {
   const [description, setDescription] = useState<string | null>("");
   const [restaurantId, setrestaurantId] = useState<string | null>("");
-  const [answer, setanswer] = useState<string | null>("");
+  const [answers, setanswer] = useState<string | null>("");
   const [title, setTitle] = useState<string | null>("");
   const [enTitle, setEnTitle] = useState<string | null>("");
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ function AddQuestion() {
     },
   });
   const handleSubmit = () => {
-    mutation.mutate({ title, enTitle, description, restaurantId, answer });
+    mutation.mutate({ title, enTitle, description, restaurantId, answers });
   };
 
   return (

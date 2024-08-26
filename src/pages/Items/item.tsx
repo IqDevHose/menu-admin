@@ -216,7 +216,7 @@ const Item = () => {
             type="button"
             className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           >
-            <span className="hidden xl:inline">Deleted</span>
+            <span className="hidden xl:inline">Trash</span>
             
           </button>
         </Link>

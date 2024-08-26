@@ -52,7 +52,7 @@ const Category = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/category/${id}`);
+      await axios.delete(`http://localhost:3000/category/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
@@ -70,24 +70,24 @@ const Category = () => {
       mutation.mutate(selectedCategory.id);
     }
   };
-  // Handle select all checkbox
-  const handleSelectAll = () => {
-    if (selectedItems.length === filteredData.length) {
-      setSelectedItems([]);
-    } else {
-      const allIds = filteredData.map((item: any) => item.id);
-      setSelectedItems(allIds);
-    }
-  };
+  // // Handle select all checkbox
+  // const handleSelectAll = () => {
+  //   if (selectedItems.length === filteredData.length) {
+  //     setSelectedItems([]);
+  //   } else {
+  //     const allIds = filteredData.map((item: any) => item.id);
+  //     setSelectedItems(allIds);
+  //   }
+  // };
 
-  // Handle individual row checkbox
-  const handleSelectItem = (id: string) => {
-    setSelectedItems((prevSelectedItems) =>
-      prevSelectedItems.includes(id)
-        ? prevSelectedItems.filter((itemId) => itemId !== id)
-        : [...prevSelectedItems, id]
-    );
-  };
+  // // Handle individual row checkbox
+  // const handleSelectItem = (id: string) => {
+  //   setSelectedItems((prevSelectedItems) =>
+  //     prevSelectedItems.includes(id)
+  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
+  //       : [...prevSelectedItems, id]
+  //   );
+  // };
 
   // Filter data based on the search query
   const filteredData = query.data?.items.filter((item: any) =>
@@ -168,6 +168,15 @@ const Category = () => {
           >
             <span className="hidden lg:inline">Add Category</span>
             <span className="inline lg:hidden">+</span>
+          </button>
+        </Link>
+        <Link to={"/deleted-category"}>
+          <button
+            type="button"
+            className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
+          >
+            <span className="hidden lg:inline">Trash</span>
+            
           </button>
         </Link>
       </div>
