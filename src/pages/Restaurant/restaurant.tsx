@@ -45,12 +45,11 @@ const Restaurant = () => {
     },
   });
 
-
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds)
+      console.log(selectedItemsIds);
       return axios.delete(`http://localhost:3000/restaurant/delete-many`, {
-        data: selectedItemsIds
+        data: selectedItemsIds,
       });
     },
     onSuccess: () => {
@@ -109,7 +108,7 @@ const Restaurant = () => {
 
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
-  }
+  };
 
   if (query.isPending) {
     return (
@@ -155,7 +154,7 @@ const Restaurant = () => {
           />
         </div>
         <div className="flex gap-x-2">
-        {
+          {/* {
           selectedItems.length > 0 && ( 
           <button
             type="button"
@@ -165,26 +164,26 @@ const Restaurant = () => {
            Delete {selectedItems.length} 
           </button>
           )
-        }
-        <Link to={"/add-restaurant"}>
-          <button
-            type="button"
-            className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
-          >
-            Add Restaurant
-          </button>
-        </Link>
+        } */}
+          <Link to={"/add-restaurant"}>
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            >
+              Add Restaurant
+            </button>
+          </Link>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              <input
+              {/* <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              />
+              /> */}
             </th>
             <th scope="col" className="px-6 py-3 w-4">
               #
@@ -208,11 +207,11 @@ const Restaurant = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                <input
+                {/* <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                />
+                /> */}
               </td>
               <td className="px-6 py-4">{index + 1}</td>
               <td
@@ -266,7 +265,10 @@ const Restaurant = () => {
           cancelText="Cancel"
           confirmButtonVariant="red"
         >
-          <p>Are you sure you want to delete {selectedItems && selectedItems.length + " restaurant/s"}?</p>
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " restaurant/s"}?
+          </p>
         </Popup>
       )}
       {showPopup && (

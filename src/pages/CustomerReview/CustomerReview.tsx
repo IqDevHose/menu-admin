@@ -58,22 +58,22 @@ const CustomerReview = () => {
       setSelectedChildData(ratings); // Pass the entire rating array to the popup
       setShowChildPopup(true);
     };
-    
+
     if (average >= 2.5) {
       return (
         <img
-        title={`${average}`}
+          title={`${average}`}
           width={24}
           height={24}
           src={happy}
           alt="happy"
           onClick={handleIconClick}
           style={{ cursor: "pointer" }}
-          />
-        );
-      } else if (average > 1 && average <= 2.5) {
-        return (
-          <img
+        />
+      );
+    } else if (average > 1 && average <= 2.5) {
+      return (
+        <img
           title={`${average}`}
           width={24}
           height={24}
@@ -81,35 +81,35 @@ const CustomerReview = () => {
           alt="satisfied"
           onClick={handleIconClick}
           style={{ cursor: "pointer" }}
-          />
-        );
-      } else if (isNaN(average)) {
-        return (
-        <img
-        title={`${average}`}
-        width={24}
-        height={24}
-        src={happy}
-        alt="happy"
-        onClick={handleIconClick}
-        style={{ cursor: "pointer" }}
         />
       );
-    } else if(average <= 1) {
+    } else if (isNaN(average)) {
       return (
         <img
-        title={`${average}`}
-        width={24}
-        height={24}
-        src={sad}
-        alt="sad"
-        onClick={handleIconClick}
-        style={{ cursor: "pointer" }}
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={happy}
+          alt="happy"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
+        />
+      );
+    } else if (average <= 1) {
+      return (
+        <img
+          title={`${average}`}
+          width={24}
+          height={24}
+          src={sad}
+          alt="sad"
+          onClick={handleIconClick}
+          style={{ cursor: "pointer" }}
         />
       );
     }
   }
-  
+
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/customer-review/${id}`);
@@ -119,61 +119,61 @@ const CustomerReview = () => {
       setShowPopup(false);
     },
   });
-  
+
   const handleDeleteClick = (item: customerReviewType) => {
     setSelectedCustomerReview(item);
     setShowPopup(true);
   };
-  
+
   const confirmDelete = () => {
     if (selectedCustomerReview) {
       mutation.mutate(selectedCustomerReview.id);
     }
   };
-  
+
   // Filter the data based on the search query
   const filteredData = query.data?.items.filter((item: any) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-);
-
-// Calculate the total number of pages
-const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
-
-const handlePageChange = (newPage: number) => {
-  setCurrentPage(newPage);
-  setSelectedItems([]);
-};
-  // Handle select all checkbox
-const handleSelectAll = () => {
-  if (selectedItems.length === filteredData.length) {
-    setSelectedItems([]);
-  } else {
-    const allIds = filteredData.map((item: any) => item.id);
-    setSelectedItems(allIds);
-  }
-};
-
-// Handle individual row checkbox
-const handleSelectItem = (id: string) => {
-  setSelectedItems((prevSelectedItems) =>
-    prevSelectedItems.includes(id)
-      ? prevSelectedItems.filter((itemId) => itemId !== id)
-      : [...prevSelectedItems, id]
   );
-};
 
-if (query.isPending) {
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedItems([]);
+  };
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
+
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
+
+  if (query.isPending) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
       </div>
     );
   }
-  
+
   if (query.isError) {
     return <div>Error</div>;
   }
-  
+
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -217,20 +217,34 @@ if (query.isPending) {
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-          <th scope="col" className="px-6 py-3 w-4">
-              <input
+            <th scope="col" className="px-6 py-3 w-4">
+              {/* <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              />
+              /> */}
             </th>
-            <th scope="col" className="px-6 py-3 w-4">#</th>
-            <th scope="col" className="px-6 py-3 w-4">Name</th>
-            <th scope="col" className="px-6 py-3">Comment</th>
-            <th scope="col" className="px-6 py-3">Avg Rating</th>
-            <th scope="col" className="px-6 py-3">Phone</th>
-            <th scope="col" className="px-6 py-3">Email</th>
-            <th scope="col" className="px-6 py-3">Birthday</th>
+            <th scope="col" className="px-6 py-3 w-4">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3 w-4">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Comment
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Avg Rating
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Phone
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Email
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Birthday
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -238,13 +252,13 @@ if (query.isPending) {
           {Array.isArray(query.data.items) &&
             filteredData?.map((item: any, index: number) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                <input
+                <td className="px-6 py-4">
+                  {/* <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                />
-              </td>
+                /> */}
+                </td>
                 <td className="px-6 py-4">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </td>
@@ -252,9 +266,7 @@ if (query.isPending) {
                   {highlightText(item.name || "", searchQuery)}
                 </td>
                 <td className="px-6 py-4">{item.comment}</td>
-                <td className="px-6 py-4">
-                  {summation(item.rating)}
-                </td>
+                <td className="px-6 py-4">{summation(item.rating)}</td>
                 <td className="px-6 py-4">{item.phone}</td>
                 <td className="px-6 py-4">{item.email}</td>
                 <td className="px-6 py-4">{item.birthday}</td>
@@ -288,18 +300,17 @@ if (query.isPending) {
       </div>
 
       {showChildPopup && (
-      <Popup
-        onClose={() => setShowChildPopup(false)}
-        loading={query.isLoading}
-        confirmText="Close"
-        showOneBtn={true}  // This ensures only one button is shown
-        onConfirm={() => setShowChildPopup(false)}  // The close functionality
-        confirmButtonVariant="red"  // You can choose the variant
-      >
-        <RatingPopup data={selectedChildData} />
-      </Popup>
-    )}
-
+        <Popup
+          onClose={() => setShowChildPopup(false)}
+          loading={query.isLoading}
+          confirmText="Close"
+          showOneBtn={true} // This ensures only one button is shown
+          onConfirm={() => setShowChildPopup(false)} // The close functionality
+          confirmButtonVariant="red" // You can choose the variant
+        >
+          <RatingPopup data={selectedChildData} />
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup

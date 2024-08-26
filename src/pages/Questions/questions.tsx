@@ -62,24 +62,24 @@ const Questions = () => {
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-      // Handle select all checkbox
-const handleSelectAll = () => {
-  if (selectedItems.length === filteredData.length) {
-    setSelectedItems([]);
-  } else {
-    const allIds = filteredData.map((item: any) => item.id);
-    setSelectedItems(allIds);
-  }
-};
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
 
-// Handle individual row checkbox
-const handleSelectItem = (id: string) => {
-  setSelectedItems((prevSelectedItems) =>
-    prevSelectedItems.includes(id)
-      ? prevSelectedItems.filter((itemId) => itemId !== id)
-      : [...prevSelectedItems, id]
-  );
-};
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
   // Calculate the total number of pages
   const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
@@ -143,12 +143,12 @@ const handleSelectItem = (id: string) => {
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
-          <th scope="col" className="px-6 py-3 w-4">
-              <input
+            <th scope="col" className="px-6 py-3 w-4">
+              {/* <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              />
+              /> */}
             </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
@@ -174,12 +174,12 @@ const handleSelectItem = (id: string) => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                     <td className="px-6 py-4">
-                <input
+              <td className="px-6 py-4">
+                {/* <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                />
+                /> */}
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -213,7 +213,7 @@ const handleSelectItem = (id: string) => {
       </table>
 
       {/* Use the Pagination component */}
-            <div className="flex justify-center items-center mt-10">
+      <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
