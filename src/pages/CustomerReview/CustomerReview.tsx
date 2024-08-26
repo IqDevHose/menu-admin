@@ -329,19 +329,19 @@ const CustomerReview = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
-      {showPopup && (
-        <Popup
-          onClose={() => setShowPopup(false)}
-          onConfirm={confirmDelete}
-          loading={mutation.isPending}
-          confirmText="Delete"
-          loadingText="Deleting..."
-          cancelText="Cancel"
-          confirmButtonVariant="red"
-        >
-          <p>Are you sure you want to delete {selectedCustomerReview?.name}?</p>
-        </Popup>
-      )}
+   {showChildPopup && (
+      <Popup
+        onClose={() => setShowChildPopup(false)}
+        loading={query.isLoading}
+        confirmText="Close"
+        showOneBtn={true}  // This ensures only one button is shown
+        onConfirm={() => setShowChildPopup(false)}  // The close functionality
+        confirmButtonVariant="red"  // You can choose the variant
+      >
+        <RatingPopup data={selectedChildData} />
+      </Popup>
+    )}
+
     </div>
   );
 };
