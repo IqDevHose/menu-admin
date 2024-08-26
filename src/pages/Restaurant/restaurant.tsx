@@ -37,7 +37,7 @@ const Restaurant = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/restaurant/${id}`);
+      await axios.delete(`http://localhost:3000/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["restaurant"] });
@@ -171,6 +171,14 @@ const Restaurant = () => {
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
             >
               Add Restaurant
+            </button>
+          </Link>
+          <Link to={"/deleted-restaurant"}>
+            <button
+              type="button"
+              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+            >
+              Trash
             </button>
           </Link>
         </div>
