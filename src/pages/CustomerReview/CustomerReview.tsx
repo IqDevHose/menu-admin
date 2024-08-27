@@ -286,7 +286,10 @@ const CustomerReview = () => {
                 <td className="px-6 py-4">{summation(item.rating)}</td>
                 <td className="px-6 py-4">{item.phone}</td>
                 <td className="px-6 py-4">{item.email}</td>
-                <td className="px-6 py-4">{item.birthday}</td>
+                <td className="px-6 py-4">
+                  {new Date(item.birthday).toLocaleDateString("en-CA")}
+                </td>
+
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
                     to={`/edit-customer-review/${item.id}`}
