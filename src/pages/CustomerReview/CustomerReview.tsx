@@ -329,6 +329,7 @@ const CustomerReview = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
+      {/* popup for customer review rating */}
    {showChildPopup && (
       <Popup
         onClose={() => setShowChildPopup(false)}
