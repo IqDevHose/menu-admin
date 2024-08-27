@@ -26,24 +26,26 @@ type restaurantType = {
   bg: string | null;
   image: string | null;
 };
+
 function AddRestaurant() {
   const [name, setName] = useState<string | null>("");
   const [description, setDescription] = useState<string | null>("");
   const [accessCode, setAccessCode] = useState<string | null>("");
-  const [uploadImage, setUploadImage] = useState<string | null>();
+  const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [primary, setPrimary] = useState<string | null>("");
   const [secondary, setSecondary] = useState<string | null>("");
   const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
   const [bg, setBg] = useState<string | null>("");
   const navigate = useNavigate();
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/category");
       return response.data;
     },
   });
+
   const mutation = useMutation({
     mutationFn: (newRest: restaurantType) => {
       return axios.post(`http://localhost:3000/restaurant`, newRest);
@@ -52,15 +54,15 @@ function AddRestaurant() {
       console.log(e);
     },
     onSuccess: () => {
-      navigate("/restaurant"); // Navigate back to the item list after successful addition
+      navigate("/restaurant");
     },
   });
+
   const handleChange = (
     newValue: MultiValue<CategoryOption> | SingleValue<CategoryOption> | null,
     actionMeta: ActionMeta<CategoryOption>
   ) => {
     if (newValue) {
-      // Type assertion to handle MultiValue, which is the case when isMulti is true
       const selectedCategories = (newValue as MultiValue<CategoryOption>).map(
         (option) => ({
           name: option.value,
@@ -69,10 +71,10 @@ function AddRestaurant() {
       );
       setCategoriesData(selectedCategories);
     } else {
-      // If no value is selected (null), reset categoriesData
       setCategoriesData([]);
     }
   };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     mutation.mutate({
@@ -81,7 +83,7 @@ function AddRestaurant() {
       icon: null,
       description,
       accessCode,
-      image: null,
+      image: null, // You'll need to handle file upload separately
       primary,
       secondary,
       bg,
@@ -92,7 +94,7 @@ function AddRestaurant() {
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md overflow-auto">
       <h2 className="text-2xl font-bold mb-6">Add Restaurant</h2>
 
-      <form className="">
+      <form onSubmit={handleSubmit}>
         {/* Restaurant Name */}
         <div className="mb-4">
           <label
@@ -119,16 +121,18 @@ function AddRestaurant() {
           >
             Category Name
           </label>
-          <CreatableSelect
-            onChange={handleChange}
-            isMulti
-            isClearable
-            options={categories?.items?.map((category: any) => ({
-              value: category.name,
-              label: category.name,
-            }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+          {!isLoading && (
+            <CreatableSelect
+              onChange={handleChange}
+              isMulti
+              isClearable
+              options={categories?.items?.map((category: any) => ({
+                value: category.name,
+                label: category.name,
+              }))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          )}
         </div>
 
         <div className="mb-4">
@@ -250,21 +254,21 @@ function AddRestaurant() {
           />
         </div>
 
-        {/* upload image */}
+        {/* Upload Image */}
         <div className="mb-4">
           <label
-            htmlFor="access-code"
-            className="block text-sm font-medium text-gray-700 "
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
           >
             Upload image
           </label>
           <input
             type="file"
             id="upload-image"
-            value={uploadImage || ""}
-            onChange={(e) => setUploadImage(e.target.value)}
+            onChange={(e) => {
+              if (e.target.files) setUploadImage(e.target.files[0]);
+            }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Upload an image"
           />
         </div>
 
@@ -272,7 +276,6 @@ function AddRestaurant() {
         <div className="flex justify-end">
           <button
             type="submit"
-            onSubmit={handleSubmit}
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Save Changes

@@ -237,9 +237,7 @@ const Restaurant = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-restaurant/${item.id}?description=${
-                      item.description === null ? "" : item.description
-                    }&accessCode=${item.accessCode}&name=${item.name}`}
+                    to={`/edit-restaurant/${item.id}`}
                     state={item}
                   >
                     <SquarePen />

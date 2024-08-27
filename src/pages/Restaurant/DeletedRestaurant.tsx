@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -164,14 +164,14 @@ const DeletedRestaurants = () => {
               </td>
               <td className="px-6 py-4">{restaurant?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-restaurant/${restaurant?.id}`} state={restaurant}>
+                {/* <Link to={`/edit-restaurant/${restaurant?.id}`} state={restaurant}>
                   <SquarePen className="text-blue-600" />
-                </Link>
+                </Link> */}
                 <button
                   className="font-medium text-green-600"
                   onClick={() => handleRestoreClick(restaurant)}
                 >
-                  Restore
+                  <RotateCcw />
                 </button>
                 <button
                   className="font-medium text-red-600"
