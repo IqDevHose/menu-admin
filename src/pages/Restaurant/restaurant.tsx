@@ -7,6 +7,7 @@ import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination";
+import axiosInstance from "@/axiosInstance";
 
 type restaurantReviewType = {
   id: string;
@@ -28,16 +29,14 @@ const Restaurant = () => {
   const query = useQuery({
     queryKey: ["restaurant", currentPage],
     queryFn: async () => {
-      const res = await axios.get(
-        `http://localhost:3000/restaurant?page=${currentPage}`
-      );
+      const res = await axiosInstance.get(`/restaurant?page=${currentPage}`);
       return res.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/restaurant/soft-delete/${id}`);
+      await axiosInstance.delete(`/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["restaurant"] });
@@ -48,7 +47,7 @@ const Restaurant = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axios.delete(`http://localhost:3000/restaurant/delete-many`, {
+      return axiosInstance.delete(`/restaurant/delete-many`, {
         data: selectedItemsIds,
       });
     },

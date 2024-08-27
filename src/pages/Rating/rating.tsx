@@ -7,6 +7,7 @@ import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type ratingReviewType = {
   id: string;
@@ -32,16 +33,14 @@ const Rating = () => {
   const query = useQuery({
     queryKey: ["rating", currentPage],
     queryFn: async () => {
-      const res = await axios.get(
-        `http://localhost:3000/rating?page=${currentPage}`
-      );
+      const res = await axiosInstance.get(`/rating?page=${currentPage}`);
       return res.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/rating/${id}`);
+      await axiosInstance.delete(`/rating/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rating"] });

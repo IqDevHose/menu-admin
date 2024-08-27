@@ -3,6 +3,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner"; // Assuming you have a Spinner component for loading states
+import axiosInstance from "@/axiosInstance";
+
 
 type questionType = {
   title: string | null;
@@ -38,7 +40,7 @@ function EditQuestion() {
 
   const mutation = useMutation({
     mutationFn: (newEdit: questionType) => {
-      return axios.put(`http://localhost:3000/question/${questionId}`, newEdit);
+      return axiosInstance.put(`/question/${questionId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/questions"); // Navigate back to the questions list after successful edit

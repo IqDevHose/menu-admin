@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -29,14 +30,14 @@ function EditCategory() {
   } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get("/restaurant");
       return response.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: (newEdit: categoryType) => {
-      return axios.put(`http://localhost:3000/category/${categoryId}`, newEdit);
+      return axiosInstance.put(`/category/${categoryId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/category"); // Navigate back to the item list after successful addition

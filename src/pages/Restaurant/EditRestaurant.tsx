@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { ActionMeta, MultiValue } from "react-select";
+import axiosInstance from "@/axiosInstance";
 
 type categoryType = {
   name: string;
@@ -14,6 +15,7 @@ type CategoryOption = {
   value: string;
   label: string;
 };
+
 
 type restaurantType = {
   name: string | null;
@@ -54,8 +56,8 @@ function EditRestaurant() {
 
   // Mutation for updating restaurant
   const mutation = useMutation({
-    mutationFn: (updatedRest: restaurantType) => {
-      return axios.put(`http://localhost:3000/restaurant/${restaurantId}`, updatedRest);
+    mutationFn: (newEdit: restaurantType) => {
+      return axiosInstance.put(`/restaurant/${restaurantId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/restaurant");
@@ -261,3 +263,7 @@ function EditRestaurant() {
 }
 
 export default EditRestaurant;
+
+
+
+

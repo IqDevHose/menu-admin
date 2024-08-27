@@ -19,18 +19,19 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { AvgRatingPerRestaurant, StatsData, Restaurant, Rating, Category } from '../../utils/types'; // Import Category
 
+
+import axiosInstance from "@/axiosInstance";
 type CustomerReviewType = {
   name: string;
   comment: string;
 };
-
 const Home = () => {
   // Fetching data using useQuery
   const query = useQuery<StatsData>({
     queryKey: ['dashboard'],
     queryFn: async () => {
-      const response = await axios.get<StatsData>(`http://localhost:3000/dashboard`);
-      return response.data;
+      const customerReview = await axiosInstance.get(`/dashboard`);
+      return customerReview.data;
     },
   });
 
@@ -99,7 +100,7 @@ const Home = () => {
     topReviewedItems = [], // Default to empty array if not defined
   } = query.data || {};
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   if (query.isPending || restaurantQuery.isPending || ratingQuery.isPending) {
     return (
@@ -220,7 +221,9 @@ const Home = () => {
           {/* Average Rating per Restaurant */}
           <Col xs={24} lg={12}>
             <Card hoverable>
-              <h2 className="text-lg font-medium mb-4 text-gray-800">Average Rating per Restaurant</h2>
+              <h2 className="text-lg font-medium mb-4 text-gray-800">
+                Average Rating per Restaurant
+              </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={filteredAvgRatingData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -237,7 +240,9 @@ const Home = () => {
           {/* Ratings Distribution (Pie Chart) */}
           <Col xs={24} lg={12}>
             <Card hoverable>
-              <h2 className="text-lg font-medium mb-4 text-gray-800">Ratings Distribution</h2>
+              <h2 className="text-lg font-medium mb-4 text-gray-800">
+                Ratings Distribution
+              </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -265,12 +270,18 @@ const Home = () => {
 
         {/* Top Reviewed Items */}
         <div>
-          <h2 className="text-lg font-medium mb-4 text-gray-800">Top Reviewed Items</h2>
+          <h2 className="text-lg font-medium mb-4 text-gray-800">
+            Top Reviewed Items
+          </h2>
           <Row gutter={24}>
             {filteredTopReviewedItems.map((item, index) => (
               <Col key={index} xs={24} sm={12} lg={6}>
                 <Card hoverable>
-                  <Statistic title={item.itemName} value={item.reviews} valueStyle={{ color: '#3f8600' }} />
+                  <Statistic
+                    title={item.itemName}
+                    value={item.reviews}
+                    valueStyle={{ color: "#3f8600" }}
+                  />
                 </Card>
               </Col>
             ))}
@@ -295,10 +306,10 @@ const Home = () => {
         <Card title="Quick Links" className="mb-6">
           <List
             dataSource={[
-              { title: 'View all Restaurant', link: '/restaurant' },
-              { title: 'View All Reviews', link: '/customerReview' },
-              { title: 'Manage Categories', link: '/category' },
-              { title: 'Manage Items', link: '/items' },
+              { title: "View all Restaurant", link: "/restaurant" },
+              { title: "View All Reviews", link: "/customerReview" },
+              { title: "Manage Categories", link: "/category" },
+              { title: "Manage Items", link: "/items" },
             ]}
             renderItem={(item) => (
               <List.Item>

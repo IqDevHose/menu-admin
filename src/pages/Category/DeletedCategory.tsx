@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type CategoryType = {
   id: string;
@@ -17,7 +18,9 @@ type CategoryType = {
 const DeletedCategories = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
-  const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,7 +41,9 @@ const DeletedCategories = () => {
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
       // Fetching deleted categories from the server
-      const category = await axios.get(`http://localhost:3000/category/findAll-deleted`, { params });
+      const category = await axiosInstance.get(`/category/findAll-deleted`, {
+        params,
+      });
       return category.data;
     },
   });
@@ -47,7 +52,7 @@ const DeletedCategories = () => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axiosInstance.get("/restaurant");
       return res.data;
     },
   });
@@ -55,10 +60,12 @@ const DeletedCategories = () => {
   // Handle category restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/category/restore/${id}`);
+      await axiosInstance.put(`/category/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-categories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-categories"],
+      });
       setShowRestorePopup(false); // Close the restore popup after success
     },
   });
@@ -66,10 +73,12 @@ const DeletedCategories = () => {
   // Handle category final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/category/${id}`);
+      await axiosInstance.delete(`/category/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-categories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-categories"],
+      });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });
@@ -171,15 +180,24 @@ const DeletedCategories = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
           {filteredData?.map((category: any, index: number) => (
-            <tr key={category.id} className="bg-white border-b hover:bg-gray-50">
+            <tr
+              key={category.id}
+              className="bg-white border-b hover:bg-gray-50"
+            >
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -228,7 +246,6 @@ const DeletedCategories = () => {
           confirmText="Restore"
           loadingText="Restoring..."
           cancelText="Cancel"
-          
         >
           <p>Are you sure you want to restore {selectedCategory?.name}?</p>
         </Popup>

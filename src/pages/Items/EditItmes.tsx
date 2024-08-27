@@ -1,7 +1,13 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 type itemType = {
   name: string | null;
@@ -16,11 +22,17 @@ function EditItem() {
   const record = location.state;
   console.log(record);
   const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(record.description);
+  const [description, setDescription] = useState<string | null>(
+    record.description
+  );
   const [price, setPrice] = useState<number | null>(record.price);
-  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [restaurantId, setRestaurantId] = useState<string | null>(
+    record.restaurantId
+  );
   const [image, setImage] = useState<string | null>(record.image);
-  const [categoryId, setCategoryId] = useState<string | null>(record.categoryId);
+  const [categoryId, setCategoryId] = useState<string | null>(
+    record.categoryId
+  );
 
   const { itemId } = useParams();
   const navigate = useNavigate();
@@ -33,7 +45,7 @@ function EditItem() {
   } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get("/restaurant");
       return response.data;
     },
   });
@@ -46,17 +58,13 @@ function EditItem() {
   } = useQuery({
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
-      if(restaurantId){
-        const response = await axios.get(
-          `http://localhost:3000/category?restaurantId=${restaurantId}`
+      if (restaurantId) {
+        const response = await axiosInstance.get(
+          `/category?restaurantId=${restaurantId}`
         );
         return response.data;
-
-      }
-      else{
-        const response = await axios.get(
-          `http://localhost:3000/category`
-        );
+      } else {
+        const response = await axiosInstance.get(`/category`);
         return response.data;
       }
     },
@@ -65,7 +73,7 @@ function EditItem() {
 
   const mutation = useMutation({
     mutationFn: (newEdit: itemType) => {
-      return axios.put(`http://localhost:3000/item/${itemId}`, newEdit);
+      return axiosInstance.put(`/item/${itemId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/items"); // Navigate back to the item list after successful addition

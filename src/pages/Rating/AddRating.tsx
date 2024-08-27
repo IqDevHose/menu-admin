@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import axiosInstance from "@/axiosInstance";
 
 type ratingType = {
   name: string | null;
@@ -17,7 +18,7 @@ function AddRating() {
 
   const mutation = useMutation({
     mutationFn: (newRating: ratingType) => {
-      return axios.post(`http://localhost:3000/rating`, newRating);
+      return axiosInstance.post(`/rating`, newRating);
     },
     onSuccess: () => {
       navigate("/rating"); // Navigate back to the ratings list after successful addition

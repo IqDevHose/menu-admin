@@ -1,7 +1,13 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 type customerReviewType = {
   id: string;
@@ -28,8 +34,8 @@ function EditCustomerReview() {
   const query = useQuery({
     queryKey: ["customerReview"],
     queryFn: async () => {
-      const customerReview = await axios.get(
-        `http://localhost:3000/customer-review/${customerReviewId}`
+      const customerReview = await axiosInstance.get(
+        `/customer-review/${customerReviewId}`
       );
       console.log(customerReview.data);
       return customerReview.data;
@@ -38,8 +44,8 @@ function EditCustomerReview() {
 
   const mutation = useMutation({
     mutationFn: (updatedReview: customerReviewType) => {
-      return axios.put(
-        `http://localhost:3000/customer-review/${customerReviewId}`,
+      return axiosInstance.put(
+        `/customer-review/${customerReviewId}`,
         updatedReview
       );
     },
@@ -57,7 +63,7 @@ function EditCustomerReview() {
       email: email as string,
       phone: phone as string,
       birthday: birthday as string,
-      resturantId: query.data.resturant.id
+      resturantId: query.data.resturant.id,
     });
   };
 
@@ -156,7 +162,10 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="restaurant" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="restaurant"
+            className="block text-sm font-medium text-gray-700"
+          >
             restaurant
           </label>
           <input
@@ -169,7 +178,6 @@ function EditCustomerReview() {
             placeholder={query?.data?.resturant?.name}
           />
         </div>
-
 
         <div className="flex justify-end">
           <button

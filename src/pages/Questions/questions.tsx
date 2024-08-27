@@ -7,6 +7,7 @@ import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import axiosInstance from "@/axiosInstance";
 
 type questionsReviewType = {
   id: string;
@@ -30,8 +31,8 @@ const Questions = () => {
   const query = useQuery({
     queryKey: ["questions", currentPage],
     queryFn: async () => {
-      const questions = await axios.get(
-        `http://localhost:3000/question?page=${currentPage}`
+      const questions = await axiosInstance.get(
+        `/question?page=${currentPage}`
       );
       return questions.data;
     },
@@ -39,7 +40,7 @@ const Questions = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/question/${id}`);
+      await axiosInstance.delete(`/question/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["questions"] });

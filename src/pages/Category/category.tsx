@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
+import axiosInstance from "@/axiosInstance";
 
 type categoryReviewType = {
   id: string;
@@ -29,7 +30,7 @@ const Category = () => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axiosInstance.get("/restaurant");
       return res.data;
     },
   });
@@ -43,7 +44,7 @@ const Category = () => {
       if (selectedRestaurant) {
         params.append("restaurantId", selectedRestaurant);
       }
-      const category = await axios.get(`http://localhost:3000/category`, {
+      const category = await axiosInstance.get(`/category`, {
         params,
       });
       return category.data;
@@ -52,7 +53,7 @@ const Category = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/category/soft-delete/${id}`);
+      await axiosInstance.delete(`/category/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });

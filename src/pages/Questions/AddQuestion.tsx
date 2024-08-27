@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/axiosInstance";
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +36,7 @@ function AddQuestion() {
 
   const mutation = useMutation({
     mutationFn: (newQuestion: questionType) => {
-      return axios.post(`http://localhost:3000/question`, newQuestion);
+      return axiosInstance.post(`/question`, newQuestion);
     },
     onSuccess: () => {
       navigate("/questions"); // Navigate to the questions route after successful addition

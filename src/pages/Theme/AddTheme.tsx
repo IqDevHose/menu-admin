@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -23,14 +24,14 @@ function AddTheme() {
   } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get("/restaurant");
       return response.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: (newTheme: themeType) => {
-      return axios.post(`http://localhost:3000/theme`, newTheme);
+      return axiosInstance.post(`/theme`, newTheme);
     },
   });
   const handleSubmit = () => {
