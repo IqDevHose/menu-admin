@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
+// import Layout from "./Layout"; // Import the MainLayout component
 import Home from "./pages/Home/home";
 import Restaurant from "./pages/Restaurant/restaurant";
 import EditRestaurant from "./pages/Restaurant/EditRestaurant";
@@ -29,13 +29,17 @@ import DeletedThemes from "./pages/Theme/DeletedTheme";
 import DeletedRestaurant from "./pages/Restaurant/DeletedRestaurant";
 import DeletedReview from "./pages/CustomerReview/DeletedReview";
 import DeletedRating from "./pages/Rating/DeletedRating";
+import Login from "./pages/Login/Login";
+import Layout from "./components/Layout";
 
 function App() {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
+    <Routes>
+      {/* Routes without Sidebar */}
+      <Route path="/login" element={<Login />} />
 
-      <Routes>
+      {/* Routes with Sidebar */}
+      <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/restaurant" element={<Restaurant />} />
@@ -55,35 +59,28 @@ function App() {
         />
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/deleted-customer-review" element={<DeletedReview />} />
-        <Route path="/category" element={<Category />}></Route>
-        <Route
-          path="/edit-category/:categoryId"
-          element={<EditCategory />}
-        ></Route>
-        
-        <Route path="/add-category" element={<AddCategory />}></Route>
-        <Route path="/deleted-category" element={<DeletedCategories />}></Route>
-        <Route path="/items" element={<Item />}></Route>
-        <Route path="/edit-items/:itemId" element={<EditItmes />}></Route>
+        <Route path="/category" element={<Category />} />
+        <Route path="/edit-category/:categoryId" element={<EditCategory />} />
+        <Route path="/add-category" element={<AddCategory />} />
+        <Route path="/deleted-category" element={<DeletedCategories />} />
+        <Route path="/items" element={<Item />} />
+        <Route path="/edit-items/:itemId" element={<EditItmes />} />
         <Route path="/add-item" element={<AddItem />} />
         <Route path="/deleted-items" element={<DeletedItems />} />
 
-        <Route path="/customerReview" element={<CustomerReview />}></Route>
-        <Route path="/rating" element={<Rating />}></Route>
-        
-        <Route path="/questions" element={<Questions />}></Route>
-        <Route
-          path="/edit-questions/:questionId"
-          element={<EditQuestion />}
-        ></Route>
-        <Route path="/add-question" element={<AddQuestion />}></Route>
-        <Route path="/deleted-question" element={<DeletedQuestions/>}></Route>
-        <Route path="/theme" element={<Theme />}></Route>
-        <Route path="/add-theme" element={<AddTheme />}></Route>
-        <Route path="/deleted-theme" element={<DeletedThemes />}></Route>
-        <Route path="/edit-theme/:themeId" element={<EditTheme />}></Route>
-      </Routes>
-    </div>
+        <Route path="/customerReview" element={<CustomerReview />} />
+        <Route path="/rating" element={<Rating />} />
+
+        <Route path="/questions" element={<Questions />} />
+        <Route path="/edit-questions/:questionId" element={<EditQuestion />} />
+        <Route path="/add-question" element={<AddQuestion />} />
+        <Route path="/deleted-question" element={<DeletedQuestions />} />
+        <Route path="/theme" element={<Theme />} />
+        <Route path="/add-theme" element={<AddTheme />} />
+        <Route path="/deleted-theme" element={<DeletedThemes />} />
+        <Route path="/edit-theme/:themeId" element={<EditTheme />} />
+      </Route>
+    </Routes>
   );
 }
 

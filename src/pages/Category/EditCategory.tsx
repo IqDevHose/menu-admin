@@ -1,3 +1,4 @@
+import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -54,7 +55,13 @@ function EditCategory() {
     mutation.mutate(newEdit);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
   if (isError) return <div>Error loading restaurants</div>;
 
   return (
