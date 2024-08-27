@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -24,14 +25,14 @@ function AddCategory() {
   } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get("/restaurant");
       return response.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: (newCategory: CreateCategoryDto) => {
-      return axios.post(`http://localhost:3000/category`, newCategory);
+      return axiosInstance.post(`/category`, newCategory);
     },
     onSuccess: () => {
       navigate("/category"); // Navigate back to the item list after successful addition
@@ -50,7 +51,7 @@ function AddCategory() {
     mutation.mutate(newCategory);
   };
 
-    if (isLoading) {
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />

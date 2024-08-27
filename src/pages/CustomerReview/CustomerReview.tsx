@@ -11,6 +11,7 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import RatingPopup from "@/components/RatingPopup";
+import axiosInstance from "@/axiosInstance";
 
 type customerReviewType = {
   id: string;
@@ -39,8 +40,8 @@ const CustomerReview = () => {
   const query = useQuery({
     queryKey: ["customerReview", currentPage],
     queryFn: async () => {
-      const customerReview = await axios.get(
-        `http://localhost:3000/customer-review?page=${currentPage}`
+      const customerReview = await axiosInstance.get(
+        `/customer-review?page=${currentPage}`
       );
       console.log(customerReview.data.items);
       return customerReview.data;
@@ -115,7 +116,7 @@ const CustomerReview = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/customer-review/${id}`);
+      await axiosInstance.delete(`/customer-review/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["customerReview"] });
@@ -330,19 +331,18 @@ const CustomerReview = () => {
         </Popup>
       )}
       {/* popup for customer review rating */}
-   {showChildPopup && (
-      <Popup
-        onClose={() => setShowChildPopup(false)}
-        loading={query.isLoading}
-        confirmText="Close"
-        showOneBtn={true}  // This ensures only one button is shown
-        onConfirm={() => setShowChildPopup(false)}  // The close functionality
-        confirmButtonVariant="red"  // You can choose the variant
-      >
-        <RatingPopup data={selectedChildData} />
-      </Popup>
-    )}
-
+      {showChildPopup && (
+        <Popup
+          onClose={() => setShowChildPopup(false)}
+          loading={query.isLoading}
+          confirmText="Close"
+          showOneBtn={true} // This ensures only one button is shown
+          onConfirm={() => setShowChildPopup(false)} // The close functionality
+          confirmButtonVariant="red" // You can choose the variant
+        >
+          <RatingPopup data={selectedChildData} />
+        </Popup>
+      )}
     </div>
   );
 };

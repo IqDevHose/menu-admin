@@ -7,6 +7,7 @@ import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axiosInstance from "@/axiosInstance";
 
 type themeType = {
   id: string;
@@ -28,16 +29,14 @@ const Theme = () => {
   const query = useQuery({
     queryKey: ["theme", currentPage],
     queryFn: async () => {
-      const theme = await axios.get(
-        `http://localhost:3000/theme?page=${currentPage}`
-      );
+      const theme = await axiosInstance.get(`/theme?page=${currentPage}`);
       return theme.data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/theme/${id}`);
+      await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["theme"] });

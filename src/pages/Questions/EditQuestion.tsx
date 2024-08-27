@@ -1,7 +1,13 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 type questionType = {
   title: string | null;
@@ -15,8 +21,12 @@ function EditQuestion() {
   const location = useLocation();
   const record = location.state;
   console.log(record);
-  const [description, setDescription] = useState<string | null>(record.description);
-  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [description, setDescription] = useState<string | null>(
+    record.description
+  );
+  const [restaurantId, setRestaurantId] = useState<string | null>(
+    record.restaurantId
+  );
   const [answer, setAnswer] = useState<string | null>(record.answer);
   const [title, setTitle] = useState<string | null>(record.title);
   const [enTitle, setEnTitle] = useState<string | null>(record.enTitle);
@@ -25,7 +35,7 @@ function EditQuestion() {
 
   const mutation = useMutation({
     mutationFn: (newEdit: questionType) => {
-      return axios.put(`http://localhost:3000/question/${questionId}`, newEdit);
+      return axiosInstance.put(`/question/${questionId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/question"); // Navigate back to the item list after successful addition

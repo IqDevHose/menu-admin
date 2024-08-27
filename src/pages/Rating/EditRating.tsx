@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -21,7 +22,7 @@ function EditRating() {
 
   const mutation = useMutation({
     mutationFn: (newEdit: ratingType) => {
-      return axios.put(`http://localhost:3000/ratings/${ratingId}`, newEdit);
+      return axiosInstance.put(`/ratings/${ratingId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/rating"); // Navigate back to the ratings list after successful addition

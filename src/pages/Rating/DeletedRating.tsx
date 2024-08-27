@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type RatingType = {
   id: string;
@@ -37,7 +38,9 @@ const DeletedRatings = () => {
       params.append("page", String(currentPage));
 
       // Fetching deleted ratings from the server
-      const rating = await axios.get(`http://localhost:3000/rating/findAll-deleted`, { params });
+      const rating = await axiosInstance.get(`/rating/findAll-deleted`, {
+        params,
+      });
       return rating.data;
     },
   });
@@ -45,7 +48,7 @@ const DeletedRatings = () => {
   // Handle rating restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/rating/restore/${id}`);
+      await axiosInstance.put(`/rating/restore/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
@@ -56,7 +59,7 @@ const DeletedRatings = () => {
   // Handle rating final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/rating/${id}`);
+      await axiosInstance.delete(`/rating/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
@@ -147,10 +150,18 @@ const DeletedRatings = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
-            <th scope="col" className="px-6 py-3">Rating</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Rating
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>

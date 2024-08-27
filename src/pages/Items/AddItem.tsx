@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "@/axiosInstance";
 
 function AddItem() {
   const [name, setName] = useState<string>("");
@@ -15,20 +16,25 @@ function AddItem() {
   const { data: restaurants, isLoading: isLoadingRestaurants } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get("/restaurant");
       return response.data;
     },
   });
 
   // Fetch categories based on selected restaurant
-  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useQuery({
+  const {
+    data: categories,
+    isLoading: isLoadingCategories,
+    refetch: refetchCategories,
+  } = useQuery({
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
       if (!restaurantId) return [];
-      const response = await axios.get(`http://localhost:3000/category?restaurantId=${restaurantId}`);
+      const response = await axiosInstance.get(
+        `/category?restaurantId=${restaurantId}`
+      );
       // console.log(response.data)
       return response.data;
-
     },
     enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
   });
@@ -36,7 +42,7 @@ function AddItem() {
   const mutation = useMutation({
     mutationFn: async (newItem: any) => {
       console.log("Data being sent to API:", newItem); // Debugging: log the data being sent
-      return await axios.post(`http://localhost:3000/item`, newItem);
+      return await axiosInstance.post(`/item`, newItem);
     },
     onSuccess: () => {
       navigate("/items"); // Navigate back to the item list after successful addition
@@ -44,7 +50,7 @@ function AddItem() {
   });
 
   const handleSubmit = () => {
-    mutation.mutate({ name, description, price, image:null, categoryId });
+    mutation.mutate({ name, description, price, image: null, categoryId });
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
@@ -157,12 +163,14 @@ function AddItem() {
             disabled={!restaurantId || isLoadingCategories}
           >
             <option value="" disabled>
-              {isLoadingCategories ? "Loading categories..." : "Select a category"}
+              {isLoadingCategories
+                ? "Loading categories..."
+                : "Select a category"}
             </option>
             {categories && categories.items.length > 0 ? (
               categories.items.map((category: any) => (
                 <option key={category.id} value={category.id}>
-                 {console.log(category)}
+                  {console.log(category)}
                   {category.name}
                 </option>
               ))

@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type itemReviewType = {
   id: string;
@@ -36,7 +37,12 @@ const DeletedItems = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["findAll-deleted", currentPage, selectedCategory, selectedRestaurant],
+    queryKey: [
+      "findAll-deleted",
+      currentPage,
+      selectedCategory,
+      selectedRestaurant,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", String(currentPage));
@@ -44,7 +50,7 @@ const DeletedItems = () => {
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
       // Fetching deleted items from the server
-      const item = await axios.get(`http://localhost:3000/item/findAll-deleted`, { params });
+      const item = await axiosInstance.get(`/item/findAll-deleted`, { params });
       return item.data;
     },
   });
@@ -54,8 +60,8 @@ const DeletedItems = () => {
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       if (!selectedRestaurant) return [];
-      const res = await axios.get(
-        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
+      const res = await axiosInstance.get(
+        `/category?restaurantId=${selectedRestaurant}`
       );
       return res.data;
     },
@@ -66,7 +72,7 @@ const DeletedItems = () => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axiosInstance.get("/restaurant");
       return res.data;
     },
   });
@@ -74,7 +80,7 @@ const DeletedItems = () => {
   // Handle item restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/item/restore/${id}`);
+      await axiosInstance.put(`/item/restore/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
@@ -85,7 +91,7 @@ const DeletedItems = () => {
   // Handle item final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/item/${id}`);
+      await axiosInstance.delete(`/item/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
@@ -209,10 +215,18 @@ const DeletedItems = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
-            <th scope="col" className="px-6 py-3">Price</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Price
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -268,7 +282,6 @@ const DeletedItems = () => {
           confirmText="Restore"
           loadingText="Restoring..."
           cancelText="Cancel"
-          
         >
           <p>Are you sure you want to restore {selectedItem?.name}?</p>
         </Popup>

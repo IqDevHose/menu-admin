@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type itemReviewType = {
   id: string;
@@ -42,7 +43,7 @@ const Item = () => {
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      const item = await axios.get(`http://localhost:3000/item`, { params });
+      const item = await axiosInstance.get(`/item`, { params });
       return item.data;
     },
   });
@@ -52,8 +53,8 @@ const Item = () => {
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       if (!selectedRestaurant) return []; // Return empty array if no restaurant is selected
-      const res = await axios.get(
-        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
+      const res = await axiosInstance.get(
+        `/category?restaurantId=${selectedRestaurant}`
       );
       return res.data;
     },
@@ -64,7 +65,7 @@ const Item = () => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axiosInstance.get("/restaurant");
       return res.data;
     },
   });
@@ -72,7 +73,7 @@ const Item = () => {
   // Handle item deletion
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
+      await axiosInstance.delete(`/item/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });

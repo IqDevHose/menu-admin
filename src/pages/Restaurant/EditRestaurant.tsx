@@ -1,11 +1,8 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 type restaurantType = {
   name: string | null;
@@ -31,10 +28,7 @@ function EditRestaurant() {
 
   const mutation = useMutation({
     mutationFn: (newEdit: restaurantType) => {
-      return axios.put(
-        `http://localhost:3000/restaurant/${restaurantId}`,
-        newEdit
-      );
+      return axiosInstance.put(`/restaurant/${restaurantId}`, newEdit);
     },
     onSuccess: () => {
       navigate("/restaurant");

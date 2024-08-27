@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -20,7 +21,7 @@ function EditTheme() {
   const [bg, setBg] = useState<string | null>(record.bg);
   const mutation = useMutation({
     mutationFn: (newEdit: themeType) => {
-      return axios.put(`http://localhost:3000/theme/${themeId}`, newEdit);
+      return axiosInstance.put(`/theme/${themeId}`, newEdit);
     },
   });
   const handleSubmit = () => {

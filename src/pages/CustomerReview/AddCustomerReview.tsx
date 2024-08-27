@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import axiosInstance from "@/axiosInstance";
 
 type customerReviewType = {
   name: string;
@@ -20,21 +21,19 @@ function AddCustomerReview() {
   const [email, setEmail] = useState<string>("");
   const [birthday, setBirthday] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
- 
+
   const navigate = useNavigate();
 
   const query = useQuery({
     queryKey: ["resaurant"],
     queryFn: async () => {
-      const resaurants = await axios.get(
-        "http://localhost:3000/restaurant"
-      );
+      const resaurants = await axiosInstance.get("/restaurant");
       return resaurants.data;
     },
   });
   const mutation = useMutation({
     mutationFn: (newReview: customerReviewType) => {
-      return axios.post(`http://localhost:3000/customer-review`, newReview);
+      return axiosInstance.post(`/customer-review`, newReview);
     },
     onSuccess: () => {
       navigate("/customerReview"); // Navigate back to the customer reviews list after successful addition
@@ -43,7 +42,7 @@ function AddCustomerReview() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ name, comment, email, birthday, phone, resturantId }); 
+    mutation.mutate({ name, comment, email, birthday, phone, resturantId });
   };
 
   return (
@@ -106,7 +105,10 @@ function AddCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="birthday"
+            className="block text-sm font-medium text-gray-700"
+          >
             Birthday
           </label>
           <input
@@ -120,7 +122,10 @@ function AddCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700"
+          >
             Phone
           </label>
           <input
@@ -136,13 +141,16 @@ function AddCustomerReview() {
 
         {/* select to restaurants */}
         <div className="mb-4">
-          <label htmlFor="resaurant" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="resaurant"
+            className="block text-sm font-medium text-gray-700"
+          >
             Restaurant
           </label>
           <select
             id="resaurant"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-           onChange={e=>setResturantId(e.target.value)}
+            onChange={(e) => setResturantId(e.target.value)}
             required
           >
             {query.data?.items.map((resaurant: any) => (

@@ -1,3 +1,4 @@
+import axiosInstance from "@/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FormEvent, useState } from "react";
@@ -40,13 +41,13 @@ function AddRestaurant() {
   const { data: categories } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/category");
+      const response = await axiosInstance.get("/category");
       return response.data;
     },
   });
   const mutation = useMutation({
     mutationFn: (newRest: restaurantType) => {
-      return axios.post(`http://localhost:3000/restaurant`, newRest);
+      return axiosInstance.post(`/restaurant`, newRest);
     },
     onError: (e) => {
       console.log(e);

@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type RestaurantType = {
   id: string;
@@ -17,7 +18,8 @@ type RestaurantType = {
 const DeletedRestaurants = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
-  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantType | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] =
+    useState<RestaurantType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -36,7 +38,10 @@ const DeletedRestaurants = () => {
       params.append("page", String(currentPage));
 
       // Fetching deleted restaurants from the server
-      const restaurant = await axios.get(`http://localhost:3000/restaurant/findAll-deleted`, { params });
+      const restaurant = await axiosInstance.get(
+        `/restaurant/findAll-deleted`,
+        { params }
+      );
       return restaurant.data;
     },
   });
@@ -44,10 +49,12 @@ const DeletedRestaurants = () => {
   // Handle restaurant restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/restaurant/restore/${id}`);
+      await axiosInstance.put(`/restaurant/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-restaurants"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-restaurants"],
+      });
       setShowRestorePopup(false); // Close the restore popup after success
     },
   });
@@ -55,10 +62,12 @@ const DeletedRestaurants = () => {
   // Handle restaurant final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/restaurant/${id}`);
+      await axiosInstance.delete(`/restaurant/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-restaurants"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-restaurants"],
+      });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });
@@ -86,8 +95,9 @@ const DeletedRestaurants = () => {
     }
   };
 
-  const filteredData = restaurantsData?.items?.filter((restaurant: RestaurantType) =>
-    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = restaurantsData?.items?.filter(
+    (restaurant: RestaurantType) =>
+      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(restaurantsData?.totalItems / itemsPerPage);
@@ -146,15 +156,24 @@ const DeletedRestaurants = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
           {filteredData?.map((restaurant: any, index: number) => (
-            <tr key={restaurant.id} className="bg-white border-b hover:bg-gray-50">
+            <tr
+              key={restaurant.id}
+              className="bg-white border-b hover:bg-gray-50"
+            >
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -164,7 +183,10 @@ const DeletedRestaurants = () => {
               </td>
               <td className="px-6 py-4">{restaurant?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-restaurant/${restaurant?.id}`} state={restaurant}>
+                <Link
+                  to={`/edit-restaurant/${restaurant?.id}`}
+                  state={restaurant}
+                >
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

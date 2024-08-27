@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type itemReviewType = {
   id: string;
@@ -39,7 +40,9 @@ const DeletedReview = () => {
       const params = new URLSearchParams();
       params.append("page", String(currentPage));
       // Fetching deleted items from the server
-      const item = await axios.get(`http://localhost:3000/customer-review/findAll-deleted`, { params });
+      const item = await axiosInstance.get(`/customer-review/findAll-deleted`, {
+        params,
+      });
       return item.data;
     },
   });
@@ -47,7 +50,7 @@ const DeletedReview = () => {
   // Handle item restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/customer-review/restore/${id}`);
+      await axiosInstance.put(`/customer-review/restore/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
@@ -58,7 +61,7 @@ const DeletedReview = () => {
   // Handle item final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/customer-review/${id}`);
+      await axiosInstance.delete(`/customer-review/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
@@ -150,10 +153,18 @@ const DeletedReview = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
-            <th scope="col" className="px-6 py-3">Price</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Price
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>

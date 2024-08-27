@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type QuestionType = {
   id: string;
@@ -17,7 +18,9 @@ type QuestionType = {
 const DeletedQuestions = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
-  const [selectedQuestion, setSelectedQuestion] = useState<QuestionType | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<QuestionType | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -36,7 +39,9 @@ const DeletedQuestions = () => {
       params.append("page", String(currentPage));
 
       // Fetching deleted questions from the server
-      const question = await axios.get(`http://localhost:3000/question/findAll-deleted`, { params });
+      const question = await axiosInstance.get(`/question/findAll-deleted`, {
+        params,
+      });
       return question.data;
     },
   });
@@ -44,10 +49,12 @@ const DeletedQuestions = () => {
   // Handle question restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/question/restore/${id}`);
+      await axiosInstance.put(`/question/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-questions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-questions"],
+      });
       setShowRestorePopup(false); // Close the restore popup after success
     },
   });
@@ -55,10 +62,12 @@ const DeletedQuestions = () => {
   // Handle question final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/question/${id}`);
+      await axiosInstance.delete(`/question/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-questions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-questions"],
+      });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });
@@ -146,15 +155,24 @@ const DeletedQuestions = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Question</th>
-            <th scope="col" className="px-6 py-3">Answer</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Question
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Answer
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
           {filteredData?.map((question: any, index: number) => (
-            <tr key={question.id} className="bg-white border-b hover:bg-gray-50">
+            <tr
+              key={question.id}
+              className="bg-white border-b hover:bg-gray-50"
+            >
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -203,7 +221,6 @@ const DeletedQuestions = () => {
           confirmText="Restore"
           loadingText="Restoring..."
           cancelText="Cancel"
-          
         >
           <p>Are you sure you want to restore this question?</p>
         </Popup>

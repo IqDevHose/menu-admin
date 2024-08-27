@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
+import axiosInstance from "@/axiosInstance";
 
 type ThemeType = {
   id: string;
@@ -36,7 +37,9 @@ const DeletedThemes = () => {
       params.append("page", String(currentPage));
 
       // Fetching deleted themes from the server
-      const theme = await axios.get(`http://localhost:3000/theme/findAll-deleted`, { params });
+      const theme = await axiosInstance.get(`/theme/findAll-deleted`, {
+        params,
+      });
       return theme.data;
     },
   });
@@ -44,7 +47,7 @@ const DeletedThemes = () => {
   // Handle theme restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/theme/restore/${id}`);
+      await axiosInstance.put(`/theme/restore/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
@@ -55,7 +58,7 @@ const DeletedThemes = () => {
   // Handle theme final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/theme/${id}`);
+      await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
@@ -146,9 +149,15 @@ const DeletedThemes = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">#</th>
-            <th scope="col" className="px-6 py-3">Name</th>
-            <th scope="col" className="px-6 py-3">Description</th>
+            <th scope="col" className="px-6 py-3">
+              #
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Description
+            </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -203,7 +212,6 @@ const DeletedThemes = () => {
           confirmText="Restore"
           loadingText="Restoring..."
           cancelText="Cancel"
-          
         >
           <p>Are you sure you want to restore this theme?</p>
         </Popup>
