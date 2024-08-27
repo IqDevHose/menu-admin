@@ -87,7 +87,7 @@ const DeletedQuestions = () => {
   };
 
   const filteredData = questionsData?.items?.filter((question: QuestionType) =>
-    question.questionText.toLowerCase().includes(searchQuery.toLowerCase())
+    question.questionText?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(questionsData?.totalItems / itemsPerPage);
