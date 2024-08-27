@@ -1,47 +1,93 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CreatableSelect from "react-select/creatable";
+import { ActionMeta, MultiValue } from "react-select";
+
+type categoryType = {
+  name: string;
+  icon?: string | null;
+};
+
+type CategoryOption = {
+  value: string;
+  label: string;
+};
 
 type restaurantType = {
   name: string | null;
   description: string | null;
   accessCode: string | null;
   image: string | null;
+  primary: string | null;
+  secondary: string | null;
+  bg: string | null;
+  categories: categoryType[] | null;
 };
+
 function EditRestaurant() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
-
-  const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(
-    record.description
-  );
-  const [accessCode, setAccessCode] = useState<string | null>(
-    record.accessCode
-  );
-  const [uploadImage, setUploadImage] = useState<string | null>();
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
+  // State management
+  const [name, setName] = useState<string | null>(record.name || "");
+  const [description, setDescription] = useState<string | null>(record.description || "");
+  const [accessCode, setAccessCode] = useState<string | null>(record.accessCode || "");
+  const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const [primary, setPrimary] = useState<string | null>(record.primary || "");
+  const [secondary, setSecondary] = useState<string | null>(record.secondary || "");
+  const [bg, setBg] = useState<string | null>(record.bg || "");
+  const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
+
+  // Fetch categories
+  const { data: categories } = useQuery({
+    queryKey: ["category"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:3000/category");
+      return response.data;
+    },
+  });
+
+  // Mutation for updating restaurant
   const mutation = useMutation({
-    mutationFn: (newEdit: restaurantType) => {
-      return axios.put(
-        `http://localhost:3000/restaurant/${restaurantId}`,
-        newEdit
-      );
+    mutationFn: (updatedRest: restaurantType) => {
+      return axios.put(`http://localhost:3000/restaurant/${restaurantId}`, updatedRest);
     },
     onSuccess: () => {
       navigate("/restaurant");
     },
   });
-  const handleSubmit = () => {
-    mutation.mutate({ name, description, accessCode, image: null });
+
+  const handleCategoryChange = (
+    newValue: MultiValue<CategoryOption> | null,
+    actionMeta: ActionMeta<CategoryOption>
+  ) => {
+    if (newValue) {
+      const selectedCategories = (newValue as MultiValue<CategoryOption>).map(option => ({
+        name: option.value,
+        icon: null,
+      }));
+      setCategoriesData(selectedCategories);
+    } else {
+      setCategoriesData([]);
+    }
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({
+      name,
+      description,
+      accessCode,
+      image: uploadImage ? URL.createObjectURL(uploadImage) : null, // Handle file upload URL
+      primary,
+      secondary,
+      bg,
+      categories: categoriesData,
+    });
   };
 
   return (
@@ -51,10 +97,7 @@ function EditRestaurant() {
       <form onSubmit={handleSubmit}>
         {/* Restaurant Name */}
         <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Restaurant Name
           </label>
           <input
@@ -67,12 +110,99 @@ function EditRestaurant() {
           />
         </div>
 
+        {/* Category Select */}
+        <div className="mb-4">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            Category Name
+          </label>
+          <CreatableSelect
+            onChange={handleCategoryChange}
+            isMulti
+            isClearable
+            options={categories?.items?.map((category: any) => ({
+              value: category.name,
+              label: category.name,
+            }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            defaultValue={categoriesData.map(cat => ({ value: cat.name, label: cat.name }))}
+          />
+        </div>
+
+        {/* Primary Color */}
+        <div className="mb-4">
+          <label htmlFor="primary" className="block mb-1 text-sm font-medium text-gray-700">
+            Primary Color
+          </label>
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="primary"
+              value={primary || "#000000"} // Default color if null
+              onChange={(e) => setPrimary(e.target.value)}
+              className="block h-10 bg-transparent rounded-md sm:text-sm"
+            />
+            <input
+              type="text"
+              id="primary"
+              value={primary || ""}
+              onChange={(e) => setPrimary(e.target.value)}
+              className="block border-none h-10 bg-transparent rounded-md sm:text-sm"
+              placeholder="Primary color"
+            />
+          </div>
+        </div>
+
+        {/* Secondary Color */}
+        <div className="mb-4">
+          <label htmlFor="secondary" className="block mb-1 text-sm font-medium text-gray-700">
+            Secondary Color
+          </label>
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="secondary"
+              value={secondary || "#000000"} // Default color if null
+              onChange={(e) => setSecondary(e.target.value)}
+              className="block h-10 bg-transparent rounded-md sm:text-sm"
+            />
+            <input
+              type="text"
+              id="secondary"
+              value={secondary || ""}
+              onChange={(e) => setSecondary(e.target.value)}
+              className="block border-none h-10 bg-transparent rounded-md sm:text-sm"
+              placeholder="Secondary color"
+            />
+          </div>
+        </div>
+
+        {/* Background Color */}
+        <div className="mb-4">
+          <label htmlFor="bg" className="block mb-1 text-sm font-medium text-gray-700">
+            Background Color
+          </label>
+          <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
+            <input
+              type="color"
+              id="bg"
+              value={bg || "#000000"} // Default color if null
+              onChange={(e) => setBg(e.target.value)}
+              className="block h-10 bg-transparent rounded-md sm:text-sm"
+            />
+            <input
+              type="text"
+              id="bg"
+              value={bg || ""}
+              onChange={(e) => setBg(e.target.value)}
+              className="block border-none h-10 bg-transparent rounded-md sm:text-sm"
+              placeholder="Background color"
+            />
+          </div>
+        </div>
+
         {/* Description */}
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Description
           </label>
           <textarea
@@ -87,10 +217,7 @@ function EditRestaurant() {
 
         {/* Access Code */}
         <div className="mb-4">
-          <label
-            htmlFor="access-code"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="access-code" className="block text-sm font-medium text-gray-700">
             Access Code
           </label>
           <input
@@ -103,21 +230,18 @@ function EditRestaurant() {
           />
         </div>
 
-        {/* upload image */}
+        {/* Upload Image */}
         <div className="mb-4">
-          <label
-            htmlFor="access-code"
-            className="block text-sm font-medium text-gray-700 "
-          >
-            Upload image
+          <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">
+            Upload Image
           </label>
           <input
             type="file"
             id="upload-image"
-            value={uploadImage || ""}
-            onChange={(e) => setUploadImage(e.target.value)}
+            onChange={(e) => {
+              if (e.target.files) setUploadImage(e.target.files[0]);
+            }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Upload an image"
           />
         </div>
 
