@@ -1,27 +1,28 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 type customerReviewType = {
-  id: string;
-  name: string;
-  comment: string;
-  email: string;
-  phone: string;
-  birthday: string;
-  resturantId: string;
+  id: string | null;
+  name: string | null;
+  comment: string | null;
+  email: string | null;
+  phone: string | null;
+  birthday: string | null; 
+  resturantId: string | null;
 };
 
 function EditCustomerReview() {
   const location = useLocation();
   const record = location.state;
   console.log(record);
-  const [name, setName] = useState<string | null>(record.name);
+  
+  const [name, setName] = useState<string | null>(record.name || null);
   const [comment, setComment] = useState<string | null>(record.comment);
   const [email, setEmail] = useState<string | null>(record.email);
   const [phone, setPhone] = useState<string | null>(record.phone);
-  const [birthday, setBirthday] = useState<string | null>(record.birthday);
+  const [birthday, setBirthday] = useState<string | null>(record.birthday ? new Date(record.birthday).toISOString().split('T')[0] : null); 
   const { customerReviewId } = useParams();
   const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ function EditCustomerReview() {
       );
     },
     onSuccess: () => {
-      navigate("/customerReview"); // Navigate back to the item list after successful addition
+      navigate("/customerReview"); // Navigate back to the item list after successful update
     },
   });
 
@@ -52,12 +53,12 @@ function EditCustomerReview() {
     e.preventDefault();
     mutation.mutate({
       id: customerReviewId as string,
-      name: name as string,
-      comment: comment as string,
-      email: email as string,
-      phone: phone as string,
-      birthday: birthday as string,
-      resturantId: query.data.resturant.id
+      name: name,
+      comment: comment,
+      email: email,
+      phone: phone,
+      birthday: birthday, // Use birthday as a string in yyyy-MM-dd format
+      resturantId: query.data.resturant.id,
     });
   };
 
@@ -156,20 +157,22 @@ function EditCustomerReview() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="restaurant" className="block text-sm font-medium text-gray-700">
-            restaurant
+          <label
+            htmlFor="restaurant"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Restaurant
           </label>
           <input
             type="text"
             id="restaurant"
             disabled
-            value={query?.data?.resturant?.name}
+            value={query?.data?.resturant?.name || ""}
             className="mt-1 block w-full rounded-md text-gray-400 bg-gray-50 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             required
-            placeholder={query?.data?.resturant?.name}
+            placeholder={query?.data?.resturant?.name || ""}
           />
         </div>
-
 
         <div className="flex justify-end">
           <button

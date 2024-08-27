@@ -285,7 +285,10 @@ const CustomerReview = () => {
                 <td className="px-6 py-4">{summation(item.rating)}</td>
                 <td className="px-6 py-4">{item.phone}</td>
                 <td className="px-6 py-4">{item.email}</td>
-                <td className="px-6 py-4">{item.birthday}</td>
+                <td className="px-6 py-4">
+                  {new Date(item.birthday).toLocaleDateString("en-CA")}
+                </td>
+
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
                     to={`/edit-customer-review/${item.id}`}
@@ -330,19 +333,18 @@ const CustomerReview = () => {
         </Popup>
       )}
       {/* popup for customer review rating */}
-   {showChildPopup && (
-      <Popup
-        onClose={() => setShowChildPopup(false)}
-        loading={query.isLoading}
-        confirmText="Close"
-        showOneBtn={true}  // This ensures only one button is shown
-        onConfirm={() => setShowChildPopup(false)}  // The close functionality
-        confirmButtonVariant="red"  // You can choose the variant
-      >
-        <RatingPopup data={selectedChildData} />
-      </Popup>
-    )}
-
+      {showChildPopup && (
+        <Popup
+          onClose={() => setShowChildPopup(false)}
+          loading={query.isLoading}
+          confirmText="Close"
+          showOneBtn={true} // This ensures only one button is shown
+          onConfirm={() => setShowChildPopup(false)} // The close functionality
+          confirmButtonVariant="red" // You can choose the variant
+        >
+          <RatingPopup data={selectedChildData} />
+        </Popup>
+      )}
     </div>
   );
 };
