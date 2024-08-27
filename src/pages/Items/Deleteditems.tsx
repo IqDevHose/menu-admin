@@ -88,7 +88,7 @@ const DeletedItems = () => {
       await axios.delete(`http://localhost:3000/item/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["deletedItems"] });
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });

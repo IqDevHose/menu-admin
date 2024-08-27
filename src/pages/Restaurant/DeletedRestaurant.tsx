@@ -8,131 +8,92 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 
-type itemReviewType = {
+type RestaurantType = {
   id: string;
   name: string;
   description: string;
-  price: number;
-  categoryName: string;
-  image: string;
 };
 
-const DeletedRestaurant = () => {
+const DeletedRestaurants = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
-  const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
 
-  // Fetch deleted items based on current page, category, and restaurant filters
+  // Fetch deleted restaurants based on current page
   const {
-    data: itemsData,
+    data: restaurantsData,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: [
-      "findAll-deleted",
-      currentPage,
-      selectedCategory,
-      selectedRestaurant,
-    ],
+    queryKey: ["findAll-deleted-restaurants", currentPage],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", String(currentPage));
-      if (selectedCategory) params.append("categoryId", selectedCategory);
-      if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      // Fetching deleted items from the server
-      const item = await axios.get(
-        `http://localhost:3000/restaurant/findAll-deleted`,
-        { params }
-      );
-      return item.data;
+      // Fetching deleted restaurants from the server
+      const restaurant = await axios.get(`http://localhost:3000/restaurant/findAll-deleted`, { params });
+      return restaurant.data;
     },
   });
 
-  // Fetch categories based on the selected restaurant
-  const { data: categories } = useQuery({
-    queryKey: ["categories", selectedRestaurant],
-    queryFn: async () => {
-      if (!selectedRestaurant) return [];
-      const res = await axios.get(
-        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
-      );
-      return res.data;
-    },
-    enabled: !!selectedRestaurant,
-  });
-
-  // Fetch restaurants
-  const { data: restaurants } = useQuery({
-    queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
-      return res.data;
-    },
-  });
-
-  // Handle item restoration
+  // Handle restaurant restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.put(`http://localhost:3000/restaurant/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-restaurants"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
   });
 
-  // Handle item final deletion
+  // Handle restaurant final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/restaurant/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["restaurant"] });
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-restaurants"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });
 
   // Handle restore and delete operations
-  const handleRestoreClick = (item: itemReviewType) => {
-    setSelectedItem(item);
+  const handleRestoreClick = (restaurant: RestaurantType) => {
+    setSelectedRestaurant(restaurant);
     setShowRestorePopup(true); // Show restore popup
   };
 
-  const handleDeleteClick = (item: itemReviewType) => {
-    setSelectedItem(item);
+  const handleDeleteClick = (restaurant: RestaurantType) => {
+    setSelectedRestaurant(restaurant);
     setShowDeletePopup(true); // Show delete popup
   };
 
   const confirmRestore = () => {
-    if (selectedItem) {
-      restoreMutation.mutate(selectedItem.id);
+    if (selectedRestaurant) {
+      restoreMutation.mutate(selectedRestaurant.id);
     }
   };
 
   const confirmDelete = () => {
-    if (selectedItem) {
-      deleteMutation.mutate(selectedItem.id);
+    if (selectedRestaurant) {
+      deleteMutation.mutate(selectedRestaurant.id);
     }
   };
 
-  const filteredData = itemsData?.items?.filter((item: itemReviewType) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = restaurantsData?.items?.filter((restaurant: RestaurantType) =>
+    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(itemsData?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(restaurantsData?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    setSelectedItems([]);
   };
 
   if (isLoading) {
@@ -172,91 +133,49 @@ const DeletedRestaurant = () => {
               type="text"
               id="table-search"
               className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search for items"
+              placeholder="Search for restaurants"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
-            disabled={!selectedRestaurant}
-          >
-            <option value="">All Categories</option>
-            {categories?.items?.map((category: any) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Restaurant Filter */}
-          <select
-            value={selectedRestaurant}
-            onChange={(e) => {
-              setSelectedRestaurant(e.target.value);
-              setSelectedCategory("");
-            }}
-            className="p-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
-      {/* Items Table */}
+      {/* Restaurants Table */}
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4"></th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Description
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
+            <th scope="col" className="px-6 py-3">#</th>
+            <th scope="col" className="px-6 py-3">Name</th>
+            <th scope="col" className="px-6 py-3">Description</th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
-          {filteredData?.map((item: any, index: number) => (
-            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+          {filteredData?.map((restaurant: any, index: number) => (
+            <tr key={restaurant.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(item?.name, searchQuery)}
+                {highlightText(restaurant?.name, searchQuery)}
               </td>
-              <td className="px-6 py-4">{item?.description}</td>
-              <td className="px-6 py-4">{item?.price}</td>
+              <td className="px-6 py-4">{restaurant?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-items/${item?.id}`} state={item}>
+                <Link to={`/edit-restaurant/${restaurant?.id}`} state={restaurant}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button
                   className="font-medium text-green-600"
-                  onClick={() => handleRestoreClick(item)}
+                  onClick={() => handleRestoreClick(restaurant)}
                 >
                   Restore
                 </button>
                 <button
                   className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(item)}
+                  onClick={() => handleDeleteClick(restaurant)}
                 >
                   <Trash2 />
                 </button>
@@ -285,7 +204,7 @@ const DeletedRestaurant = () => {
           loadingText="Restoring..."
           cancelText="Cancel"
         >
-          <p>Are you sure you want to restore {selectedItem?.name}?</p>
+          <p>Are you sure you want to restore {selectedRestaurant?.name}?</p>
         </Popup>
       )}
 
@@ -300,11 +219,11 @@ const DeletedRestaurant = () => {
           cancelText="Cancel"
           confirmButtonVariant="red"
         >
-          <p>Are you sure you want to delete {selectedItem?.name}?</p>
+          <p>Are you sure you want to delete {selectedRestaurant?.name}?</p>
         </Popup>
       )}
     </div>
   );
 };
 
-export default DeletedRestaurant;
+export default DeletedRestaurants;

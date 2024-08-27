@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -22,62 +22,35 @@ const DeletedReview = () => {
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
 
-  // Fetch deleted items based on current page, category, and restaurant filters
+  // Fetch deleted items based on current page and search query
   const {
     data: itemsData,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["findAll-deleted", currentPage, selectedCategory, selectedRestaurant],
+    queryKey: ["findAll-deleted-review", currentPage],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", String(currentPage));
-      if (selectedCategory) params.append("categoryId", selectedCategory);
-      if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
-
       // Fetching deleted items from the server
       const item = await axios.get(`http://localhost:3000/customer-review/findAll-deleted`, { params });
       return item.data;
     },
   });
 
-  // Fetch categories based on the selected restaurant
-  const { data: categories } = useQuery({
-    queryKey: ["categories", selectedRestaurant],
-    queryFn: async () => {
-      if (!selectedRestaurant) return [];
-      const res = await axios.get(
-        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
-      );
-      return res.data;
-    },
-    enabled: !!selectedRestaurant,
-  });
-
-  // Fetch restaurants
-  const { data: restaurants } = useQuery({
-    queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
-      return res.data;
-    },
-  });
-
   // Handle item restoration
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.put(`http://localhost:3000/item/restore/${id}`);
+      await axios.put(`http://localhost:3000/customer-review/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
   });
@@ -88,7 +61,7 @@ const DeletedReview = () => {
       await axios.delete(`http://localhost:3000/customer-review/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customerReview"] });
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
   });
@@ -169,38 +142,6 @@ const DeletedReview = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
-            disabled={!selectedRestaurant}
-          >
-            <option value="">All Categories</option>
-            {categories?.items?.map((category: any) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Restaurant Filter */}
-          <select
-            value={selectedRestaurant}
-            onChange={(e) => {
-              setSelectedRestaurant(e.target.value);
-              setSelectedCategory("");
-            }}
-            className="p-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
@@ -268,7 +209,6 @@ const DeletedReview = () => {
           confirmText="Restore"
           loadingText="Restoring..."
           cancelText="Cancel"
-          
         >
           <p>Are you sure you want to restore {selectedItem?.name}?</p>
         </Popup>
