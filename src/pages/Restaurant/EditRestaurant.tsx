@@ -29,6 +29,7 @@ type restaurantType = {
 function EditRestaurant() {
   const location = useLocation();
   const record = location.state;
+  console.log(record)
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
@@ -37,10 +38,10 @@ function EditRestaurant() {
   const [description, setDescription] = useState<string | null>(record.description || "");
   const [accessCode, setAccessCode] = useState<string | null>(record.accessCode || "");
   const [uploadImage, setUploadImage] = useState<File | null>(null);
-  const [primary, setPrimary] = useState<string | null>(record.primary || "");
-  const [secondary, setSecondary] = useState<string | null>(record.secondary || "");
-  const [bg, setBg] = useState<string | null>(record.bg || "");
-  const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
+  const [primary, setPrimary] = useState<string | null>(record?.theme?.primary || "");
+  const [secondary, setSecondary] = useState<string | null>(record?.theme?.secondary || "");
+  const [bg, setBg] = useState<string | null>(record?.theme?.bg || "");
+  const [categoriesData, setCategoriesData] = useState<categoryType[]>(record?.categories);
 
   // Fetch categories
   const { data: categories } = useQuery({
