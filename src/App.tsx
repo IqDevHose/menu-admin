@@ -32,7 +32,13 @@ import DeletedRating from "./pages/Rating/DeletedRating";
 import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./middlewares/ProtectedRoute";
-import Import from "./pages/Items/Import";
+import ImportItem from "./pages/Items/Import";
+import ImportCategory from "./pages/Category/ImportCategory";
+import ImportRestaurant from "./pages/Restaurant/ImportRestauarnt";
+import ImportTheme from "./pages/Theme/ImportTheme";
+import ImportRating from "./pages/Rating/ImportRating";
+import ImportQuestion from "./pages/Questions/ImportQuestion";
+import ImportCustomerReview from "./pages/CustomerReview/ImportCustomerReview";
 
 function App() {
   return (
@@ -61,6 +67,7 @@ function App() {
             <Route path="edit/:restaurantId" element={<EditRestaurant />} />
             <Route path="add" element={<AddRestaurant />} />
             <Route path="trash" element={<DeletedRestaurant />} />
+            <Route path="import" element={<ImportRestaurant />} />
           </Route>
           {/*end  restaurant */}
 
@@ -70,6 +77,7 @@ function App() {
             <Route path="edit/:ratingId" element={<EditRating />} />
             <Route path="add" element={<AddRating />} />
             <Route path="trash" element={<DeletedRating />} />
+            <Route path="import" element={<ImportRating />} />
           </Route>
           {/* end rating */}
 
@@ -82,6 +90,7 @@ function App() {
             />
             <Route path="add" element={<AddCustomerReview />} />
             <Route path="trash" element={<DeletedReview />} />
+            <Route path="import" element={<ImportCustomerReview />} />
           </Route>
           {/*end  customerReview */}
 
@@ -91,16 +100,18 @@ function App() {
             <Route path="edit/:categoryId" element={<EditCategory />} />
             <Route path="add" element={<AddCategory />} />
             <Route path="trash" element={<DeletedCategories />} />
+            <Route path="import" element={<ImportCategory />} />
           </Route>
           {/*end  category */}
 
           {/* items */}
           <Route path="/items/*">
             <Route index element={<Item />} />
-            <Route path="import" element={<Import />} />
+            <Route path="import" element={<ImportItem />} />
             <Route path="edit/:itemId" element={<EditItmes />} />
             <Route path="add" element={<AddItem />} />
             <Route path="trash" element={<DeletedItems />} />
+            <Route path="import" element={<ImportItem />} />
           </Route>
           {/*end items */}
 
@@ -110,6 +121,7 @@ function App() {
             <Route path="edit/:questionId" element={<EditQuestion />} />
             <Route path="add" element={<AddQuestion />} />
             <Route path="trash" element={<DeletedQuestions />} />
+            <Route path="import" element={<ImportQuestion />} />
           </Route>
           {/* end questions */}
 
@@ -119,6 +131,7 @@ function App() {
             <Route path="add" element={<AddTheme />} />
             <Route path="trash" element={<DeletedThemes />} />
             <Route path="edit/:themeId" element={<EditTheme />} />
+            <Route path="import" element={<ImportTheme />} />
           </Route>
           {/*end theme */}
           {/* end sidebar */}

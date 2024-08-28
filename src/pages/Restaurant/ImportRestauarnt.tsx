@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 import { useQuery } from '@tanstack/react-query';
@@ -6,16 +5,18 @@ import axiosInstance from '@/axiosInstance';
 
 type Props = {}
 
-interface DataItem {
-  categoryId: string;
+interface RestaurantItem {
+  accessCode: string;
   createdAt: string;
   deleted: boolean;
   description: string;
   id: string;
   image: string | null;
   name: string;
-  price: number;
   updatedAt: string;
+  primary?: string; // Add optional fields for theme creation
+  secondary?: string;
+  bg?: string;
 }
 
 // Utility function to flatten the JSON object
@@ -34,23 +35,29 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 };
 
 // Extract headers from the data
-const extractHeaders = (data: DataItem[]): string[] => {
+const extractHeaders = (data: RestaurantItem[]): string[] => {
   const flattenedData = data.map(item => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
 
-const ImportItem = (props: Props) => {
+const ImportRestaurant = (props: Props) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [isHeaderMatch, setIsHeaderMatch] = useState(false);
 
+  // Define expected headers explicitly
+  const expectedHeaders = [
+    'id', 'accessCode', 'name', 'description', 'image',
+    'createdAt', 'updatedAt', 'deleted', 'secondary', 'primary', 'bg'
+  ];
+
   // Fetch headers from the API using react-query
   const { data } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/item?page=all`);
+      const response = await axiosInstance.get(`/restaurant?page=all`);
       const heads: any[] = extractHeaders(response.data.items);
       setHeaders(heads);
       return response.data;
@@ -68,11 +75,10 @@ const ImportItem = (props: Props) => {
         complete: (result) => {
           let data = result.data;
 
-          // Convert `deleted` field to boolean, `price` to float
+          // Convert `deleted` field to boolean
           data = data.map((item: any) => ({
             ...item,
-            deleted: item.deleted === 'true',  // Convert to boolean
-            price: parseFloat(item.price),     // Convert to float
+            deleted: item.deleted === 'true', // Convert to boolean
           }));
 
           const csvHeads = result.meta.fields || [];
@@ -82,8 +88,8 @@ const ImportItem = (props: Props) => {
           setCsvHeaders(csvHeads);
           setParsedData(data);
 
-          // Check if the CSV headers match the expected headers
-          const headersMatch = csvHeads.every(header => headers.includes(header)) && headers.every(header => csvHeads.includes(header));
+          // Explicitly compare CSV headers with expected headers
+          const headersMatch = expectedHeaders.every(header => csvHeads.includes(header)) && csvHeads.every(header => expectedHeaders.includes(header));
           setIsHeaderMatch(headersMatch);
         },
         error: (error) => {
@@ -97,7 +103,7 @@ const ImportItem = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/item/import', parsedData);
+        const response = await axiosInstance.post('/restaurant/import', parsedData);
         console.log('Data uploaded successfully:', response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
@@ -143,4 +149,4 @@ const ImportItem = (props: Props) => {
   );
 };
 
-export default ImportItem;
+export default ImportRestaurant;
