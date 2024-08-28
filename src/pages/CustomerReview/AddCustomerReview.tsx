@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { Query, useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
+import Spinner from "@/components/Spinner";
 
-type customerReviewType = {
+type CustomerReviewType = {
   name: string;
   comment: string;
   email: string;
   birthday: string;
   phone: string;
-  resturantId: string | undefined;
+  restaurantId: string;
 };
 
 function AddCustomerReview() {
-  const [resturantId, setResturantId] = useState<string>("");
-
+  const [restaurantId, setRestaurantId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [comment, setComment] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -24,15 +23,21 @@ function AddCustomerReview() {
 
   const navigate = useNavigate();
 
-  const query = useQuery({
-    queryKey: ["resaurant"],
+  const {
+    data: restaurantData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["restaurant"],
     queryFn: async () => {
-      const resaurants = await axiosInstance.get("/restaurant");
-      return resaurants.data;
+      const response = await axiosInstance.get("/restaurant");
+      return response.data;
     },
   });
+
   const mutation = useMutation({
-    mutationFn: (newReview: customerReviewType) => {
+    mutationFn: (newReview: CustomerReviewType) => {
+      console.log(newReview);
       return axiosInstance.post(`/customer-review`, newReview);
     },
     onSuccess: () => {
@@ -42,8 +47,26 @@ function AddCustomerReview() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ name, comment, email, birthday, phone, resturantId });
+    if (restaurantId) {
+      const newReview = { name, comment, email, birthday, phone, restaurantId };
+      console.log("Submitting review:", newReview); // Log the data being sent
+      mutation.mutate(newReview);
+    } else {
+      alert("Please select a restaurant");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div>Error loading restaurants. Please try again later.</div>;
+  }
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -139,23 +162,25 @@ function AddCustomerReview() {
           />
         </div>
 
-        {/* select to restaurants */}
+        {/* Select to restaurants */}
         <div className="mb-4">
           <label
-            htmlFor="resaurant"
+            htmlFor="restaurant"
             className="block text-sm font-medium text-gray-700"
           >
             Restaurant
           </label>
           <select
-            id="resaurant"
+            id="restaurant"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            onChange={(e) => setResturantId(e.target.value)}
+            onChange={(e) => setRestaurantId(e.target.value)}
             required
+            value={restaurantId}
           >
-            {query.data?.items.map((resaurant: any) => (
-              <option key={resaurant.id} value={resaurant.id}>
-                {resaurant.name}
+            <option value="">Select a restaurant</option>
+            {restaurantData?.items.map((restaurant: any) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
               </option>
             ))}
           </select>
