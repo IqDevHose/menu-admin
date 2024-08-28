@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 import { useQuery } from '@tanstack/react-query';
@@ -6,17 +5,16 @@ import axiosInstance from '@/axiosInstance';
 
 type Props = {}
 
-interface DataItem {
-  categoryId: string;
-  createdAt: string;
-  deleted: boolean;
-  description: string;
-  id: string;
-  image: string | null;
-  name: string;
-  price: number;
-  updatedAt: string;
-}
+interface DataCategory {
+    createdAt: String;
+    deleted: boolean
+    icon: String
+    id: String
+    name: String
+    orderNumber: String
+    restaurantId: String
+    updatedAt: String
+  }
 
 // Utility function to flatten the JSON object
 const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
@@ -34,13 +32,13 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 };
 
 // Extract headers from the data
-const extractHeaders = (data: DataItem[]): string[] => {
+const extractHeaders = (data: DataCategory[]): string[] => {
   const flattenedData = data.map(item => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
 
-const Import = (props: Props) => {
+const ImportCustomerReview = (props: Props) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -48,12 +46,12 @@ const Import = (props: Props) => {
 
   // Fetch headers from the API using react-query
   const { data } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["customer-review"],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/item?page=all`);
-      const heads: any[] = extractHeaders(response.data.items);
+      const item = await axiosInstance.get(`/customer-review?page=all`);
+      const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
-      return response.data;
+      return item.data;
     },
   });
 
@@ -66,19 +64,11 @@ const Import = (props: Props) => {
         header: true,
         skipEmptyLines: true,
         complete: (result) => {
-          let data = result.data;
-
-          // Convert `deleted` field to boolean, `price` to float
-          data = data.map((item: any) => ({
-            ...item,
-            deleted: item.deleted === 'true',  // Convert to boolean
-            price: parseFloat(item.price),     // Convert to float
-          }));
-
+          const data = result.data;
           const csvHeads = result.meta.fields || [];
-          console.log('CSV Headers:', csvHeads);
-          console.log('Parsed Data:', data);
 
+          console.log(csvHeads);
+          console.log(data);
           setCsvHeaders(csvHeads);
           setParsedData(data);
 
@@ -97,7 +87,7 @@ const Import = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/item/import', parsedData);
+        const response = await axiosInstance.post('/customer-review/import', parsedData);
         console.log('Data uploaded successfully:', response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
@@ -111,13 +101,15 @@ const Import = (props: Props) => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           <label
             htmlFor="file"
-            className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
+            className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           >
-            <span className="flex gap-1">Import</span>
+            <span className="flex gap-1 ">
+              Import
+            </span>
           </label>
           <input
             id="file"
@@ -125,7 +117,7 @@ const Import = (props: Props) => {
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="hidden"
+            className="hidden text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           />
           {isHeaderMatch ? (
             <button
@@ -141,6 +133,6 @@ const Import = (props: Props) => {
       </div>
     </div>
   );
-};
+}
 
-export default Import;
+export default ImportCustomerReview;

@@ -222,7 +222,7 @@ const Questions = () => {
           </Link>
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/question/import"
+            link="/questions/import"
           ></DropdownMenuDemo>
         </div>
       </div>

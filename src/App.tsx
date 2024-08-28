@@ -33,6 +33,12 @@ import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./middlewares/ProtectedRoute";
 import Import from "./pages/Items/Import";
+import ImportCategory from "./pages/Category/ImportCategory";
+import ImportRestaurant from "./pages/Restaurant/ImportRestauarnt";
+import ImportTheme from "./pages/Theme/ImportTheme";
+import ImportRating from "./pages/Rating/ImportRating";
+import ImportQuestion from "./pages/Questions/ImportQuestion";
+import ImportCustomerReview from "./pages/CustomerReview/ImportCustomerReview";
 
 function App() {
   return (
@@ -57,9 +63,12 @@ function App() {
           element={<EditRestaurant />}
         />
         <Route path="/add-restaurant" element={<AddRestaurant />} />
+        <Route path="restaurant/import" element={<ImportRestaurant />} />
         <Route path="/deleted-restaurant" element={<DeletedRestaurant />} />
         <Route path="/edit-rating/:ratingId" element={<EditRating />} />
         <Route path="/add-rating" element={<AddRating />} />
+        <Route path="/rating/import" element={<ImportRating />} />
+
         <Route path="/deleted-rating" element={<DeletedRating />} />
 
         <Route
@@ -69,6 +78,7 @@ function App() {
         <Route path="/add-customer-review" element={<AddCustomerReview />} />
         <Route path="/deleted-customer-review" element={<DeletedReview />} />
         <Route path="/category" element={<Category />} />
+        <Route path="category/import" element={<ImportCategory />} />
         <Route path="/edit-category/:categoryId" element={<EditCategory />} />
         <Route path="/add-category" element={<AddCategory />} />
         <Route path="/deleted-category" element={<DeletedCategories />} />
@@ -79,13 +89,18 @@ function App() {
         <Route path="/deleted-items" element={<DeletedItems />} />
 
         <Route path="/customerReview" element={<CustomerReview />} />
+        <Route path="/customerReview/import" element={<ImportCustomerReview />} />
         <Route path="/rating" element={<Rating />} />
 
         <Route path="/questions" element={<Questions />} />
+        <Route path="/questions/import" element={<ImportQuestion />} />
+        
         <Route path="/edit-questions/:questionId" element={<EditQuestion />} />
         <Route path="/add-question" element={<AddQuestion />} />
         <Route path="/deleted-question" element={<DeletedQuestions />} />
         <Route path="/theme" element={<Theme />} />
+        <Route path="/theme/import" element={<ImportTheme />} />
+
         <Route path="/add-theme" element={<AddTheme />} />
         <Route path="/deleted-theme" element={<DeletedThemes />} />
         <Route path="/edit-theme/:themeId" element={<EditTheme />} />

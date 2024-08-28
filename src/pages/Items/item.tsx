@@ -339,7 +339,7 @@ const Item = () => {
 
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/item/import"
+            link="/items/import"
           ></DropdownMenuDemo>
           {/* <label
             htmlFor="file"

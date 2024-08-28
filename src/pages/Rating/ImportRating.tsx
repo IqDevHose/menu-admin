@@ -6,17 +6,15 @@ import axiosInstance from '@/axiosInstance';
 
 type Props = {}
 
-interface DataItem {
-  categoryId: string;
-  createdAt: string;
-  deleted: boolean;
-  description: string;
-  id: string;
-  image: string | null;
-  name: string;
-  price: number;
-  updatedAt: string;
-}
+interface DataRating {
+    CustomerReviewId: String;
+    createdAt: String;
+    deleted: Boolean;
+    id: String;
+    questionId: String;
+    score: String;
+    updatedAt: String;
+  }
 
 // Utility function to flatten the JSON object
 const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
@@ -34,13 +32,13 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 };
 
 // Extract headers from the data
-const extractHeaders = (data: DataItem[]): string[] => {
+const extractHeaders = (data: DataRating[]): string[] => {
   const flattenedData = data.map(item => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
 
-const Import = (props: Props) => {
+const ImportRating = (props: Props) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -48,9 +46,9 @@ const Import = (props: Props) => {
 
   // Fetch headers from the API using react-query
   const { data } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["rating"],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/item?page=all`);
+      const response = await axiosInstance.get(`/rating?page=all`);
       const heads: any[] = extractHeaders(response.data.items);
       setHeaders(heads);
       return response.data;
@@ -97,7 +95,7 @@ const Import = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/item/import', parsedData);
+        const response = await axiosInstance.post('/rating/import', parsedData);
         console.log('Data uploaded successfully:', response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
@@ -143,4 +141,4 @@ const Import = (props: Props) => {
   );
 };
 
-export default Import;
+export default ImportRating;
