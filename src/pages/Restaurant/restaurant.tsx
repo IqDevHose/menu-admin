@@ -8,7 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination";
 import axiosInstance from "@/axiosInstance";
-import exportCSVFile from 'json-to-csv-export';
+import exportCSVFile from "json-to-csv-export";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type restaurantReviewType = {
   id: string;
@@ -26,11 +27,15 @@ interface DataItem {
   updatedAt: string;
 }
 
-const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  res: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
         res[propName] = obj[key];
@@ -42,7 +47,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 
 // Extract headers from the data
 const extractHeaders = (data: DataItem[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -59,7 +64,6 @@ const Restaurant = () => {
   const itemsPerPage = 10; // Set the number of items per page
   const [headers, setHeaders] = useState<string[]>([]);
 
-
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -72,28 +76,29 @@ const Restaurant = () => {
     },
   });
 
-  const {data: exportData} = useQuery({
+  const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
 
-
-      console.log(item.data.items)
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'restaurants',
-      delimiter: ',',
-      headers
-    }
+      filename: "restaurants",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -217,7 +222,7 @@ const Restaurant = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-start gap-x-2">
+        <div className="flex items-start gap-x-4">
           {/* {
           selectedItems.length > 0 && ( 
           <button
@@ -248,15 +253,9 @@ const Restaurant = () => {
               </span>
             </button>
           </Link>
-            <button
-              onClick={handleExport}
-              type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="flex gap-1 ">
-                Export
-              </span>
-            </button>
+          <div>
+            <DropdownMenuDemo handleExport={handleExport}></DropdownMenuDemo>
+          </div>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -309,10 +308,7 @@ const Restaurant = () => {
               <td className="px-6 py-4">{item.categories.length}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link
-                    to={`/edit-restaurant/${item.id}`}
-                    state={item}
-                  >
+                  <Link to={`/edit-restaurant/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>
