@@ -10,8 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-export function DropdownMenuDemo({ handleExport }) {
+import { Link } from "react-router-dom";
+type DropdownMenuDemoType = {
+  handleExport: () => void,
+  link:string
+}
+export function DropdownMenuDemo({ handleExport,link }:DropdownMenuDemoType) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,7 +29,7 @@ export function DropdownMenuDemo({ handleExport }) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
-            <span>Import</span>
+            <Link to={link}>Import</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Mail className="mr-2 h-4 w-4" />
