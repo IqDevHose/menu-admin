@@ -17,92 +17,50 @@ import Spinner from '@/components/Spinner';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { AvgRatingPerRestaurant, StatsData, Restaurant, Rating, Category } from '../../utils/types'; // Import Category
-
-
+import { StatsData, Restaurant, Rating, Category } from '../../utils/types';
 import axiosInstance from "@/axiosInstance";
-type CustomerReviewType = {
-  name: string;
-  comment: string;
-};
-const Home = () => {
-  // Fetching data using useQuery
-  const query = useQuery<StatsData>({
-    queryKey: ['dashboard'],
-    queryFn: async () => {
-      const customerReview = await axiosInstance.get(`/dashboard`);
-      return customerReview.data;
-    },
-  });
 
-  const customerReviewQuery = useQuery({
-    queryKey: ['customerReview'],
+type CustomerReviewType = {
+  name: string | null;
+  comment: string | null;
+  rating?: Rating[];
+};
+
+// Custom YAxis component using default parameters
+const CustomYAxis = ({ tick = { fill: '#4b5563' }, ...props }) => {
+  return <YAxis tick={tick} {...props} />;
+};
+
+const Home = () => {
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>('all');
+
+  // Fetching statistics data from the dashboard endpoint
+  const { data: dashboardData, isLoading: isDashboardLoading, isError: isDashboardError } = useQuery<StatsData>({
+    queryKey: ['dashboard', selectedRestaurant],
     queryFn: async () => {
-      const response = await axios.get(`http://localhost:3000/customer-review`);
+      const endpoint =
+        selectedRestaurant === 'all'
+          ? '/dashboard'
+          : `/dashboard/${selectedRestaurant}`;
+      const response = await axiosInstance.get(endpoint);
       return response.data;
     },
   });
 
   // Fetch restaurant list for selection
-  const restaurantQuery = useQuery({
+  const { data: restaurantData, isLoading: isRestaurantLoading, isError: isRestaurantError } = useQuery<Restaurant[]>({
     queryKey: ['restaurants'],
     queryFn: async () => {
       const response = await axios.get(`http://localhost:3000/restaurant`);
-      return response.data;
+      return response.data.items; // Assuming response.data.items contains the list of restaurants
     },
   });
-
-  // Fetch all ratings
-  const ratingQuery = useQuery({
-    queryKey: ['ratings'],
-    queryFn: async () => {
-      const response = await axios.get(`http://localhost:3000/rating`);
-      return response.data;
-    },
-  });
-
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>('all');
 
   const handleRestaurantChange = (value: string) => {
     setSelectedRestaurant(value);
   };
 
-  // Calculating the average rating per restaurant
-  const calculateAverageRatings = (): AvgRatingPerRestaurant[] => {
-    const ratings: Rating[] = Array.isArray(ratingQuery.data?.items) ? ratingQuery.data.items : [];
-    const restaurants: Restaurant[] = Array.isArray(restaurantQuery.data?.items) ? restaurantQuery.data.items : [];
-
-    return restaurants.map((restaurant: Restaurant) => {
-      const restaurantRatings = ratings.filter(
-        (rating: Rating) => rating.customerReview?.resturantId === restaurant.id
-      );
-
-      const averageRating =
-        restaurantRatings.reduce((sum: number, rating: Rating) => sum + rating.score, 0) /
-        (restaurantRatings.length || 1); // Avoid division by zero
-
-      return {
-        restaurantName: restaurant.name,
-        avgRating: averageRating ? parseFloat(averageRating.toFixed(2)) : 0,
-        restaurantId: restaurant.id,
-      };
-    });
-  };
-
-  const avgRatingPerRestaurant = calculateAverageRatings();
-
-  // Extracting topReviewedItems from the query data or setting a default
-  const {
-    totalCustomerReview,
-    totalRatings,
-    totalCategories,
-    totalItems,
-    topReviewedItems = [], // Default to empty array if not defined
-  } = query.data || {};
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
-  if (query.isPending || restaurantQuery.isPending || ratingQuery.isPending) {
+  if (isDashboardLoading || isRestaurantLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -110,80 +68,124 @@ const Home = () => {
     );
   }
 
-  if (query.isError || restaurantQuery.isError || ratingQuery.isError) {
+  if (isDashboardError || isRestaurantError || !dashboardData || !restaurantData) {
     return <div>Error loading statistics.</div>;
   }
 
-  // Filter data based on selected restaurant
-  const filteredAvgRatingData =
-    selectedRestaurant === 'all'
-      ? avgRatingPerRestaurant
-      : avgRatingPerRestaurant.filter((data) => data.restaurantId === selectedRestaurant);
+  // Extracting statistics from the dashboard API response
+  let totalCustomerReview = 0;
+  let totalRatings = 0;
+  let totalCategories = 0;
+  let totalItems = 0;
+  let customerReviews: CustomerReviewType[] = [];
 
-  const filteredTopReviewedItems =
-    selectedRestaurant === 'all'
-      ? topReviewedItems
-      : topReviewedItems.filter((item) => item.restaurantId === selectedRestaurant);
+  // Initialize avgRatingData array to hold rating data
+  let avgRatingData: { restaurantName: string; avgRating: number; restaurantId: string }[] = [];
 
-  // Calculate totals based on selected restaurant
-  const filteredTotalReviews =
-    selectedRestaurant === 'all'
-      ? totalCustomerReview
-      : ratingQuery.data?.items.filter(
-          (rating: Rating) => rating.customerReview?.resturantId === selectedRestaurant
-        ).length || 0;
+  console.log("Selected Restaurant:", selectedRestaurant);
+  console.log("Dashboard Data:", dashboardData);
+  console.log("Restaurant Data:", restaurantData);
+  console.log("All Restaurants Data:", dashboardData?.restaurants);
 
-  const filteredTotalRatings =
-    selectedRestaurant === 'all'
-      ? totalRatings
-      : ratingQuery.data?.items.filter(
-          (rating: Rating) => rating.customerReview?.resturantId === selectedRestaurant
-        ).length || 0;
+  if (selectedRestaurant === 'all') {
+    const allRestaurantsData = dashboardData.restaurants || [];
+    
+    totalCustomerReview = allRestaurantsData.reduce((acc: number, restaurant: Restaurant) => {
+      return acc + (restaurant.customerReview ? restaurant.customerReview.length : 0);
+    }, 0);
 
-  const filteredTotalCategories =
-    selectedRestaurant === 'all'
-      ? totalCategories
-      : restaurantQuery.data?.items.find(
-          (restaurant: Restaurant) => restaurant.id === selectedRestaurant
-        )?.categories.length || 0;
+    totalRatings = allRestaurantsData.reduce((acc: number, restaurant: Restaurant) => {
+      return acc + (restaurant.customerReview ? restaurant.customerReview.reduce((acc2: number, review: CustomerReviewType) => {
+        return acc2 + (review.rating ? review.rating.length : 0);
+      }, 0) : 0);
+    }, 0);
 
-  const filteredTotalItems =
-    selectedRestaurant === 'all'
-      ? totalItems
-      : restaurantQuery.data?.items.find(
-          (restaurant: Restaurant) => restaurant.id === selectedRestaurant
-        )?.categories.reduce((acc: number, category: Category) => acc + (category.items ? category.items.length : 0), 0) || 0;
+    totalCategories = allRestaurantsData.reduce((acc: number, restaurant: Restaurant) => {
+      return acc + (restaurant.categories ? restaurant.categories.length : 0);
+    }, 0);
+
+    totalItems = allRestaurantsData.reduce((acc: number, restaurant: Restaurant) => {
+      return acc + (restaurant.categories ? restaurant.categories.reduce((acc2: number, category: Category) => {
+        return acc2 + (category.items ? category.items.length : 0);
+      }, 0) : 0);
+    }, 0);
+
+    avgRatingData = allRestaurantsData.map((restaurant: Restaurant) => {
+      const ratings = restaurant.customerReview ? restaurant.customerReview.flatMap((review: CustomerReviewType) => review.rating || []) : [];
+      const totalScore = ratings.reduce((sum: number, rating: Rating) => sum + (rating.score || 0), 0);
+      const avgRating = ratings.length ? parseFloat((totalScore / ratings.length).toFixed(2)) : 0;
+      
+      return {
+        restaurantName: restaurant.name,
+        avgRating: avgRating,
+        restaurantId: restaurant.id,
+      };
+    });
+
+    customerReviews = allRestaurantsData.flatMap((restaurant: Restaurant) => restaurant.customerReview || []) || [];
+  } else {
+    const restaurantDetail = dashboardData as Restaurant;
+
+    totalCustomerReview = restaurantDetail.customerReview ? restaurantDetail.customerReview.length : 0;
+    totalCategories = restaurantDetail.categories ? restaurantDetail.categories.length : 0;
+    totalItems = restaurantDetail.categories
+      ? restaurantDetail.categories.reduce((acc: number, category: Category) => acc + (category.items ? category.items.length : 0), 0)
+      : 0;
+
+    if (restaurantDetail.customerReview) {
+      totalRatings = restaurantDetail.customerReview.reduce((acc: number, review: CustomerReviewType) => {
+        if (review.rating) {
+          return acc + review.rating.length;
+        }
+        return acc;
+      }, 0);
+
+      const ratings = restaurantDetail.customerReview.flatMap((review: CustomerReviewType) => review.rating || []);
+      const totalScore = ratings.reduce((sum: number, rating: Rating) => sum + (rating.score || 0), 0);
+      const avgRating = ratings.length ? parseFloat((totalScore / ratings.length).toFixed(2)) : 0;
+
+      avgRatingData = [
+        {
+          restaurantName: restaurantDetail.name || '',
+          avgRating: avgRating,
+          restaurantId: restaurantDetail.id || '',
+        },
+      ];
+    }
+
+    customerReviews = restaurantDetail.customerReview || [];
+  }
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
     <div className="p-8 w-full overflow-hidden bg-white min-h-screen flex">
       <div className="flex-1">
         <div className="flex items-center space-x-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-          {/* Restaurant Selection */}
           <Select
-          placeholder="Select a restaurant"
-          style={{ width: 200 }}
-          onChange={handleRestaurantChange}
-          value={selectedRestaurant}
-        >
-          <Select.Option key="all" value="all">
-            All Restaurants
-          </Select.Option>
-          {restaurantQuery.data.items.map((restaurant: Restaurant) => (
-            <Select.Option key={restaurant.id} value={restaurant.id}>
-              {restaurant.name}
+            placeholder="Select a restaurant"
+            style={{ width: 200 }}
+            onChange={handleRestaurantChange}
+            value={selectedRestaurant}
+          >
+            <Select.Option key="all" value="all">
+              All Restaurants
             </Select.Option>
-          ))}
-        </Select>
+            {restaurantData.map((restaurant: Restaurant) => (
+              <Select.Option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </Select.Option>
+            ))}
+          </Select>
         </div>
 
         <Row gutter={24}>
-          {/* Total Reviews, Ratings, Categories, Items */}
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
                 title="Total Reviews"
-                value={filteredTotalReviews}
+                value={totalCustomerReview}
                 valueStyle={{ color: '#3f8600' }}
               />
             </Card>
@@ -192,7 +194,7 @@ const Home = () => {
             <Card hoverable>
               <Statistic
                 title="Total Ratings"
-                value={filteredTotalRatings}
+                value={totalRatings}
                 valueStyle={{ color: '#3f8600' }}
               />
             </Card>
@@ -201,7 +203,7 @@ const Home = () => {
             <Card hoverable>
               <Statistic
                 title="Total Categories"
-                value={filteredTotalCategories}
+                value={totalCategories}
                 valueStyle={{ color: '#3f8600' }}
               />
             </Card>
@@ -210,7 +212,7 @@ const Home = () => {
             <Card hoverable>
               <Statistic
                 title="Total Items"
-                value={filteredTotalItems}
+                value={totalItems}
                 valueStyle={{ color: '#3f8600' }}
               />
             </Card>
@@ -218,17 +220,16 @@ const Home = () => {
         </Row>
 
         <Row gutter={24} className="mt-6">
-          {/* Average Rating per Restaurant */}
           <Col xs={24} lg={12}>
             <Card hoverable>
               <h2 className="text-lg font-medium mb-4 text-gray-800">
                 Average Rating per Restaurant
               </h2>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={filteredAvgRatingData}>
+                <BarChart data={avgRatingData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="restaurantName" tick={{ fill: '#4b5563' }} />
-                  <YAxis tick={{ fill: '#4b5563' }} />
+                  <CustomYAxis />
                   <Tooltip formatter={(value) => [`${value}`, 'Average Rating']} />
                   <Legend formatter={() => 'Average Rating'} />
                   <Bar dataKey="avgRating" fill="#0088FE" />
@@ -237,7 +238,6 @@ const Home = () => {
             </Card>
           </Col>
 
-          {/* Ratings Distribution (Pie Chart) */}
           <Col xs={24} lg={12}>
             <Card hoverable>
               <h2 className="text-lg font-medium mb-4 text-gray-800">
@@ -246,7 +246,7 @@ const Home = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={filteredAvgRatingData}
+                    data={avgRatingData}
                     dataKey="avgRating"
                     nameKey="restaurantName"
                     cx="50%"
@@ -254,7 +254,7 @@ const Home = () => {
                     outerRadius={100}
                     fill="#8884d8"
                   >
-                    {filteredAvgRatingData.map((entry, index) => (
+                    {avgRatingData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -268,18 +268,17 @@ const Home = () => {
 
         <Divider className="my-8" />
 
-        {/* Top Reviewed Items */}
         <div>
           <h2 className="text-lg font-medium mb-4 text-gray-800">
             Top Reviewed Items
           </h2>
           <Row gutter={24}>
-            {filteredTopReviewedItems.map((item, index) => (
+            {avgRatingData.map((item, index) => (
               <Col key={index} xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Statistic
-                    title={item.itemName}
-                    value={item.reviews}
+                    title={item.restaurantName}
+                    value={item.avgRating}
                     valueStyle={{ color: "#3f8600" }}
                   />
                 </Card>
@@ -289,17 +288,23 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Sidebar Content */}
       <div className="w-80 pl-4">
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
-            dataSource={customerReviewQuery?.data?.items?.slice(0, 4) as CustomerReviewType[]}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta avatar={<Avatar src={item.name} />} title={item.name + ": " + item.comment} />
-              </List.Item>
-            )}
+            dataSource={customerReviews.slice(0, 4)}
+            renderItem={(item) => {
+              const displayName = item.name ? item.name.trim() : 'Anonymous';
+              const displayComment = item.comment ? item.comment.trim() : 'No comment available';
+              return (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar>{displayName.charAt(0).toUpperCase()}</Avatar>}
+                    title={displayName + ": " + displayComment}
+                  />
+                </List.Item>
+              );
+            }}
           />
         </Card>
 
