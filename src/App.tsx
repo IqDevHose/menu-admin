@@ -32,6 +32,7 @@ import DeletedRating from "./pages/Rating/DeletedRating";
 import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./middlewares/ProtectedRoute";
+import Import from "./pages/Items/Import";
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
         <Route path="/add-category" element={<AddCategory />} />
         <Route path="/deleted-category" element={<DeletedCategories />} />
         <Route path="/items" element={<Item />} />
+        <Route path="/items/import" element={<Import />} />
         <Route path="/edit-items/:itemId" element={<EditItmes />} />
         <Route path="/add-item" element={<AddItem />} />
         <Route path="/deleted-items" element={<DeletedItems />} />
