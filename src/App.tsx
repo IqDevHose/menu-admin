@@ -31,6 +31,7 @@ import DeletedReview from "./pages/CustomerReview/DeletedReview";
 import DeletedRating from "./pages/Rating/DeletedRating";
 import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./middlewares/ProtectedRoute";
 
 function App() {
   return (
@@ -39,6 +40,13 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       {/* Routes with Sidebar */}
+      {/* <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      > */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
