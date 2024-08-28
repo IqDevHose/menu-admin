@@ -8,6 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import exportCSVFile from 'json-to-csv-export';
+import axiosInstance from "@/axiosInstance";
+import Papa from 'papaparse';
 
 type itemReviewType = {
   id: string;
@@ -62,6 +64,48 @@ const Item = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [headers , setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
+
+  // Import Data
+  // const [parsedData, setParsedData] = useState<any[]>([]);
+  // const [csvHeaders, setCsvHeaders] = useState<string[]>();
+
+  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files && event.target.files.length > 0) {
+  //     const file = event.target.files[0];
+
+  //     Papa.parse(file, {
+  //       header: true,
+  //       skipEmptyLines: true,
+  //       complete: (result) => {
+  //         const data = result.data;
+  //         const csvHeads = result.meta.fields || [];
+
+  //         console.log(csvHeads)
+  //         console.log(data)
+  //         setCsvHeaders(csvHeads);
+  //         setParsedData(data);
+  //       },
+  //       error: (error) => {
+  //         console.error('Error parsing CSV file:', error);
+  //       },
+  //     });
+      
+  //   }
+  // };
+
+  // const handleUpload = async () => {
+  //   console.log(parsedData)
+  //   // if (parsedData.length > 0) {
+  //   //   try {
+  //   //     const response = await axios.post('/api/upload', parsedData);
+  //   //     console.log('Data uploaded successfully:', response.data);
+  //   //     // Handle success (e.g., show a success message)
+  //   //   } catch (error) {
+  //   //     console.error('Error uploading data:', error);
+  //   //     // Handle error (e.g., show an error message)
+  //   //   }
+  //   // }
+  // };
 
   const queryClient = useQueryClient();
 
@@ -266,7 +310,7 @@ const Item = () => {
             ))}
           </select>
         </div>
-        <div className="gap-4 items-start flex justify-center">
+        <div className="gap-4 flex items-start justify-center">
           <Link to="/add-item">
             <button
               type="button"
@@ -286,15 +330,33 @@ const Item = () => {
               </span>
             </button>
           </Link>
+
+          <Link to="/items/import">
             <button
-              onClick={handleExport}
               type="button"
               className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
             >
               <span className="flex gap-1 ">
-                Export
+                Import
               </span>
             </button>
+          </Link>
+            {/* <label
+            htmlFor="file"
+              className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+            >
+              <span className="flex gap-1 ">
+                Import
+              </span>
+            </label>
+            <input
+              id="file"
+              name="file"
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className="hidden text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+            /> */}
         </div>
       </div>
 
