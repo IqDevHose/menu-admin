@@ -317,7 +317,7 @@ const Item = () => {
           </select>
         </div>
         <div className="gap-4 flex items-start justify-center">
-          <Link to="/add-item">
+          <Link to="/items/add">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -326,7 +326,7 @@ const Item = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to="/deleted-items">
+          <Link to="/items/trash">
             <button
               type="button"
               className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
@@ -339,7 +339,7 @@ const Item = () => {
 
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/item/import"
+            link="/items/import"
           ></DropdownMenuDemo>
           {/* <label
             htmlFor="file"

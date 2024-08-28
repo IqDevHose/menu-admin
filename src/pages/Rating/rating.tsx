@@ -199,7 +199,7 @@ const Rating = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
-          <Link to="/add-rating">
+          <Link to="/ratings/add">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -208,7 +208,7 @@ const Rating = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to="/deleted-rating">
+          <Link to="/ratings/trash">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
@@ -221,7 +221,7 @@ const Rating = () => {
 
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/rating/import"
+            link="/ratings/import"
           ></DropdownMenuDemo>
         </div>
       </div>

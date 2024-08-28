@@ -234,7 +234,7 @@ const Restaurant = () => {
           </button>
           )
         } */}
-          <Link to={"/add-restaurant"}>
+          <Link to="/restaurants/add">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -243,7 +243,7 @@ const Restaurant = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to={"/deleted-restaurant"}>
+          <Link to="/restaurants/trash">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
@@ -256,7 +256,7 @@ const Restaurant = () => {
 
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/restaurant/import"
+            link="/restaurants/import"
           ></DropdownMenuDemo>
         </div>
       </div>

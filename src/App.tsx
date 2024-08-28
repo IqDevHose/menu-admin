@@ -49,86 +49,80 @@ function App() {
             </ProtectedRoute>
           }
         > */}
-        <Route element={<Layout />}/>
+        <Route element={<Layout />}>
           {/* home */}
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
-
           {/* end home */}
 
           {/* restaurant */}
-          <Route path="/restaurants" element={<Restaurant />}>
-            <Route path="/edit/:restaurantId" element={<EditRestaurant />} />
-            <Route path="/add" element={<AddRestaurant />} />
-            <Route path="/trash" element={<DeletedRestaurant />} />
+          <Route path="/restaurants/*">
+            <Route index element={<Restaurant />} />
+            <Route path="edit/:restaurantId" element={<EditRestaurant />} />
+            <Route path="add" element={<AddRestaurant />} />
+            <Route path="trash" element={<DeletedRestaurant />} />
           </Route>
           {/*end  restaurant */}
 
           {/* rating */}
-          <Route path="/ratings" element={<Rating />}>
-            <Route path="/edit/:ratingId" element={<EditRating />} />
-            <Route path="/add" element={<AddRating />} />
-            <Route path="/trash" element={<DeletedRating />} />
+          <Route path="/ratings/*">
+            <Route index element={<Rating />} />
+            <Route path="edit/:ratingId" element={<EditRating />} />
+            <Route path="add" element={<AddRating />} />
+            <Route path="trash" element={<DeletedRating />} />
           </Route>
           {/* end rating */}
 
-          {/* customerReview */}
-          <Route path="/customerReviews" element={<CustomerReview />}>
+          {/* customerReviews */}
+          <Route path="/customerReviews/*">
+            <Route index element={<CustomerReview />} />
             <Route
-              path="/edit/:customerReviewId"
+              path="edit/:customerReviewId"
               element={<EditCustomerReview />}
             />
-            <Route
-              path="/add"
-              element={<AddCustomerReview />}
-            />
-            <Route
-              path="/trash"
-              element={<DeletedReview />}
-            />
+            <Route path="add" element={<AddCustomerReview />} />
+            <Route path="trash" element={<DeletedReview />} />
           </Route>
           {/*end  customerReview */}
 
           {/* category */}
-          <Route path="/categories" element={<Category />}>
-            <Route
-              path="/edit/:categoryId"
-              element={<EditCategory />}
-            />
-            <Route path="/add" element={<AddCategory />} />
-            <Route path="/trash" element={<DeletedCategories />} />
+          <Route path="/categories/*">
+            <Route index element={<Category />} />
+            <Route path="edit/:categoryId" element={<EditCategory />} />
+            <Route path="add" element={<AddCategory />} />
+            <Route path="trash" element={<DeletedCategories />} />
           </Route>
           {/*end  category */}
 
           {/* items */}
-          <Route path="/items" element={<Item />}>
-            <Route path="/import" element={<Import />} />
-            <Route path="/edit/:itemId" element={<EditItmes />} />
-            <Route path="/add" element={<AddItem />} />
-            <Route path="/trash" element={<DeletedItems />} />
+          <Route path="/items/*">
+            <Route index element={<Item />} />
+            <Route path="import" element={<Import />} />
+            <Route path="edit/:itemId" element={<EditItmes />} />
+            <Route path="add" element={<AddItem />} />
+            <Route path="trash" element={<DeletedItems />} />
           </Route>
           {/*end items */}
 
           {/* questions */}
-          <Route path="/questions" element={<Questions />}>
-            <Route
-              path="/edit/:questionId"
-              element={<EditQuestion />}
-            />
-            <Route path="/add" element={<AddQuestion />} />
-            <Route path="/trash" element={<DeletedQuestions />} />
+          <Route path="/questions/*">
+            <Route index element={<Questions />} />
+            <Route path="edit/:questionId" element={<EditQuestion />} />
+            <Route path="add" element={<AddQuestion />} />
+            <Route path="trash" element={<DeletedQuestions />} />
           </Route>
           {/* end questions */}
 
-          {/* theme */}
-          <Route path="/themes" element={<Theme />}>
-            <Route path="/add" element={<AddTheme />} />
-            <Route path="/trash" element={<DeletedThemes />} />
-            <Route path="/edit/:themeId" element={<EditTheme />} />
+          {/* themes */}
+          <Route path="/themes/*">
+            <Route index element={<Theme />} />
+            <Route path="add" element={<AddTheme />} />
+            <Route path="trash" element={<DeletedThemes />} />
+            <Route path="edit/:themeId" element={<EditTheme />} />
           </Route>
           {/*end theme */}
           {/* end sidebar */}
-       
+        </Route>
       </>
     </Routes>
   );

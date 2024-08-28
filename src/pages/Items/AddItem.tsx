@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
+import Spinner from "@/components/Spinner";
 
 function AddItem() {
   const [name, setName] = useState<string>("");
@@ -53,7 +54,13 @@ function AddItem() {
     mutation.mutate({ name, description, price, image: null, categoryId });
   };
 
-  if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
+  if (isLoadingRestaurants) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">

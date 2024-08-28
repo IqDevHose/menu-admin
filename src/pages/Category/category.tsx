@@ -230,7 +230,7 @@ const Category = () => {
           </select>
         </div>{" "}
         <div className="gap-4 flex justify-center items-start">
-          <Link to={"/add-category"}>
+          <Link to={"/categories/add"}>
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -239,7 +239,7 @@ const Category = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to={"/deleted-category"}>
+          <Link to={"/categories/trash"}>
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
@@ -251,7 +251,7 @@ const Category = () => {
           </Link>
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/category/import"
+            link="/categories/import"
           ></DropdownMenuDemo>
         </div>
       </div>

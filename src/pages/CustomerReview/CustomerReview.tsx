@@ -281,7 +281,7 @@ const CustomerReview = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
-          <Link to="/add-customer-review">
+          <Link to="/customerReviews/add">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -290,7 +290,7 @@ const CustomerReview = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to="/deleted-customer-review">
+          <Link to="/customerReviews/trash">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
@@ -302,7 +302,7 @@ const CustomerReview = () => {
           </Link>
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/customerReview/import"
+            link="/customerReviews/import"
           ></DropdownMenuDemo>
         </div>
       </div>

@@ -190,7 +190,7 @@ const Theme = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
-          <Link to="/add-theme">
+          <Link to="/themes/add">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
@@ -199,7 +199,7 @@ const Theme = () => {
               <span className="inline xl:hidden">+</span>
             </button>
           </Link>
-          <Link to="/deleted-theme">
+          <Link to="/themes/trash">
             <button
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
@@ -211,7 +211,7 @@ const Theme = () => {
           </Link>
           <DropdownMenuDemo
             handleExport={handleExport}
-            link="/theme/import"
+            link="/themes/import"
           ></DropdownMenuDemo>
         </div>
       </div>
