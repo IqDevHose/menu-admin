@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
-import axiosInstance from "@/axiosInstance";
+import exportCSVFile from 'json-to-csv-export';
 
 type itemReviewType = {
   id: string;
@@ -18,6 +18,40 @@ type itemReviewType = {
   image: string;
 };
 
+interface DataItem {
+  categoryId: string;
+  createdAt: string;
+  deleted: boolean;
+  description: string;
+  id: string;
+  image: string | null;
+  name: string;
+  price: number;
+  updatedAt: string;
+}
+
+// Utility function to flatten the JSON object
+const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const propName = parent ? `${parent}.${key}` : key;
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        flattenObject(obj[key], propName, res);
+      } else {
+        res[propName] = obj[key];
+      }
+    }
+  }
+  return res;
+};
+
+// Extract headers from the data
+const extractHeaders = (data: DataItem[]): string[] => {
+  const flattenedData = data.map(item => flattenObject(item));
+  const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
+  return headers;
+};
+
 const Item = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
@@ -26,10 +60,35 @@ const Item = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1);
+  const [headers , setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
 
+  const {data: exportData} = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const item = await axios.get(`http://localhost:3000/item?page=all`);
+
+      const heads: any[] = extractHeaders(item.data.items)
+      setHeaders(heads)
+      return item.data;
+    },
+  });
+
+  const handleExport = () => {
+    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+
+    const dataToConvert = {
+      data: flattenedData,
+      filename: 'items',
+      delimiter: ',',
+      headers
+    }
+
+    // console.log(dataToConvert)
+    exportCSVFile(dataToConvert);
+  };
   // Fetch items based on current page, category, and restaurant filters
   const {
     data: itemsData,
@@ -43,18 +102,23 @@ const Item = () => {
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      const item = await axiosInstance.get(`/item`, { params });
+      const item = await axios.get(`http://localhost:3000/item`, { params });
+      // const heads: any[] = extractHeaders(item.data.items)
+      // setHeaders(heads)
       return item.data;
     },
   });
+
+  // Handle item deletion
+
 
   // Fetch categories based on the selected restaurant
   const { data: categories } = useQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       if (!selectedRestaurant) return []; // Return empty array if no restaurant is selected
-      const res = await axiosInstance.get(
-        `/category?restaurantId=${selectedRestaurant}`
+      const res = await axios.get(
+        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
       );
       return res.data;
     },
@@ -65,7 +129,7 @@ const Item = () => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
+      const res = await axios.get("http://localhost:3000/restaurant");
       return res.data;
     },
   });
@@ -73,7 +137,7 @@ const Item = () => {
   // Handle item deletion
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/item/soft-delete/${id}`);
+      await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
@@ -202,7 +266,7 @@ const Item = () => {
             ))}
           </select>
         </div>
-        <div className="gap-4 flex justify-center">
+        <div className="gap-4 items-start flex justify-center">
           <Link to="/add-item">
             <button
               type="button"
@@ -222,6 +286,15 @@ const Item = () => {
               </span>
             </button>
           </Link>
+            <button
+              onClick={handleExport}
+              type="button"
+              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+            >
+              <span className="flex gap-1 ">
+                Export
+              </span>
+            </button>
         </div>
       </div>
 
