@@ -12,6 +12,7 @@ import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import RatingPopup from "@/components/RatingPopup";
 import axiosInstance from "@/axiosInstance";
+import exportCSVFile from 'json-to-csv-export';
 
 type customerReviewType = {
   id: string;
@@ -19,6 +20,40 @@ type customerReviewType = {
   comment: string;
   email: string;
   blue: string;
+};
+
+interface DataItem {
+  birthday: String
+  comment: String
+  createdAt: String
+  deleted: Boolean
+  email: String
+  id: String
+  name: String
+  phone: String
+  resturantId: String
+  updatedAt: String
+}
+
+const flattenObject = (obj: Record<string, any>, parent = '', customerRev: Record<string, any> = {}): Record<string, any> => {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const propName = parent ? `${parent}.${key}` : key;
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        flattenObject(obj[key], propName, customerRev);
+      } else {
+        customerRev[propName] = obj[key];
+      }
+    }
+  }
+  return customerRev;
+};
+
+// Extract headers from the data
+const extractHeaders = (data: DataItem[]): string[] => {
+  const flattenedData = data.map(item => flattenObject(item));
+  const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
+  return headers;
 };
 
 const CustomerReview = () => {
@@ -34,6 +69,7 @@ const CustomerReview = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const itemsPerPage = 10; // Set the number of items per page
+  const [headers, setHeaders] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -47,6 +83,33 @@ const CustomerReview = () => {
       return customerReview.data;
     },
   });
+
+  const { data: exportData } = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const item = await axios.get(`http://localhost:3000/customer-review?page=all`);
+
+
+      console.log(item.data.items)
+      const heads: any[] = extractHeaders(item.data.items)
+      setHeaders(heads)
+      return item.data;
+    },
+  });
+
+  const handleExport = () => {
+    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+
+    const dataToConvert = {
+      data: flattenedData,
+      filename: 'customerReviews',
+      delimiter: ',',
+      headers
+    }
+
+    // console.log(dataToConvert)
+    exportCSVFile(dataToConvert);
+  };
 
   function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
@@ -209,7 +272,7 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
-        <div className="gap-4 flex justify-center">
+        <div className="gap-4 flex justify-center items-start">
           <Link to="/add-customer-review">
             <button
               type="button"
@@ -229,6 +292,15 @@ const CustomerReview = () => {
               </span>
             </button>
           </Link>
+          <button
+            onClick={handleExport}
+            type="button"
+            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+          >
+            <span className="flex gap-1 ">
+              Export
+            </span>
+          </button>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
