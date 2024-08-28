@@ -8,6 +8,7 @@ import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
+import exportCSVFile from 'json-to-csv-export';
 
 type questionsReviewType = {
   id: string;
@@ -15,6 +16,39 @@ type questionsReviewType = {
   description: string;
   price: number;
   categoryName: string;
+};
+
+interface DataItem {
+  // answers: object
+  createdAt: String
+  deleted:Boolean
+  description:String
+  enTitle:String
+  id:String
+  restaurantId:String
+  title:String
+  updatedAt:String
+}
+
+const flattenObject = (obj: Record<string, any>, parent = '', ques: Record<string, any> = {}): Record<string, any> => {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const propName = parent ? `${parent}.${key}` : key;
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        flattenObject(obj[key], propName, ques);
+      } else {
+        ques[propName] = obj[key];
+      }
+    }
+  }
+  return ques;
+};
+
+// Extract headers from the data
+const extractHeaders = (data: DataItem[]): string[] => {
+  const flattenedData = data.map(item => flattenObject(item));
+  const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
+  return headers;
 };
 
 const Questions = () => {
@@ -27,6 +61,7 @@ const Questions = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const itemsPerPage = 10; // Set the number of items per page
   const queryClient = useQueryClient();
+  const [headers, setHeaders] = useState<string[]>([]);
 
   const query = useQuery({
     queryKey: ["questions", currentPage],
@@ -47,6 +82,33 @@ const Questions = () => {
       setShowPopup(false); // Close the popup after successful deletion
     },
   });
+
+  const { data: exportData } = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const item = await axios.get(`http://localhost:3000/question?page=all`);
+
+
+      console.log(item.data.items)
+      const heads: any[] = extractHeaders(item.data.items)
+      setHeaders(heads)
+      return item.data;
+    },
+  });
+
+  const handleExport = () => {
+    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+
+    const dataToConvert = {
+      data: flattenedData,
+      filename: 'questions',
+      delimiter: ',',
+      headers
+    }
+
+    // console.log(dataToConvert)
+    exportCSVFile(dataToConvert);
+  };
 
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
@@ -132,7 +194,7 @@ const Questions = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="gap-4 flex justify-center">
+        <div className="gap-4 flex justify-center items-start">
           <Link to={"/add-question"}>
             <button
               type="button"
@@ -152,6 +214,15 @@ const Questions = () => {
               </span>
             </button>
           </Link>
+          <button
+            onClick={handleExport}
+            type="button"
+            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+          >
+            <span className="flex gap-1 ">
+              Export
+            </span>
+          </button>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
