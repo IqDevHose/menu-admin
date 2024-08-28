@@ -57,7 +57,7 @@ function App() {
           {/* end home */}
 
           {/* restaurant */}
-          <Route path="/restaurant" element={<Restaurant />}>
+          <Route path="/restaurants" element={<Restaurant />}>
             <Route path="/edit/:restaurantId" element={<EditRestaurant />} />
             <Route path="/add" element={<AddRestaurant />} />
             <Route path="/trash" element={<DeletedRestaurant />} />
@@ -65,7 +65,7 @@ function App() {
           {/*end  restaurant */}
 
           {/* rating */}
-          <Route path="/rating" element={<Rating />}>
+          <Route path="/ratings" element={<Rating />}>
             <Route path="/edit/:ratingId" element={<EditRating />} />
             <Route path="/add" element={<AddRating />} />
             <Route path="/trash" element={<DeletedRating />} />
@@ -73,7 +73,7 @@ function App() {
           {/* end rating */}
 
           {/* customerReview */}
-          <Route path="/customerReview" element={<CustomerReview />}>
+          <Route path="/customerReviews" element={<CustomerReview />}>
             <Route
               path="/edit/:customerReviewId"
               element={<EditCustomerReview />}
@@ -90,7 +90,7 @@ function App() {
           {/*end  customerReview */}
 
           {/* category */}
-          <Route path="/category" element={<Category />}>
+          <Route path="/categories" element={<Category />}>
             <Route
               path="/edit/:categoryId"
               element={<EditCategory />}
@@ -121,7 +121,7 @@ function App() {
           {/* end questions */}
 
           {/* theme */}
-          <Route path="/theme" element={<Theme />}>
+          <Route path="/themes" element={<Theme />}>
             <Route path="/add" element={<AddTheme />} />
             <Route path="/trash" element={<DeletedThemes />} />
             <Route path="/edit/:themeId" element={<EditTheme />} />
