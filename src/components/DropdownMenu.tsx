@@ -28,18 +28,26 @@ export function DropdownMenuDemo({ handleExport, link }: DropdownMenuDemoType) {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <Link to={link}>Import</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Mail className="mr-2 h-4 w-4" />
-            <button onClick={handleExport}>Export</button>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Print</span>
-          </DropdownMenuItem>
+          <Link to={link}>
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              Import
+            </DropdownMenuItem>
+          </Link>
+          <label htmlFor="btn">
+            <DropdownMenuItem>
+              <Mail className="mr-2 h-4 w-4" />
+              <button id="btn" onClick={handleExport}>
+                Export
+              </button>
+            </DropdownMenuItem>
+          </label>
+          <label htmlFor="print">
+            <DropdownMenuItem>
+              <CreditCard className="mr-2 h-4 w-4" />
+              <span id="print">Print</span>
+            </DropdownMenuItem>
+          </label>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
