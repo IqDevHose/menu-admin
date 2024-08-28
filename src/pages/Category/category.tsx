@@ -249,16 +249,6 @@ const Category = () => {
               </span>
             </button>
           </Link>
-          <Link to="/category/import">
-            <button
-              type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="flex gap-1 ">
-                Import
-              </span>
-            </button>
-          </Link>
 
           <DropdownMenuDemo
             handleExport={handleExport}
