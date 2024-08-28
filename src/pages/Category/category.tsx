@@ -8,10 +8,44 @@ import Pagination from "../../components/Pagination";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import axiosInstance from "@/axiosInstance";
+import exportCSVFile from 'json-to-csv-export';
+
 
 type categoryReviewType = {
   id: string;
   name: string;
+};
+
+interface DataCategory {
+  createdAt: String;
+  deleted: boolean
+  icon: String
+  id: String
+  name: String
+  orderNumber: String
+  restaurantId: String
+  updatedAt: String
+}
+
+const flattenObject = (obj: Record<string, any>, parent = '', category: Record<string, any> = {}): Record<string, any> => {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const propName = parent ? `${parent}.${key}` : key;
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        flattenObject(obj[key], propName, category);
+      } else {
+        category[propName] = obj[key];
+      }
+    }
+  }
+  return category;
+};
+
+// Extract headers from the data
+const extractHeaders = (data: DataCategory[]): string[] => {
+  const flattenedData = data.map(item => flattenObject(item));
+  const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
+  return headers;
 };
 
 const Category = () => {
@@ -25,6 +59,8 @@ const Category = () => {
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
+  const [headers, setHeaders] = useState<string[]>([]);
+
 
   // Fetch restaurants
   const { data: restaurants } = useQuery({
@@ -34,6 +70,32 @@ const Category = () => {
       return res.data;
     },
   });
+
+  const { data: exportData } = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const item = await axios.get(`http://localhost:3000/category?page=all`);
+
+      console.log(item.data.items)
+      const heads: any[] = extractHeaders(item.data.items)
+      setHeaders(heads)
+      return item.data;
+    },
+  });
+
+  const handleExport = () => {
+    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+
+    const dataToConvert = {
+      data: flattenedData,
+      filename: 'categories',
+      delimiter: ',',
+      headers
+    }
+
+    // console.log(dataToConvert)
+    exportCSVFile(dataToConvert);
+  };
 
   // Fetch categories based on selected restaurant
   const query = useQuery({
@@ -162,7 +224,7 @@ const Category = () => {
             ))}
           </select>
         </div>{" "}
-        <div className="gap-4 flex justify-center">
+        <div className="gap-4 flex justify-center items-start">
           <Link to={"/add-category"}>
             <button
               type="button"
@@ -182,6 +244,15 @@ const Category = () => {
               </span>
             </button>
           </Link>
+          <button
+            onClick={handleExport}
+            type="button"
+            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+          >
+            <span className="flex gap-1 ">
+              Export
+            </span>
+          </button>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
