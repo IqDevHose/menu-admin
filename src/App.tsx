@@ -37,59 +37,99 @@ import Import from "./pages/Items/Import";
 function App() {
   return (
     <Routes>
-      {/* Routes without Sidebar */}
-      <Route path="/login" element={<Login />} />
+      <>
+        {/* Routes without Sidebar */}
+        <Route path="/login" element={<Login />} />
 
-      {/* Routes with Sidebar */}
-      {/* <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      > */}
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/restaurant" element={<Restaurant />} />
-        <Route
-          path="/edit-restaurant/:restaurantId"
-          element={<EditRestaurant />}
-        />
-        <Route path="/add-restaurant" element={<AddRestaurant />} />
-        <Route path="/deleted-restaurant" element={<DeletedRestaurant />} />
-        <Route path="/edit-rating/:ratingId" element={<EditRating />} />
-        <Route path="/add-rating" element={<AddRating />} />
-        <Route path="/deleted-rating" element={<DeletedRating />} />
+        {/* Routes with Sidebar */}
+        {/* <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        > */}
+        <Route element={<Layout />}/>
+          {/* home */}
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
 
-        <Route
-          path="/edit-customer-review/:customerReviewId"
-          element={<EditCustomerReview />}
-        />
-        <Route path="/add-customer-review" element={<AddCustomerReview />} />
-        <Route path="/deleted-customer-review" element={<DeletedReview />} />
-        <Route path="/category" element={<Category />} />
-        <Route path="/edit-category/:categoryId" element={<EditCategory />} />
-        <Route path="/add-category" element={<AddCategory />} />
-        <Route path="/deleted-category" element={<DeletedCategories />} />
-        <Route path="/items" element={<Item />} />
-        <Route path="/items/import" element={<Import />} />
-        <Route path="/edit-items/:itemId" element={<EditItmes />} />
-        <Route path="/add-item" element={<AddItem />} />
-        <Route path="/deleted-items" element={<DeletedItems />} />
+          {/* end home */}
 
-        <Route path="/customerReview" element={<CustomerReview />} />
-        <Route path="/rating" element={<Rating />} />
+          {/* restaurant */}
+          <Route path="/restaurant" element={<Restaurant />}>
+            <Route path="/edit/:restaurantId" element={<EditRestaurant />} />
+            <Route path="/add" element={<AddRestaurant />} />
+            <Route path="/trash" element={<DeletedRestaurant />} />
+          </Route>
+          {/*end  restaurant */}
 
-        <Route path="/questions" element={<Questions />} />
-        <Route path="/edit-questions/:questionId" element={<EditQuestion />} />
-        <Route path="/add-question" element={<AddQuestion />} />
-        <Route path="/deleted-question" element={<DeletedQuestions />} />
-        <Route path="/theme" element={<Theme />} />
-        <Route path="/add-theme" element={<AddTheme />} />
-        <Route path="/deleted-theme" element={<DeletedThemes />} />
-        <Route path="/edit-theme/:themeId" element={<EditTheme />} />
-      </Route>
+          {/* rating */}
+          <Route path="/rating" element={<Rating />}>
+            <Route path="/edit/:ratingId" element={<EditRating />} />
+            <Route path="/add" element={<AddRating />} />
+            <Route path="/trash" element={<DeletedRating />} />
+          </Route>
+          {/* end rating */}
+
+          {/* customerReview */}
+          <Route path="/customerReview" element={<CustomerReview />}>
+            <Route
+              path="/edit/:customerReviewId"
+              element={<EditCustomerReview />}
+            />
+            <Route
+              path="/add"
+              element={<AddCustomerReview />}
+            />
+            <Route
+              path="/trash"
+              element={<DeletedReview />}
+            />
+          </Route>
+          {/*end  customerReview */}
+
+          {/* category */}
+          <Route path="/category" element={<Category />}>
+            <Route
+              path="/edit/:categoryId"
+              element={<EditCategory />}
+            />
+            <Route path="/add" element={<AddCategory />} />
+            <Route path="/trash" element={<DeletedCategories />} />
+          </Route>
+          {/*end  category */}
+
+          {/* items */}
+          <Route path="/items" element={<Item />}>
+            <Route path="/import" element={<Import />} />
+            <Route path="/edit/:itemId" element={<EditItmes />} />
+            <Route path="/add" element={<AddItem />} />
+            <Route path="/trash" element={<DeletedItems />} />
+          </Route>
+          {/*end items */}
+
+          {/* questions */}
+          <Route path="/questions" element={<Questions />}>
+            <Route
+              path="/edit/:questionId"
+              element={<EditQuestion />}
+            />
+            <Route path="/add" element={<AddQuestion />} />
+            <Route path="/trash" element={<DeletedQuestions />} />
+          </Route>
+          {/* end questions */}
+
+          {/* theme */}
+          <Route path="/theme" element={<Theme />}>
+            <Route path="/add" element={<AddTheme />} />
+            <Route path="/trash" element={<DeletedThemes />} />
+            <Route path="/edit/:themeId" element={<EditTheme />} />
+          </Route>
+          {/*end theme */}
+          {/* end sidebar */}
+       
+      </>
     </Routes>
   );
 }
