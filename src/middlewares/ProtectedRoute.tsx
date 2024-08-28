@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 // Assume you have some kind of authentication check function
 const isAuthenticated = (): boolean => {
   // Implement your authentication logic here
-  return localStorage.getItem("authToken") !== null;
+  return localStorage.getItem("jwtToken") !== null;
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
