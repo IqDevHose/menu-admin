@@ -8,7 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import axiosInstance from "@/axiosInstance";
-import exportCSVFile from 'json-to-csv-export';
+import exportCSVFile from "json-to-csv-export";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type ratingReviewType = {
   id: string;
@@ -20,20 +21,24 @@ type ratingReviewType = {
 };
 
 interface DataRating {
-  CustomerReviewId: String
-  createdAt: String
-  deleted: Boolean
-  id: String
-  questionId: String
-  score: String
-  updatedAt: String
+  CustomerReviewId: String;
+  createdAt: String;
+  deleted: Boolean;
+  id: String;
+  questionId: String;
+  score: String;
+  updatedAt: String;
 }
 
-const flattenObject = (obj: Record<string, any>, parent = '', rate: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  rate: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, rate);
       } else {
         rate[propName] = obj[key];
@@ -45,7 +50,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', rate: Record<strin
 
 // Extract headers from the data
 const extractHeaders = (data: DataRating[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -71,28 +76,29 @@ const Rating = () => {
     },
   });
 
-  const {data: exportData} = useQuery({
+  const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/rating?page=all`);
 
-
-      console.log(item.data.items)
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'ratings',
-      delimiter: ',',
-      headers
-    }
+      filename: "ratings",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -196,7 +202,7 @@ const Rating = () => {
           <Link to="/add-rating">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add Rating</span>
               <span className="inline xl:hidden">+</span>
@@ -207,20 +213,16 @@ const Rating = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 mb-2 px-5"
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-          <button
-              onClick={handleExport}
-              type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="flex gap-1 ">
-                Export
-              </span>
-            </button>
+
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/rating/import"
+          ></DropdownMenuDemo>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">

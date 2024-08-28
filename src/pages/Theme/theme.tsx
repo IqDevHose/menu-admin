@@ -8,7 +8,8 @@ import { SquarePen, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
-import exportCSVFile from 'json-to-csv-export';
+import exportCSVFile from "json-to-csv-export";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type themeType = {
   id: string;
@@ -19,18 +20,22 @@ type themeType = {
 };
 
 interface DataItem {
-  bg: String
-  deleted: boolean
-  id: String
-  primary: String
-  restaurantId: String
-  secondary: String
+  bg: String;
+  deleted: boolean;
+  id: String;
+  primary: String;
+  restaurantId: String;
+  secondary: String;
 }
-const flattenObject = (obj: Record<string, any>, parent = '', theme: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  theme: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, theme);
       } else {
         theme[propName] = obj[key];
@@ -42,7 +47,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', theme: Record<stri
 
 // Extract headers from the data
 const extractHeaders = (data: DataItem[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -69,23 +74,24 @@ const Theme = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
 
-
-      console.log(item.data.items)
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'themes',
-      delimiter: ',',
-      headers
-    }
+      filename: "themes",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -187,7 +193,7 @@ const Theme = () => {
           <Link to="/add-theme">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add theme</span>
               <span className="inline xl:hidden">+</span>
@@ -198,20 +204,15 @@ const Theme = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg  py-2.5  mb-2 px-5"
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-          <button
-            onClick={handleExport}
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="flex gap-1 ">
-              Export
-            </span>
-          </button>
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/theme/import"
+          ></DropdownMenuDemo>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">

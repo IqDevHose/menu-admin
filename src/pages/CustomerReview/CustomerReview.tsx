@@ -12,7 +12,8 @@ import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import RatingPopup from "@/components/RatingPopup";
 import axiosInstance from "@/axiosInstance";
-import exportCSVFile from 'json-to-csv-export';
+import exportCSVFile from "json-to-csv-export";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type customerReviewType = {
   id: string;
@@ -23,23 +24,27 @@ type customerReviewType = {
 };
 
 interface DataItem {
-  birthday: String
-  comment: String
-  createdAt: String
-  deleted: Boolean
-  email: String
-  id: String
-  name: String
-  phone: String
-  resturantId: String
-  updatedAt: String
+  birthday: String;
+  comment: String;
+  createdAt: String;
+  deleted: Boolean;
+  email: String;
+  id: String;
+  name: String;
+  phone: String;
+  resturantId: String;
+  updatedAt: String;
 }
 
-const flattenObject = (obj: Record<string, any>, parent = '', customerRev: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  customerRev: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, customerRev);
       } else {
         customerRev[propName] = obj[key];
@@ -51,7 +56,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', customerRev: Recor
 
 // Extract headers from the data
 const extractHeaders = (data: DataItem[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -87,25 +92,28 @@ const CustomerReview = () => {
   const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/customer-review?page=all`);
+      const item = await axios.get(
+        `http://localhost:3000/customer-review?page=all`
+      );
 
-
-      console.log(item.data.items)
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'customerReviews',
-      delimiter: ',',
-      headers
-    }
+      filename: "customerReviews",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -276,7 +284,7 @@ const CustomerReview = () => {
           <Link to="/add-customer-review">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add Customer Review</span>
               <span className="inline xl:hidden">+</span>
@@ -287,20 +295,15 @@ const CustomerReview = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-          <button
-            onClick={handleExport}
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="flex gap-1 ">
-              Export
-            </span>
-          </button>
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/customerReview/import"
+          ></DropdownMenuDemo>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">

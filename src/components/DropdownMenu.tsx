@@ -1,4 +1,4 @@
-import { CreditCard, Mail, User } from "lucide-react";
+import { CreditCard, Mail, User, Cog } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,15 +12,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 type DropdownMenuDemoType = {
-  handleExport: () => void,
-  link:string
-}
-export function DropdownMenuDemo({ handleExport,link }:DropdownMenuDemoType) {
+  handleExport: () => void;
+  link: string;
+};
+export function DropdownMenuDemo({ handleExport, link }: DropdownMenuDemoType) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5">
-          Open
+        <button className="text-white flex items-center gap-1 bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5">
+          <Cog size={20} />
+          <p className="hidden xl:inline">Actions</p>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

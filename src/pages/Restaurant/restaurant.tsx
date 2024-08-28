@@ -237,7 +237,7 @@ const Restaurant = () => {
           <Link to={"/add-restaurant"}>
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add Restaurant</span>
               <span className="inline xl:hidden">+</span>
@@ -248,14 +248,16 @@ const Restaurant = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-          <div>
-            <DropdownMenuDemo handleExport={handleExport} link="/TODD:add link"></DropdownMenuDemo>
-          </div>
+
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/restaurant/import"
+          ></DropdownMenuDemo>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">

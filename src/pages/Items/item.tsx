@@ -7,9 +7,10 @@ import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
-import exportCSVFile from 'json-to-csv-export';
+import exportCSVFile from "json-to-csv-export";
 import axiosInstance from "@/axiosInstance";
-import Papa from 'papaparse';
+import Papa from "papaparse";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type itemReviewType = {
   id: string;
@@ -33,11 +34,15 @@ interface DataItem {
 }
 
 // Utility function to flatten the JSON object
-const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  res: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
         res[propName] = obj[key];
@@ -49,7 +54,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 
 // Extract headers from the data
 const extractHeaders = (data: DataItem[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -62,7 +67,7 @@ const Item = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1);
-  const [headers , setHeaders] = useState<string[]>();
+  const [headers, setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
 
   // Import Data
@@ -89,7 +94,7 @@ const Item = () => {
   //         console.error('Error parsing CSV file:', error);
   //       },
   //     });
-      
+
   //   }
   // };
 
@@ -109,26 +114,28 @@ const Item = () => {
 
   const queryClient = useQueryClient();
 
-  const {data: exportData} = useQuery({
+  const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/item?page=all`);
 
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'items',
-      delimiter: ',',
-      headers
-    }
+      filename: "items",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -154,7 +161,6 @@ const Item = () => {
   });
 
   // Handle item deletion
-
 
   // Fetch categories based on the selected restaurant
   const { data: categories } = useQuery({
@@ -314,7 +320,7 @@ const Item = () => {
           <Link to="/add-item">
             <button
               type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add Item</span>
               <span className="inline xl:hidden">+</span>
@@ -325,23 +331,17 @@ const Item = () => {
               type="button"
               className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
 
-          <Link to="/items/import">
-            <button
-              type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="flex gap-1 ">
-                Import
-              </span>
-            </button>
-          </Link>
-            {/* <label
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/item/import"
+          ></DropdownMenuDemo>
+          {/* <label
             htmlFor="file"
               className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
             >

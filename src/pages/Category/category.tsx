@@ -8,8 +8,8 @@ import Pagination from "../../components/Pagination";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import axiosInstance from "@/axiosInstance";
-import exportCSVFile from 'json-to-csv-export';
-
+import exportCSVFile from "json-to-csv-export";
+import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type categoryReviewType = {
   id: string;
@@ -18,20 +18,24 @@ type categoryReviewType = {
 
 interface DataCategory {
   createdAt: String;
-  deleted: boolean
-  icon: String
-  id: String
-  name: String
-  orderNumber: String
-  restaurantId: String
-  updatedAt: String
+  deleted: boolean;
+  icon: String;
+  id: String;
+  name: String;
+  orderNumber: String;
+  restaurantId: String;
+  updatedAt: String;
 }
 
-const flattenObject = (obj: Record<string, any>, parent = '', category: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  category: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, category);
       } else {
         category[propName] = obj[key];
@@ -43,7 +47,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', category: Record<s
 
 // Extract headers from the data
 const extractHeaders = (data: DataCategory[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -61,7 +65,6 @@ const Category = () => {
   const queryClient = useQueryClient();
   const [headers, setHeaders] = useState<string[]>([]);
 
-
   // Fetch restaurants
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
@@ -76,22 +79,24 @@ const Category = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/category?page=all`);
 
-      console.log(item.data.items)
-      const heads: any[] = extractHeaders(item.data.items)
-      setHeaders(heads)
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
       return item.data;
     },
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) => flattenObject(item));
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
     const dataToConvert = {
       data: flattenedData,
-      filename: 'categories',
-      delimiter: ',',
-      headers
-    }
+      filename: "categories",
+      delimiter: ",",
+      headers,
+    };
 
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
@@ -228,7 +233,7 @@ const Category = () => {
           <Link to={"/add-category"}>
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
             >
               <span className="hidden xl:inline">Add Category</span>
               <span className="inline xl:hidden">+</span>
@@ -239,20 +244,15 @@ const Category = () => {
               type="button"
               className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
             >
-              <span className="flex gap-1 ">
-                <Trash2 /> <p className="hidden xl:inline">Trash</p>
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-          <button
-            onClick={handleExport}
-            type="button"
-            className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-          >
-            <span className="flex gap-1 ">
-              Export
-            </span>
-          </button>
+          <DropdownMenuDemo
+            handleExport={handleExport}
+            link="/category/import"
+          ></DropdownMenuDemo>
         </div>
       </div>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
