@@ -178,10 +178,10 @@ function AddTheme() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 bg-indigo-600 disabled:animate-pulse disabled:bg-indigo-300 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
-            >
-              {mutation.isPending ? "Adding..." : "Add Theme"}
+          >
+            {mutation.isPending ? "Adding..." : "Add Theme"}
           </button>
         </div>
       </form>

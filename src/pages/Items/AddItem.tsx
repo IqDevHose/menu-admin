@@ -212,14 +212,22 @@ function AddItem() {
           </select>
         </div>
 
-        {/* File Upload */}
+        {/* Upload Image */}
         <div className="mb-4">
-          <label
-            htmlFor="upload-image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload Image
-          </label>
+          <div className="flex gap-4 items-center">
+            <label
+              htmlFor="upload-image"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Upload image
+            </label>
+            {progress > 0 && name && uploadImage && (
+              <div className="flex items-center gap-1">
+                <h1 className="text-gray-400 ">{progress}</h1>
+                <Progress value={progress} max={100} className="h-2 w-24 " />
+              </div>
+            )}
+          </div>
           <input
             type="file"
             id="upload-image"
@@ -230,20 +238,11 @@ function AddItem() {
           />
         </div>
 
-        {/* Progress Bar */}
-        { (
-          <div>     <h1 className="text-lg text-black">
-            {progress} 
-            </h1>     <Progress value={70} max={100} className="mb-4 " />
-      </div>
-        )}
-
-
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 disabled:animate-pulse disabled:bg-indigo-300 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
           >
             {mutation.isPending ? "Adding... " : "Add Item"}

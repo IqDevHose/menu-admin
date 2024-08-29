@@ -5,7 +5,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner"; // Assuming you have a Spinner component for loading states
 import axiosInstance from "@/axiosInstance";
 
-
 type questionType = {
   title: string | null;
   enTitle: string | null;
@@ -17,8 +16,12 @@ type questionType = {
 function EditQuestion() {
   const location = useLocation();
   const record = location.state;
-  const [description, setDescription] = useState<string | null>(record.description);
-  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [description, setDescription] = useState<string | null>(
+    record.description
+  );
+  const [restaurantId, setRestaurantId] = useState<string | null>(
+    record.restaurantId
+  );
   const [answer, setAnswer] = useState<string | null>(record.answer);
   const [title, setTitle] = useState<string | null>(record.title);
   const [enTitle, setEnTitle] = useState<string | null>(record.enTitle);
@@ -177,10 +180,10 @@ function EditQuestion() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 bg-indigo-600  disabled:animate-pulse disabled:bg-indigo-300 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
-            >
-              {mutation.isPending ? "Saving..." : "Save Changes"}
+          >
+            {mutation.isPending ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

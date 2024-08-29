@@ -1,7 +1,6 @@
 import axiosInstance from "@/axiosInstance";
 import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ActionMeta, MultiValue, SingleValue } from "react-select";
@@ -104,7 +103,6 @@ function AddRestaurant() {
 
     mutation.mutate(formData);
   };
-
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md overflow-auto">
       <h2 className="text-2xl font-bold mb-6">Add Restaurant</h2>
@@ -271,12 +269,20 @@ function AddRestaurant() {
 
         {/* Upload Image */}
         <div className="mb-4">
-          <label
-            htmlFor="upload-image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload image
-          </label>
+          <div className="flex gap-4 items-center">
+            <label
+              htmlFor="upload-image"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Upload image
+            </label>
+            {progress > 0 && name && uploadImage && (
+              <div className="flex items-center gap-1">
+                <h1 className="text-gray-400 ">{progress}</h1>
+                <Progress value={progress} max={100} className="h-2 w-24 " />
+              </div>
+            )}
+          </div>
           <input
             type="file"
             id="upload-image"
@@ -286,22 +292,15 @@ function AddRestaurant() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
-         {/* Progress Bar */}
-         { (
-          <div>     <h1 className="text-lg text-black">
-            {progress} 
-            </h1>     <Progress value={70} max={100} className="mb-4 " />
-      </div>
-        )}
 
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 disabled:animate-pulse disabled:bg-indigo-300 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Adding... " : "Add Restaurant"}
+            {mutation.isPending ? "Adding..." : "Add Restaurant"}
           </button>
         </div>
       </form>
