@@ -1,6 +1,4 @@
 import { CreditCard, Mail, User, Cog } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,

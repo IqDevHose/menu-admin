@@ -48,14 +48,14 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Routes with Sidebar */}
-        {/* <Route
+        <Route
           element={
             <ProtectedRoute>
               <Layout />
             </ProtectedRoute>
           }
-        > */}
-        <Route element={<Layout />}>
+        >
+          {/* <Route element={<Layout />}> */}
           {/* home */}
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />

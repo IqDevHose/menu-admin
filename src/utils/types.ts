@@ -29,5 +29,14 @@ export interface StatsData {
   totalRatings: number;
   totalCategories: number;
   totalItems: number;
-  topReviewedItems: { itemName: string; reviews: number; restaurantId: string }[];
+  topReviewedItems: {
+    itemName: string;
+    reviews: number;
+    restaurantId: string;
+  }[];
+}
+
+export interface LoginData {
+  userName: string;
+  password: string;
 }
