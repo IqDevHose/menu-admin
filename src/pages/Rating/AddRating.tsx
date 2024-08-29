@@ -21,7 +21,7 @@ function AddRating() {
       return axiosInstance.post(`/rating`, newRating);
     },
     onSuccess: () => {
-      navigate("/rating"); // Navigate back to the ratings list after successful addition
+      navigate("/ratings"); // Navigate back to the ratings list after successful addition
     },
   });
 

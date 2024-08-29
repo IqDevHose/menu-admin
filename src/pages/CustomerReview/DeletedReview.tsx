@@ -181,7 +181,7 @@ const DeletedReview = () => {
               <td className="px-6 py-4">{item?.description}</td>
               <td className="px-6 py-4">{item?.price}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-items/${item?.id}`} state={item}>
+                <Link to={`/items/edit/${item?.id}`} state={item}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

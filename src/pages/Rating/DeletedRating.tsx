@@ -178,7 +178,7 @@ const DeletedRatings = () => {
               <td className="px-6 py-4">{rating?.description}</td>
               <td className="px-6 py-4">{rating?.ratingValue}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-rating/${rating?.id}`} state={rating}>
+                <Link to={`/ratings/edit${rating?.id}`} state={rating}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

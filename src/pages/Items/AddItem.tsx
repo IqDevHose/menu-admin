@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
@@ -11,6 +10,8 @@ function AddItem() {
   const [price, setPrice] = useState<number | null>(null);
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [uploadImage, setUploadImage] = useState<File | null>(null); // State for file upload
+  const [progress, setProgress] = useState<number>(0);
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
@@ -34,24 +35,46 @@ function AddItem() {
       const response = await axiosInstance.get(
         `/category?restaurantId=${restaurantId}`
       );
-      // console.log(response.data)
       return response.data;
     },
     enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
   });
 
+  // Mutation for submitting the form
   const mutation = useMutation({
-    mutationFn: async (newItem: any) => {
-      console.log("Data being sent to API:", newItem); // Debugging: log the data being sent
-      return await axiosInstance.post(`/item`, newItem);
+    mutationFn: (newItem: FormData) => {
+      return axiosInstance.post(`/item`, newItem, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (event) => {
+          setProgress(Math.round((100 * event.loaded) / event.total));
+        },
+      });
+    },
+    onError: (e) => {
+      console.log(e);
     },
     onSuccess: () => {
-      navigate("/items"); // Navigate back to the item list after successful addition
+      navigate("/items");
     },
   });
 
-  const handleSubmit = () => {
-    mutation.mutate({ name, description, price, image: null, categoryId });
+  // Consolidated handleSubmit function using FormData
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", `${price}`); 
+    formData.append("categoryId", categoryId);
+    if (uploadImage) {
+      formData.append("file", uploadImage); 
+    }
+    
+
+    mutation.mutate(formData);
   };
 
   if (isLoadingRestaurants) {
@@ -68,10 +91,7 @@ function AddItem() {
       <form onSubmit={handleSubmit}>
         {/* Item Name */}
         <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Item Name
           </label>
           <input
@@ -87,10 +107,7 @@ function AddItem() {
 
         {/* Item Price */}
         <div className="mb-4">
-          <label
-            htmlFor="price"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
             Item Price
           </label>
           <input
@@ -106,10 +123,7 @@ function AddItem() {
 
         {/* Description */}
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Description
           </label>
           <textarea
@@ -125,10 +139,7 @@ function AddItem() {
 
         {/* Restaurant Select */}
         <div className="mb-4">
-          <label
-            htmlFor="restaurantId"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
             Restaurant
           </label>
           <select
@@ -155,10 +166,7 @@ function AddItem() {
 
         {/* Category Select */}
         <div className="mb-4">
-          <label
-            htmlFor="categoryId"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
             Category
           </label>
           <select
@@ -170,14 +178,11 @@ function AddItem() {
             disabled={!restaurantId || isLoadingCategories}
           >
             <option value="" disabled>
-              {isLoadingCategories
-                ? "Loading categories..."
-                : "Select a category"}
+              {isLoadingCategories ? "Loading categories..." : "Select a category"}
             </option>
             {categories && categories.items.length > 0 ? (
               categories.items.map((category: any) => (
                 <option key={category.id} value={category.id}>
-                  {console.log(category)}
                   {category.name}
                 </option>
               ))
@@ -187,6 +192,21 @@ function AddItem() {
               </option>
             )}
           </select>
+        </div>
+
+        {/* File Upload */}
+        <div className="mb-4">
+          <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">
+            Upload Image
+          </label>
+          <input
+            type="file"
+            id="upload-image"
+            onChange={(e) => {
+              if (e.target.files) setUploadImage(e.target.files[0]);
+            }}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
         </div>
 
         {/* Submit Button */}

@@ -173,7 +173,7 @@ const DeletedThemes = () => {
               </td>
               <td className="px-6 py-4">{theme?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-theme/${theme?.id}`} state={theme}>
+                <Link to={`/themes/edit/${theme?.id}`} state={theme}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

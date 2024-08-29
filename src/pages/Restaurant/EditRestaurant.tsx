@@ -39,7 +39,7 @@ function EditRestaurant() {
   const [name, setName] = useState<string | null>(record.name || "");
   const [description, setDescription] = useState<string | null>(record.description || "");
   const [accessCode, setAccessCode] = useState<string | null>(record.accessCode || "");
-  const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const [uploadImage, setUploadImage] = useState<File | string | null>(record.image|| null);
   const [primary, setPrimary] = useState<string | null>(record?.theme?.primary || "");
   const [secondary, setSecondary] = useState<string | null>(record?.theme?.secondary || "");
   const [bg, setBg] = useState<string | null>(record?.theme?.bg || "");
@@ -60,7 +60,7 @@ function EditRestaurant() {
       return axiosInstance.put(`/restaurant/${restaurantId}`, newEdit);
     },
     onSuccess: () => {
-      navigate("/restaurant");
+      navigate("/restaurants");
     },
   });
 
@@ -85,7 +85,7 @@ function EditRestaurant() {
       name,
       description,
       accessCode,
-      image: uploadImage ? URL.createObjectURL(uploadImage) : null, // Handle file upload URL
+      image: uploadImage ? URL.createObjectURL(uploadImage as File) : null, // Handle file upload URL
       primary,
       secondary,
       bg,
@@ -233,6 +233,8 @@ function EditRestaurant() {
           />
         </div>
 
+        <img src={uploadImage as string} alt={name || ""
+        } />
         {/* Upload Image */}
         <div className="mb-4">
           <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">

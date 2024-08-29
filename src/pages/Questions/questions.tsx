@@ -282,7 +282,7 @@ const Questions = () => {
               <td className="px-6 py-4">{item?.answer}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link to={`/edit-questions/${item.id}`} state={item}>
+                  <Link to={`/questions/edit/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>

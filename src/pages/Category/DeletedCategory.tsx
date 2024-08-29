@@ -207,7 +207,7 @@ const DeletedCategories = () => {
               </td>
               <td className="px-6 py-4">{category?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-category/${category?.id}`} state={category}>
+                <Link to={`/categories/edit/${category?.id}`} state={category}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

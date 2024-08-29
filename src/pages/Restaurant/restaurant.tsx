@@ -310,7 +310,7 @@ const Restaurant = () => {
               <td className="px-6 py-4">{item.categories.length}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link to={`/edit-restaurant/${item.id}`} state={item}>
+                  <Link to={`/restaurants/edit/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>

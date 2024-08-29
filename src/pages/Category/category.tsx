@@ -303,7 +303,7 @@ const Category = () => {
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
                   <Link
-                    to={`/edit-category/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.resturnat.name}`}
+                    to={`/categories/item/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.resturnat.name}`}
                   >
                     <SquarePen />
                   </Link>

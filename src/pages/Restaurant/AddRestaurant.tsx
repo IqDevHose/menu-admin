@@ -36,6 +36,7 @@ function AddRestaurant() {
   const [primary, setPrimary] = useState<string | null>("");
   const [secondary, setSecondary] = useState<string | null>("");
   const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
+  const [progress, setProgress] = useState<number>(0);
   const [bg, setBg] = useState<string | null>("");
   const navigate = useNavigate();
 
@@ -48,8 +49,16 @@ function AddRestaurant() {
   });
 
   const mutation = useMutation({
-    mutationFn: (newRest: restaurantType) => {
-      return axiosInstance.post(`/restaurant`, newRest);
+    mutationFn: (newRest: FormData) => {
+
+      return axiosInstance.post(`/restaurant`, newRest, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (event) => {
+            setProgress(Math.round((100 * event.loaded) / event.total));
+          },
+      });
     },
     onError: (e) => {
       console.log(e);
@@ -78,17 +87,22 @@ function AddRestaurant() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutation.mutate({
-      name,
-      categories: categoriesData,
-      icon: null,
-      description,
-      accessCode,
-      image: null, // You'll need to handle file upload separately
-      primary,
-      secondary,
-      bg,
-    });
+
+    const formData = new FormData();
+    formData.append("name", name || "");
+    formData.append("description", description || "");
+    formData.append("accessCode", accessCode || "");
+    formData.append("primary", primary || "");
+    formData.append("secondary", secondary || "");
+    formData.append("bg", bg || "");
+    if (uploadImage) {
+      formData.append("file", uploadImage);
+    }
+
+    // Append categories as JSON string
+    formData.append("categories", JSON.stringify(categoriesData));
+
+    mutation.mutate(formData);
   };
 
   return (

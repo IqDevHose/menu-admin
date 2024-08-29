@@ -182,7 +182,7 @@ const DeletedQuestions = () => {
               </td>
               <td className="px-6 py-4">{question?.answerText}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/edit-question/${question?.id}`} state={question}>
+                <Link to={`/questions/edit/${question?.id}`} state={question}>
                   <SquarePen className="text-blue-600" />
                 </Link>
                 <button

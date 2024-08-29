@@ -287,7 +287,7 @@ const Theme = () => {
               </td>
               <td className="px-6 py-4 flex gap-x-4">
                 <button className="font-medium text-blue-600">
-                  <Link to={`/edit-theme/${item.id}`} state={item}>
+                  <Link to={`/themes/edit/${item.id}`} state={item}>
                     <SquarePen />
                   </Link>
                 </button>
