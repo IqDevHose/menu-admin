@@ -1,4 +1,5 @@
 import axiosInstance from "@/axiosInstance";
+import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FormEvent, useState } from "react";
@@ -286,6 +287,13 @@ function AddRestaurant() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
+         {/* Progress Bar */}
+         { (
+          <div>     <h1 className="text-lg text-black">
+            {progress} 
+            </h1>     <Progress value={70} max={100} className="mb-4 " />
+      </div>
+        )}
 
         {/* Submit Button */}
         <div className="flex justify-end">

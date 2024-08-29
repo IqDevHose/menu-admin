@@ -41,7 +41,7 @@ function AddCustomerReview() {
       return axiosInstance.post(`/customer-review`, newReview);
     },
     onSuccess: () => {
-      navigate("/customerReview"); // Navigate back to the customer reviews list after successful addition
+      navigate("/customerReviews"); // Navigate back to the customer reviews list after successful addition
     },
   });
 
@@ -190,8 +190,9 @@ function AddCustomerReview() {
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={mutation.isPending}
           >
-            Add Review
+            {mutation.isPending ? "Adding..." : "Add Review"}
           </button>
         </div>
       </form>

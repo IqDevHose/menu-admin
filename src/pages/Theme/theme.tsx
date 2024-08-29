@@ -74,7 +74,7 @@ const Theme = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
 
-      console.log(item.data.items);
+      
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -93,7 +93,7 @@ const Theme = () => {
       headers,
     };
 
-    // console.log(dataToConvert)
+    
     exportCSVFile(dataToConvert);
   };
 

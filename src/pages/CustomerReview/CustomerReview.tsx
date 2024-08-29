@@ -84,7 +84,7 @@ const CustomerReview = () => {
       const customerReview = await axiosInstance.get(
         `/customer-review?page=${currentPage}`
       );
-      console.log(customerReview.data.items);
+      
       return customerReview.data;
     },
   });
@@ -96,7 +96,7 @@ const CustomerReview = () => {
         `http://localhost:3000/customer-review?page=all`
       );
 
-      console.log(item.data.items);
+      
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;

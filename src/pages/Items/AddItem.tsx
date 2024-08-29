@@ -1,8 +1,10 @@
+// AddItem.tsx
 import { useState, FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
+import { Progress } from "@/components/ui/progress";
 
 function AddItem() {
   const [name, setName] = useState<string>("");
@@ -10,7 +12,7 @@ function AddItem() {
   const [price, setPrice] = useState<number | null>(null);
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
-  const [uploadImage, setUploadImage] = useState<File | null>(null); // State for file upload
+  const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const navigate = useNavigate();
 
@@ -37,7 +39,7 @@ function AddItem() {
       );
       return response.data;
     },
-    enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
+    enabled: !!restaurantId,
   });
 
   // Mutation for submitting the form
@@ -67,12 +69,11 @@ function AddItem() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
-    formData.append("price", `${price}`); 
+    formData.append("price", `${price}`);
     formData.append("categoryId", categoryId);
     if (uploadImage) {
-      formData.append("file", uploadImage); 
+      formData.append("file", uploadImage);
     }
-    
 
     mutation.mutate(formData);
   };
@@ -147,7 +148,7 @@ function AddItem() {
             value={restaurantId}
             onChange={(e) => {
               setRestaurantId(e.target.value);
-              setCategoryId(""); // Clear category when changing restaurant
+              setCategoryId("");
               refetchCategories();
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -172,7 +173,7 @@ function AddItem() {
           <select
             id="categoryId"
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)} // Bind the value to state
+            onChange={(e) => setCategoryId(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             required
             disabled={!restaurantId || isLoadingCategories}
@@ -208,6 +209,15 @@ function AddItem() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
+
+        {/* Progress Bar */}
+        { (
+          <div>     <h1 className="text-lg text-black">
+            {progress} 
+            </h1>     <Progress value={70} max={100} className="mb-4 " />
+      </div>
+        )}
+
 
         {/* Submit Button */}
         <div className="flex justify-end">

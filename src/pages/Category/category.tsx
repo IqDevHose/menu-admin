@@ -79,7 +79,6 @@ const Category = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/category?page=all`);
 
-      console.log(item.data.items);
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
