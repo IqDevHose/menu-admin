@@ -41,7 +41,7 @@ function AddCustomerReview() {
       return axiosInstance.post(`/customer-review`, newReview);
     },
     onSuccess: () => {
-      navigate("/customerReview"); // Navigate back to the customer reviews list after successful addition
+      navigate("/customerReviews"); // Navigate back to the customer reviews list after successful addition
     },
   });
 

@@ -67,12 +67,11 @@ function AddItem() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
-    formData.append("price", `${price}`); 
+    formData.append("price", `${price}`);
     formData.append("categoryId", categoryId);
     if (uploadImage) {
-      formData.append("file", uploadImage); 
+      formData.append("file", uploadImage);
     }
-    
 
     mutation.mutate(formData);
   };
@@ -91,7 +90,10 @@ function AddItem() {
       <form onSubmit={handleSubmit}>
         {/* Item Name */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Item Name
           </label>
           <input
@@ -107,7 +109,10 @@ function AddItem() {
 
         {/* Item Price */}
         <div className="mb-4">
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="price"
+            className="block text-sm font-medium text-gray-700"
+          >
             Item Price
           </label>
           <input
@@ -123,7 +128,10 @@ function AddItem() {
 
         {/* Description */}
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             Description
           </label>
           <textarea
@@ -139,7 +147,10 @@ function AddItem() {
 
         {/* Restaurant Select */}
         <div className="mb-4">
-          <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="restaurantId"
+            className="block text-sm font-medium text-gray-700"
+          >
             Restaurant
           </label>
           <select
@@ -166,7 +177,10 @@ function AddItem() {
 
         {/* Category Select */}
         <div className="mb-4">
-          <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="categoryId"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category
           </label>
           <select
@@ -178,7 +192,9 @@ function AddItem() {
             disabled={!restaurantId || isLoadingCategories}
           >
             <option value="" disabled>
-              {isLoadingCategories ? "Loading categories..." : "Select a category"}
+              {isLoadingCategories
+                ? "Loading categories..."
+                : "Select a category"}
             </option>
             {categories && categories.items.length > 0 ? (
               categories.items.map((category: any) => (
@@ -196,7 +212,10 @@ function AddItem() {
 
         {/* File Upload */}
         <div className="mb-4">
-          <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
+          >
             Upload Image
           </label>
           <input
@@ -214,8 +233,9 @@ function AddItem() {
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={mutation.isPending}
           >
-            Add Item
+            {mutation.isPending ? "Adding... " : "Add Item"}
           </button>
         </div>
       </form>

@@ -50,21 +50,20 @@ function AddRestaurant() {
 
   const mutation = useMutation({
     mutationFn: (newRest: FormData) => {
-
       return axiosInstance.post(`/restaurant`, newRest, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          },
-          onUploadProgress: (event) => {
-            setProgress(Math.round((100 * event.loaded) / event.total));
-          },
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (event) => {
+          setProgress(Math.round((100 * event.loaded) / event.total));
+        },
       });
     },
     onError: (e) => {
       console.log(e);
     },
     onSuccess: () => {
-      navigate("/restaurant");
+      navigate("/restaurants");
     },
   });
 
@@ -292,8 +291,9 @@ function AddRestaurant() {
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={mutation.isPending}
           >
-            Save Changes
+            {mutation.isPending ? "Adding... " : "Add Restaurant"}
           </button>
         </div>
       </form>
