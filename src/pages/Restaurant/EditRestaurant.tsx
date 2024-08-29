@@ -16,7 +16,6 @@ type CategoryOption = {
   label: string;
 };
 
-
 type restaurantType = {
   name: string | null;
   description: string | null;
@@ -31,19 +30,31 @@ type restaurantType = {
 function EditRestaurant() {
   const location = useLocation();
   const record = location.state;
-  console.log(record)
+  console.log(record);
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
   // State management
   const [name, setName] = useState<string | null>(record.name || "");
-  const [description, setDescription] = useState<string | null>(record.description || "");
-  const [accessCode, setAccessCode] = useState<string | null>(record.accessCode || "");
-  const [uploadImage, setUploadImage] = useState<File | string | null>(record.image|| null);
-  const [primary, setPrimary] = useState<string | null>(record?.theme?.primary || "");
-  const [secondary, setSecondary] = useState<string | null>(record?.theme?.secondary || "");
+  const [description, setDescription] = useState<string | null>(
+    record.description || ""
+  );
+  const [accessCode, setAccessCode] = useState<string | null>(
+    record.accessCode || ""
+  );
+  const [uploadImage, setUploadImage] = useState<File | string | null>(
+    record.image || null
+  );
+  const [primary, setPrimary] = useState<string | null>(
+    record?.theme?.primary || ""
+  );
+  const [secondary, setSecondary] = useState<string | null>(
+    record?.theme?.secondary || ""
+  );
   const [bg, setBg] = useState<string | null>(record?.theme?.bg || "");
-  const [categoriesData, setCategoriesData] = useState<categoryType[]>(record?.categories);
+  const [categoriesData, setCategoriesData] = useState<categoryType[]>(
+    record?.categories
+  );
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -69,10 +80,12 @@ function EditRestaurant() {
     actionMeta: ActionMeta<CategoryOption>
   ) => {
     if (newValue) {
-      const selectedCategories = (newValue as MultiValue<CategoryOption>).map(option => ({
-        name: option.value,
-        icon: null,
-      }));
+      const selectedCategories = (newValue as MultiValue<CategoryOption>).map(
+        (option) => ({
+          name: option.value,
+          icon: null,
+        })
+      );
       setCategoriesData(selectedCategories);
     } else {
       setCategoriesData([]);
@@ -100,7 +113,10 @@ function EditRestaurant() {
       <form onSubmit={handleSubmit}>
         {/* Restaurant Name */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Restaurant Name
           </label>
           <input
@@ -115,7 +131,10 @@ function EditRestaurant() {
 
         {/* Category Select */}
         <div className="mb-4">
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category Name
           </label>
           <CreatableSelect
@@ -127,13 +146,19 @@ function EditRestaurant() {
               label: category.name,
             }))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            defaultValue={categoriesData.map(cat => ({ value: cat.name, label: cat.name }))}
+            defaultValue={categoriesData.map((cat) => ({
+              value: cat.name,
+              label: cat.name,
+            }))}
           />
         </div>
 
         {/* Primary Color */}
         <div className="mb-4">
-          <label htmlFor="primary" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="primary"
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
             Primary Color
           </label>
           <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
@@ -157,7 +182,10 @@ function EditRestaurant() {
 
         {/* Secondary Color */}
         <div className="mb-4">
-          <label htmlFor="secondary" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="secondary"
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
             Secondary Color
           </label>
           <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
@@ -181,7 +209,10 @@ function EditRestaurant() {
 
         {/* Background Color */}
         <div className="mb-4">
-          <label htmlFor="bg" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="bg"
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
             Background Color
           </label>
           <div className="flex items-center gap-2 rounded-md border w-fit p-2 justify-center">
@@ -205,7 +236,10 @@ function EditRestaurant() {
 
         {/* Description */}
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             Description
           </label>
           <textarea
@@ -220,7 +254,10 @@ function EditRestaurant() {
 
         {/* Access Code */}
         <div className="mb-4">
-          <label htmlFor="access-code" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="access-code"
+            className="block text-sm font-medium text-gray-700"
+          >
             Access Code
           </label>
           <input
@@ -233,11 +270,13 @@ function EditRestaurant() {
           />
         </div>
 
-        <img src={uploadImage as string} alt={name || ""
-        } />
+        <img src={uploadImage as string} alt={name || ""} />
         {/* Upload Image */}
         <div className="mb-4">
-          <label htmlFor="upload-image" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
+          >
             Upload Image
           </label>
           <input
@@ -255,8 +294,9 @@ function EditRestaurant() {
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={mutation.isPending}
           >
-            Save Changes
+            {mutation.isPending ? "Saving... " : "Save Changes"}
           </button>
         </div>
       </form>
@@ -265,7 +305,3 @@ function EditRestaurant() {
 }
 
 export default EditRestaurant;
-
-
-
-

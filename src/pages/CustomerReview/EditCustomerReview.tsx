@@ -9,7 +9,7 @@ type customerReviewType = {
   comment: string | null;
   email: string | null;
   phone: string | null;
-  birthday: string | null; 
+  birthday: string | null;
   resturantId: string | null;
 };
 
@@ -17,12 +17,16 @@ function EditCustomerReview() {
   const location = useLocation();
   const record = location.state;
   console.log(record);
-  
+
   const [name, setName] = useState<string | null>(record.name || null);
   const [comment, setComment] = useState<string | null>(record.comment);
   const [email, setEmail] = useState<string | null>(record.email);
   const [phone, setPhone] = useState<string | null>(record.phone);
-  const [birthday, setBirthday] = useState<string | null>(record.birthday ? new Date(record.birthday).toISOString().split('T')[0] : null); 
+  const [birthday, setBirthday] = useState<string | null>(
+    record.birthday
+      ? new Date(record.birthday).toISOString().split("T")[0]
+      : null
+  );
   const { customerReviewId } = useParams();
   const navigate = useNavigate();
 
@@ -45,7 +49,7 @@ function EditCustomerReview() {
       );
     },
     onSuccess: () => {
-      navigate("/customerReview"); // Navigate back to the item list after successful update
+      navigate("/customerReviews"); // Navigate back to the item list after successful update
     },
   });
 
