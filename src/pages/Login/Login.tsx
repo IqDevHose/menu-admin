@@ -22,15 +22,15 @@ function Login() {
 
   const mutation = useMutation({
     mutationFn: async (loginData: LoginData) => {
-      const response = await axiosInstance.post("/auth/login", loginData);
+      const response = await axiosInstance.post("/auth/user/login", loginData);
       return response.data;
     },
     onSuccess: (data) => {
       localStorage.setItem("jwtToken", data.access_token);
       navigate("/");
     },
-    onError: (error: any) => {
-      setError(error.response?.data?.message || "Login failed");
+    onError: () => {
+      setError("Invalid Email or Password");
     },
   });
 
@@ -51,7 +51,7 @@ function Login() {
               htmlFor="username"
               className="block text-sm font-medium text-gray-700"
             >
-              Username
+              Email
             </label>
             <input
               id="username"
