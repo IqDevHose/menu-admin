@@ -81,7 +81,7 @@ function EditItem() {
     formData.append("price", price?.toString() || "");
     formData.append("categoryId", categoryId || "");
     if (uploadImage) {
-      formData.append("file", uploadImage);
+      formData.append("image", uploadImage);
     }
 
     mutation.mutate(formData);

@@ -105,7 +105,7 @@ function AddRestaurant() {
     formData.append("secondary", secondary || "");
     formData.append("bg", bg || "");
     if (uploadImage) {
-      formData.append("file", uploadImage);
+      formData.append("image", uploadImage);
     }
 
     // Append categories as JSON string
