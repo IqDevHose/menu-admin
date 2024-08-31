@@ -117,7 +117,7 @@ const Restaurant = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(`/restaurant/delete-many`, {
+      return axiosInstance.delete(``, {
         data: selectedItemsIds,
       });
     },

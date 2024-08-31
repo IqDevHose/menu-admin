@@ -53,6 +53,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 };
 const Theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
@@ -105,9 +106,28 @@ const Theme = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(``, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -144,6 +164,11 @@ const Theme = () => {
     setCurrentPage(newPage);
     setSelectedItems([]);
   };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  };
+
   if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -188,6 +213,15 @@ const Theme = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/themes/add">
             <button
               type="button"
@@ -308,6 +342,23 @@ const Theme = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " restaurant/s"}?
+          </p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup
