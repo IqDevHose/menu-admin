@@ -58,7 +58,7 @@ function EditQuestion() {
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
-        <Spinner /> {/* Loading spinner while restaurants are being fetched */}
+        <Spinner />
       </div>
     );
   }

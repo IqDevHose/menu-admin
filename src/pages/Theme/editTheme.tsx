@@ -1,5 +1,6 @@
 import axiosInstance from "@/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import Spinner from "@/components/Spinner";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
@@ -27,6 +28,17 @@ function EditTheme() {
   const handleSubmit = () => {
     mutation.mutate({ name, primary, secondary, bg });
   };
+
+  const { isLoading } = useQuery({
+    queryKey: ["addRating"],
+  });
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Edit Theme</h2>

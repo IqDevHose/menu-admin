@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { ActionMeta, MultiValue } from "react-select";
 import axiosInstance from "@/axiosInstance";
+import Spinner from "@/components/Spinner";
 
 type categoryType = {
   name: string;
@@ -57,7 +58,7 @@ function EditRestaurant() {
   );
 
   // Fetch categories
-  const { data: categories } = useQuery({
+  const { data: categories ,isLoading} = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/category");
@@ -91,7 +92,13 @@ function EditRestaurant() {
       setCategoriesData([]);
     }
   };
-
+if (isLoading) {
+  return (
+    <div className="w-full h-screen flex items-center justify-center">
+      <Spinner />
+    </div>
+  );  
+}
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     mutation.mutate({

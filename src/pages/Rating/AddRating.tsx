@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 
@@ -24,6 +23,7 @@ function AddRating() {
       navigate("/ratings"); // Navigate back to the ratings list after successful addition
     },
   });
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
