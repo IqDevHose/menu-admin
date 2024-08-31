@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
+import Spinner from "@/components/Spinner";
 
 type ratingType = {
   name: string | null;
@@ -25,6 +26,16 @@ function AddRating() {
     },
   });
 
+  const { isLoading } = useQuery({
+    queryKey: ["addRating"],
+  });
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate({ name, score, comment });

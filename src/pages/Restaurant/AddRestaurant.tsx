@@ -1,4 +1,5 @@
 import axiosInstance from "@/axiosInstance";
+import Spinner from "@/components/Spinner";
 import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
@@ -55,7 +56,9 @@ function AddRestaurant() {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (event) => {
-          setProgress(Math.round((100 * event.loaded) / event.total));
+          setProgress(
+            event.total ? Math.round((100 * event.loaded) / event.total) : 0
+          );
         },
       });
     },
@@ -83,6 +86,13 @@ function AddRestaurant() {
       setCategoriesData([]);
     }
   };
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
