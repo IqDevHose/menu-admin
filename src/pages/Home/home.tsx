@@ -306,9 +306,9 @@ const Home = () => {
         <Card title="Quick Links" className="mb-6">
           <List
             dataSource={[
-              { title: "View all Restaurant", link: "/restaurant" },
-              { title: "View All Reviews", link: "/customerReview" },
-              { title: "Manage Categories", link: "/category" },
+              { title: "View all Restaurant", link: "/restaurants" },
+              { title: "View All Reviews", link: "/customerReviews" },
+              { title: "Manage Categories", link: "/categories" },
               { title: "Manage Items", link: "/items" },
             ]}
             renderItem={(item) => (
