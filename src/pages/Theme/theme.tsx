@@ -355,7 +355,7 @@ const Theme = () => {
         >
           <p>
             Are you sure you want to delete{" "}
-            {selectedItems && selectedItems.length + " restaurant/s"}?
+            {selectedItems && selectedItems.length + " theme/s"}?
           </p>
         </Popup>
       )}

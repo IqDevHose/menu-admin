@@ -372,7 +372,7 @@ const Category = () => {
         >
           <p>
             Are you sure you want to delete{" "}
-            {selectedItems && selectedItems.length + " restaurant/s"}?
+            {selectedItems && selectedItems.length + " category/s"}?
           </p>
         </Popup>
       )}
