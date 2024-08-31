@@ -199,7 +199,7 @@ const Item = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(``, {
+      return axiosInstance.delete(`/item/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },

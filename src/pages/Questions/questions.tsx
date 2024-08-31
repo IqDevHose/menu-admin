@@ -92,7 +92,7 @@ const Questions = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(``, {
+      return axiosInstance.delete(`/question/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },

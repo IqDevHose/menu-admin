@@ -109,7 +109,7 @@ const Theme = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(``, {
+      return axiosInstance.delete(`/theme/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },

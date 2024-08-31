@@ -131,7 +131,7 @@ const Category = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(``, {
+      return axiosInstance.delete(`/category/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
