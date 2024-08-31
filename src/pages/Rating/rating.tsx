@@ -57,6 +57,7 @@ const extractHeaders = (data: DataRating[]): string[] => {
 
 const Rating = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedRating, setSelectedRating] = useState<ratingReviewType | null>(
     null
   );
@@ -81,7 +82,6 @@ const Rating = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/rating?page=all`);
 
-      
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -113,9 +113,28 @@ const Rating = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(`/rating/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const handleDeleteClick = (item: ratingReviewType) => {
     setSelectedRating(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -152,6 +171,10 @@ const Rating = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (query.isPending) {
@@ -198,6 +221,15 @@ const Rating = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/ratings/add">
             <button
               type="button"
@@ -228,11 +260,11 @@ const Rating = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3">
               #
@@ -253,11 +285,11 @@ const Rating = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -295,6 +327,23 @@ const Rating = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " rating/s"}?
+          </p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup

@@ -61,6 +61,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const Item = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -195,24 +196,37 @@ const Item = () => {
     },
   });
 
-  // // Handle select all checkbox
-  // const handleSelectAll = () => {
-  //   if (selectedItems.length === filteredData.length) {
-  //     setSelectedItems([]);
-  //   } else {
-  //     const allIds = filteredData.map((item: any) => item.id);
-  //     setSelectedItems(allIds);
-  //   }
-  // };
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(`/item/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
 
-  // // Handle individual row checkbox
-  // const handleSelectItem = (id: string) => {
-  //   setSelectedItems((prevSelectedItems) =>
-  //     prevSelectedItems.includes(id)
-  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
-  //       : [...prevSelectedItems, id]
-  //   );
-  // };
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
+
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
 
   // Reset the current page to 1 when filters change
   useEffect(() => {
@@ -224,6 +238,11 @@ const Item = () => {
     setShowPopup(true);
   };
 
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
   const confirmDelete = () => {
     if (selectedItem) {
       mutation.mutate(selectedItem.id);
@@ -239,6 +258,10 @@ const Item = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (isLoading) {
@@ -317,6 +340,15 @@ const Item = () => {
           </select>
         </div>
         <div className="gap-4 flex items-start justify-center">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/items/add">
             <button
               type="button"
@@ -365,11 +397,11 @@ const Item = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3">
               #
@@ -390,11 +422,11 @@ const Item = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -428,6 +460,23 @@ const Item = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " item/s"}?
+          </p>
+        </Popup>
+      )}
 
       {/* Delete Confirmation Popup */}
       {showPopup && (

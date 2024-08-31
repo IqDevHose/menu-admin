@@ -58,6 +58,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const Questions = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<questionsReviewType | null>(
     null
   ); // State to manage selected item for deletion
@@ -88,12 +89,24 @@ const Questions = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(`/question/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/question?page=all`);
 
-     
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -121,6 +134,12 @@ const Questions = () => {
     setShowPopup(true);
   };
 
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
+  };
+
   const confirmDelete = () => {
     if (selectedItem) {
       mutation.mutate(selectedItem.id);
@@ -131,30 +150,34 @@ const Questions = () => {
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // // Handle select all checkbox
-  // const handleSelectAll = () => {
-  //   if (selectedItems.length === filteredData.length) {
-  //     setSelectedItems([]);
-  //   } else {
-  //     const allIds = filteredData.map((item: any) => item.id);
-  //     setSelectedItems(allIds);
-  //   }
-  // };
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
 
-  // // Handle individual row checkbox
-  // const handleSelectItem = (id: string) => {
-  //   setSelectedItems((prevSelectedItems) =>
-  //     prevSelectedItems.includes(id)
-  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
-  //       : [...prevSelectedItems, id]
-  //   );
-  // };
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
   // Calculate the total number of pages
   const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (query.isPending) {
@@ -201,6 +224,15 @@ const Questions = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to={"/questions/add"}>
             <button
               type="button"
@@ -230,11 +262,11 @@ const Questions = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
@@ -261,11 +293,11 @@ const Questions = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -306,6 +338,23 @@ const Questions = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " question/s"}?
+          </p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup

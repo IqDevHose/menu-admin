@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -63,6 +63,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<customerReviewType | null>(
     null
   );
@@ -84,7 +85,7 @@ const CustomerReview = () => {
       const customerReview = await axiosInstance.get(
         `/customer-review?page=${currentPage}`
       );
-      
+
       return customerReview.data;
     },
   });
@@ -96,7 +97,6 @@ const CustomerReview = () => {
         `http://localhost:3000/customer-review?page=all`
       );
 
-      
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -195,9 +195,28 @@ const CustomerReview = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(`/customer-review/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const handleDeleteClick = (item: customerReviewType) => {
     setSelectedCustomerReview(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -235,6 +254,9 @@ const CustomerReview = () => {
         ? prevSelectedItems.filter((itemId) => itemId !== id)
         : [...prevSelectedItems, id]
     );
+  };
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (query.isPending) {
@@ -281,6 +303,15 @@ const CustomerReview = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/customerReviews/add">
             <button
               type="button"
@@ -310,11 +341,11 @@ const CustomerReview = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4">
               #
@@ -345,11 +376,11 @@ const CustomerReview = () => {
             filteredData?.map((item: any, index: number) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="px-6 py-4">
-                  {/* <input
-                  type="checkbox"
-                  checked={selectedItems.includes(item.id)}
-                  onChange={() => handleSelectItem(item.id)}
-                /> */}
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleSelectItem(item.id)}
+                  />
                 </td>
                 <td className="px-6 py-4">
                   {(currentPage - 1) * itemsPerPage + index + 1}
@@ -393,6 +424,23 @@ const CustomerReview = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " review/s"}?
+          </p>
+        </Popup>
+      )}
 
       {/* Delete Confirmation Popup */}
       {showPopup && (

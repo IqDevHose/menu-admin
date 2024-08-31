@@ -5,7 +5,7 @@ import { highlightText } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
@@ -53,6 +53,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 };
 const Theme = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<themeType | null>(null); // State to manage selected item for deletion
   const queryClient = useQueryClient();
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
@@ -74,7 +75,6 @@ const Theme = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
 
-      
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -93,7 +93,6 @@ const Theme = () => {
       headers,
     };
 
-    
     exportCSVFile(dataToConvert);
   };
 
@@ -107,9 +106,28 @@ const Theme = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(`/theme/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -146,6 +164,11 @@ const Theme = () => {
     setCurrentPage(newPage);
     setSelectedItems([]);
   };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
+  };
+
   if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -190,6 +213,15 @@ const Theme = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/themes/add">
             <button
               type="button"
@@ -219,11 +251,11 @@ const Theme = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
@@ -248,11 +280,11 @@ const Theme = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50 ">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
@@ -310,6 +342,23 @@ const Theme = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " theme/s"}?
+          </p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup
