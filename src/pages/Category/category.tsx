@@ -137,24 +137,24 @@ const Category = () => {
       mutation.mutate(selectedCategory.id);
     }
   };
-  // // Handle select all checkbox
-  // const handleSelectAll = () => {
-  //   if (selectedItems.length === filteredData.length) {
-  //     setSelectedItems([]);
-  //   } else {
-  //     const allIds = filteredData.map((item: any) => item.id);
-  //     setSelectedItems(allIds);
-  //   }
-  // };
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
 
-  // // Handle individual row checkbox
-  // const handleSelectItem = (id: string) => {
-  //   setSelectedItems((prevSelectedItems) =>
-  //     prevSelectedItems.includes(id)
-  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
-  //       : [...prevSelectedItems, id]
-  //   );
-  // };
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
 
   // Filter data based on the search query
   const filteredData = query.data?.items.filter((item: any) =>
@@ -259,11 +259,11 @@ const Category = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
@@ -284,11 +284,11 @@ const Category = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">{index + 1}</td>
               <td

@@ -93,7 +93,6 @@ const Questions = () => {
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/question?page=all`);
 
-     
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -131,24 +130,24 @@ const Questions = () => {
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // // Handle select all checkbox
-  // const handleSelectAll = () => {
-  //   if (selectedItems.length === filteredData.length) {
-  //     setSelectedItems([]);
-  //   } else {
-  //     const allIds = filteredData.map((item: any) => item.id);
-  //     setSelectedItems(allIds);
-  //   }
-  // };
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
 
-  // // Handle individual row checkbox
-  // const handleSelectItem = (id: string) => {
-  //   setSelectedItems((prevSelectedItems) =>
-  //     prevSelectedItems.includes(id)
-  //       ? prevSelectedItems.filter((itemId) => itemId !== id)
-  //       : [...prevSelectedItems, id]
-  //   );
-  // };
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
   // Calculate the total number of pages
   const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
@@ -230,11 +229,11 @@ const Questions = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4 ">
               #
@@ -261,11 +260,11 @@ const Questions = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
