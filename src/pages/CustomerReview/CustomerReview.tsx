@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -63,6 +63,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<customerReviewType | null>(
     null
   );
@@ -194,9 +195,28 @@ const CustomerReview = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(``, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
+    },
+  });
+
   const handleDeleteClick = (item: customerReviewType) => {
     setSelectedCustomerReview(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -234,6 +254,9 @@ const CustomerReview = () => {
         ? prevSelectedItems.filter((itemId) => itemId !== id)
         : [...prevSelectedItems, id]
     );
+  };
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (query.isPending) {
@@ -280,6 +303,15 @@ const CustomerReview = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to="/customerReviews/add">
             <button
               type="button"
@@ -392,6 +424,23 @@ const CustomerReview = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " restaurant/s"}?
+          </p>
+        </Popup>
+      )}
 
       {/* Delete Confirmation Popup */}
       {showPopup && (

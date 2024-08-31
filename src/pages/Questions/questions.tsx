@@ -58,6 +58,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const Questions = () => {
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<questionsReviewType | null>(
     null
   ); // State to manage selected item for deletion
@@ -85,6 +86,19 @@ const Questions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["questions"] });
       setShowPopup(false); // Close the popup after successful deletion
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
+      return axiosInstance.delete(``, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
     },
   });
 
@@ -118,6 +132,12 @@ const Questions = () => {
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
     setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const confirmDelete = () => {
@@ -154,6 +174,10 @@ const Questions = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (query.isPending) {
@@ -200,6 +224,15 @@ const Questions = () => {
           />
         </div>
         <div className="gap-4 flex justify-center items-start">
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
           <Link to={"/questions/add"}>
             <button
               type="button"
@@ -305,6 +338,23 @@ const Questions = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {showDeleteManyPopup && (
+        <Popup
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete{" "}
+            {selectedItems && selectedItems.length + " restaurant/s"}?
+          </p>
+        </Popup>
+      )}
 
       {showPopup && (
         <Popup
