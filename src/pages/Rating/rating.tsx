@@ -269,7 +269,7 @@ const Rating = () => {
               <td className="px-6 py-4">{item.comment}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 <Link
-                  to={`/ratings/edit`}
+                  to={`/ratings/edit/${item.id}`}
                   className="font-medium text-blue-600"
                   state={item}
                 >
