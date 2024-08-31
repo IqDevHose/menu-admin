@@ -43,9 +43,7 @@ function EditRestaurant() {
   const [accessCode, setAccessCode] = useState<string | null>(
     record.accessCode || ""
   );
-  const [uploadImage, setUploadImage] = useState<File | string | null>(
-    record.image || null
-  );
+  const [uploadImage, setUploadImage] = useState<File | null>(null); // Initialize as null for file
   const [primary, setPrimary] = useState<string | null>(
     record?.theme?.primary || ""
   );
@@ -54,11 +52,11 @@ function EditRestaurant() {
   );
   const [bg, setBg] = useState<string | null>(record?.theme?.bg || "");
   const [categoriesData, setCategoriesData] = useState<categoryType[]>(
-    record?.categories
+    record?.categories || []
   );
 
   // Fetch categories
-  const { data: categories ,isLoading} = useQuery({
+  const { data: categories, isLoading } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
       const response = await axios.get("http://localhost:3000/category");
@@ -68,8 +66,12 @@ function EditRestaurant() {
 
   // Mutation for updating restaurant
   const mutation = useMutation({
-    mutationFn: (newEdit: restaurantType) => {
-      return axiosInstance.put(`/restaurant/${restaurantId}`, newEdit);
+    mutationFn: (formData: FormData) => {
+      return axiosInstance.put(`/restaurant/${restaurantId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     },
     onSuccess: () => {
       navigate("/restaurants");
@@ -92,25 +94,33 @@ function EditRestaurant() {
       setCategoriesData([]);
     }
   };
-if (isLoading) {
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <Spinner />
-    </div>
-  );  
-}
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutation.mutate({
-      name,
-      description,
-      accessCode,
-      image: uploadImage ? URL.createObjectURL(uploadImage as File) : null, // Handle file upload URL
-      primary,
-      secondary,
-      bg,
-      categories: categoriesData,
-    });
+
+    const formData = new FormData();
+    formData.append("name", name || "");
+    formData.append("description", description || "");
+    formData.append("accessCode", accessCode || "");
+    formData.append("primary", primary || "");
+    formData.append("secondary", secondary || "");
+    formData.append("bg", bg || "");
+    if (uploadImage) {
+      formData.append("file", uploadImage);
+    }
+
+    // Append categories as JSON string
+    formData.append("categories", JSON.stringify(categoriesData));
+
+    mutation.mutate(formData);
   };
 
   return (
@@ -172,7 +182,7 @@ if (isLoading) {
             <input
               type="color"
               id="primary"
-              value={primary || "#000000"} // Default color if null
+              value={primary || "#000000"}
               onChange={(e) => setPrimary(e.target.value)}
               className="block h-10 bg-transparent rounded-md sm:text-sm"
             />
@@ -199,7 +209,7 @@ if (isLoading) {
             <input
               type="color"
               id="secondary"
-              value={secondary || "#000000"} // Default color if null
+              value={secondary || "#000000"}
               onChange={(e) => setSecondary(e.target.value)}
               className="block h-10 bg-transparent rounded-md sm:text-sm"
             />
@@ -226,7 +236,7 @@ if (isLoading) {
             <input
               type="color"
               id="bg"
-              value={bg || "#000000"} // Default color if null
+              value={bg || "#000000"}
               onChange={(e) => setBg(e.target.value)}
               className="block h-10 bg-transparent rounded-md sm:text-sm"
             />
@@ -277,7 +287,6 @@ if (isLoading) {
           />
         </div>
 
-        <img src={uploadImage as string} alt={name || ""} />
         {/* Upload Image */}
         <div className="mb-4">
           <label

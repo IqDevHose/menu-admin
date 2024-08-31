@@ -1,13 +1,8 @@
 import axiosInstance from "@/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useState, FormEvent } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Spinner from "@/components/Spinner";
 
 type itemType = {
   name: string | null;
@@ -21,18 +16,13 @@ function EditItem() {
   const location = useLocation();
   const record = location.state;
   console.log(record);
+
   const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(
-    record.description
-  );
+  const [description, setDescription] = useState<string | null>(record.description);
   const [price, setPrice] = useState<number | null>(record.price);
-  const [restaurantId, setRestaurantId] = useState<string | null>(
-    record.restaurantId
-  );
-  const [image, setImage] = useState<string | null>(record.image);
-  const [categoryId, setCategoryId] = useState<string | null>(
-    record.categoryId
-  );
+  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [uploadImage, setUploadImage] = useState<File | null>(null); // Handle file uploads
+  const [categoryId, setCategoryId] = useState<string | null>(record.categoryId);
 
   const { itemId } = useParams();
   const navigate = useNavigate();
@@ -59,29 +49,42 @@ function EditItem() {
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
       if (restaurantId) {
-        const response = await axiosInstance.get(
-          `/category?restaurantId=${restaurantId}`
-        );
+        const response = await axiosInstance.get(`/category?restaurantId=${restaurantId}`);
         return response.data;
       } else {
         const response = await axiosInstance.get(`/category`);
         return response.data;
       }
     },
-    enabled: !!restaurantId, // Only fetch categories when a restaurant is selected
+    enabled: !!restaurantId,
   });
 
   const mutation = useMutation({
-    mutationFn: (newEdit: itemType) => {
-      return axiosInstance.put(`/item/${itemId}`, newEdit);
+    mutationFn: (formData: FormData) => {
+      return axiosInstance.put(`/item/${itemId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     },
     onSuccess: () => {
-      navigate("/items"); // Navigate back to the item list after successful addition
+      navigate("/items");
     },
   });
 
-  const handleSubmit = () => {
-    mutation.mutate({ name, description, price, categoryId, image });
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name || "");
+    formData.append("description", description || "");
+    formData.append("price", price?.toString() || "");
+    formData.append("categoryId", categoryId || "");
+    if (uploadImage) {
+      formData.append("file", uploadImage);
+    }
+
+    mutation.mutate(formData);
   };
 
   if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
@@ -212,6 +215,24 @@ function EditItem() {
               </option>
             )}
           </select>
+        </div>
+
+        {/* Upload Image */}
+        <div className="mb-4">
+          <label
+            htmlFor="upload-image"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Upload Image
+          </label>
+          <input
+            type="file"
+            id="upload-image"
+            onChange={(e) => {
+              if (e.target.files) setUploadImage(e.target.files[0]);
+            }}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
         </div>
 
         {/* Submit Button */}
