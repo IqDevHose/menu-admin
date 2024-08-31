@@ -302,11 +302,11 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
-        <div className="gap-4 flex justify-center items-start">
+        <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}

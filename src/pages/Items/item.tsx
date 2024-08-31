@@ -311,7 +311,7 @@ const Item = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
+            className="p-2 border border-gray-300 rounded-lg disabled:bg-gray-200"
             disabled={!selectedRestaurant} // Disable category filter until a restaurant is selected
           >
             <option value="">All Categories</option>
@@ -339,11 +339,11 @@ const Item = () => {
             ))}
           </select>
         </div>
-        <div className="gap-4 flex items-start justify-center">
+        <div className="gap-2 flex items-start justify-center">
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
