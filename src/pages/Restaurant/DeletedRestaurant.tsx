@@ -319,7 +319,7 @@ const DeletedRestaurants = () => {
       {/* Delete Many Popup */}
       {showDeleteManyPopup && (
         <Popup
-          confirmText="Delete"
+          confirmText="Delete All"
           loadingText="Deleting..."
           cancelText="Cancel"
           onClose={() => setShowDeleteManyPopup(false)}
