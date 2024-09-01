@@ -71,55 +71,13 @@ const Item = () => {
   const [headers, setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
 
-  // Import Data
-  // const [parsedData, setParsedData] = useState<any[]>([]);
-  // const [csvHeaders, setCsvHeaders] = useState<string[]>();
-
-  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.files && event.target.files.length > 0) {
-  //     const file = event.target.files[0];
-
-  //     Papa.parse(file, {
-  //       header: true,
-  //       skipEmptyLines: true,
-  //       complete: (result) => {
-  //         const data = result.data;
-  //         const csvHeads = result.meta.fields || [];
-
-  //         console.log(csvHeads)
-  //         console.log(data)
-  //         setCsvHeaders(csvHeads);
-  //         setParsedData(data);
-  //       },
-  //       error: (error) => {
-  //         console.error('Error parsing CSV file:', error);
-  //       },
-  //     });
-
-  //   }
-  // };
-
-  // const handleUpload = async () => {
-  //   console.log(parsedData)
-  //   // if (parsedData.length > 0) {
-  //   //   try {
-  //   //     const response = await axios.post('/api/upload', parsedData);
-  //   //     console.log('Data uploaded successfully:', response.data);
-  //   //     // Handle success (e.g., show a success message)
-  //   //   } catch (error) {
-  //   //     console.error('Error uploading data:', error);
-  //   //     // Handle error (e.g., show an error message)
-  //   //   }
-  //   // }
-  // };
-
   const queryClient = useQueryClient();
 
+  // Fetch all items for export and to extract headers
   const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/item?page=all`);
-
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -138,30 +96,26 @@ const Item = () => {
       headers,
     };
 
-    // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
   };
+
   // Fetch items based on current page, category, and restaurant filters
   const {
     data: itemsData,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["items", currentPage, selectedCategory, selectedRestaurant],
+    queryKey: ["items", selectedCategory, selectedRestaurant],
     queryFn: async () => {
       const params = new URLSearchParams();
-      params.append("page", String(currentPage));
+      params.append("page", "all"); // Fetch all items to handle filtering manually
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
       const item = await axios.get(`http://localhost:3000/item`, { params });
-      // const heads: any[] = extractHeaders(item.data.items)
-      // setHeaders(heads)
       return item.data;
     },
   });
-
-  // Handle item deletion
 
   // Fetch categories based on the selected restaurant
   const { data: categories } = useQuery({
@@ -185,7 +139,7 @@ const Item = () => {
     },
   });
 
-  // Handle item deletion
+  // Mutation to delete a single item
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
@@ -196,30 +150,51 @@ const Item = () => {
     },
   });
 
+  // Mutation to delete multiple items
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.delete(`/item/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },
   });
 
-  // Handle select all checkbox
+  // Filter data based on search query
+  const filteredData = itemsData?.items?.filter((item: itemReviewType) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination based on filtered data
+  const currentData = filteredData?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
+
+  // Reset the current page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedRestaurant, searchQuery]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedItems([]);
+  };
+
   const handleSelectAll = () => {
-    if (selectedItems.length === filteredData.length) {
+    if (selectedItems.length === currentData.length) {
       setSelectedItems([]);
     } else {
-      const allIds = filteredData.map((item: any) => item.id);
+      const allIds = currentData.map((item: any) => item.id);
       setSelectedItems(allIds);
     }
   };
 
-  // Handle individual row checkbox
   const handleSelectItem = (id: string) => {
     setSelectedItems((prevSelectedItems) =>
       prevSelectedItems.includes(id)
@@ -228,36 +203,21 @@ const Item = () => {
     );
   };
 
-  // Reset the current page to 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, selectedRestaurant]);
-
   const handleDeleteClick = (item: itemReviewType) => {
     setSelectedItem(item);
     setShowPopup(true);
   };
 
-  const confirmDeleteMany = () => {
-    if (selectedItems) {
-      deleteMutation.mutate(selectedItems);
-    }
-  };
   const confirmDelete = () => {
     if (selectedItem) {
       mutation.mutate(selectedItem.id);
     }
   };
 
-  const filteredData = itemsData?.items?.filter((item: itemReviewType) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(itemsData?.totalItems / itemsPerPage);
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    setSelectedItems([]);
+  const confirmDeleteMany = () => {
+    if (selectedItems.length > 0) {
+      deleteMutation.mutate(selectedItems);
+    }
   };
 
   const handleDeleteMany = () => {
@@ -369,26 +329,7 @@ const Item = () => {
             </button>
           </Link>
 
-          <DropdownMenuDemo
-            handleExport={handleExport}
-            link="/items/import"
-          ></DropdownMenuDemo>
-          {/* <label
-            htmlFor="file"
-              className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            >
-              <span className="flex gap-1 ">
-                Import
-              </span>
-            </label>
-            <input
-              id="file"
-              name="file"
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="hidden text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
-            /> */}
+          <DropdownMenuDemo handleExport={handleExport} link="/items/import" />
         </div>
       </div>
 
@@ -399,7 +340,7 @@ const Item = () => {
             <th scope="col" className="px-6 py-3 w-4">
               <input
                 type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
+                checked={selectedItems.length === currentData?.length}
                 onChange={handleSelectAll}
               />
             </th>
@@ -419,7 +360,7 @@ const Item = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData?.map((item: any, index: number) => (
+          {currentData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
                 <input
@@ -453,14 +394,17 @@ const Item = () => {
       </table>
 
       {/* Pagination Component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-10">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
 
+      {/* Delete Confirmation Popup for Multiple Items */}
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -478,7 +422,7 @@ const Item = () => {
         </Popup>
       )}
 
-      {/* Delete Confirmation Popup */}
+      {/* Delete Confirmation Popup for Single Item */}
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
