@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
@@ -146,22 +146,13 @@ const Rating = () => {
   const filteredData = query.data?.items.filter((item: any) =>
     item.customerReview?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
- // Pagination based on filtered data
- const currentData = filteredData?.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
 
-// Reset the current page to 1 when filters change
-useEffect(() => {
-  setCurrentPage(1);
-}, [searchQuery]);
   // Handle select all checkbox
   const handleSelectAll = () => {
-    if (selectedItems.length === currentData.length) {
+    if (selectedItems.length === filteredData.length) {
       setSelectedItems([]);
     } else {
-      const allIds = currentData.map((item: any) => item.id);
+      const allIds = filteredData.map((item: any) => item.id);
       setSelectedItems(allIds);
     }
   };
@@ -175,8 +166,7 @@ useEffect(() => {
     );
   };
   // Calculate the total number of pages
-  const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -330,7 +320,6 @@ useEffect(() => {
       </table>
 
       {/* Use the Pagination component */}
-      
       <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
@@ -338,7 +327,6 @@ useEffect(() => {
           onPageChange={handlePageChange}
         />
       </div>
-    
 
       {showDeleteManyPopup && (
         <Popup
