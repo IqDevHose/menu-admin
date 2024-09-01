@@ -249,19 +249,17 @@ const Home: React.FC = () => {
         <Divider className="my-8" />
 
         {/* Top Reviewed Items */}
+       {/* Restaurant Overview */}
+        {/* Restaurant Overview */}
         <div>
           <h2 className="text-lg font-medium mb-4 text-gray-800">
-            Top Reviewed Items
+            Restaurant Overview
           </h2>
           <Row gutter={24}>
-            {topReviewedItems.map((item: { itemName: string; reviews: number }, index: number) => (
+            {avgRatingPerRestaurant.map((restaurant: AvgRatingPerRestaurant, index: number) => (
               <Col key={index} xs={24} sm={12} lg={6}>
                 <Card hoverable>
-                  <Statistic
-                    title={item.itemName}
-                    value={item.reviews}
-                    valueStyle={{ color: "#3f8600" }}
-                  />
+                  <h3 className="text-center text-lg">{restaurant.name}</h3> {/* Display the restaurant name */}
                 </Card>
               </Col>
             ))}
