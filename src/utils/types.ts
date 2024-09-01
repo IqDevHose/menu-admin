@@ -17,11 +17,13 @@ export interface Rating {
   };
 }
 
+
 export interface AvgRatingPerRestaurant {
-  restaurantName: string;
-  avgRating: number;
-  restaurantId: string;
+  id: string; // Assuming 'id' is of type string
+  name: string; // Assuming 'name' is of type string
+  averageRating: number; // Assuming there is an averageRating field
 }
+
 
 export interface StatsData {
   totalCustomerReview: number;
