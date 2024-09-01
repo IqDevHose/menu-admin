@@ -21,6 +21,8 @@ const DeletedCategories = () => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
     null
   );
+  const [showRestoreManyPopup, setShowRestoreManyPopup] = useState(false);
+
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage delete many popup visibility
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,6 +74,21 @@ const DeletedCategories = () => {
     },
   });
 
+  // Handle category restoration
+  const restoreManyMutation = useMutation({
+    mutationFn: async (selectedItemsIds: string[]) => {
+      await axiosInstance.put(`/category/restore-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["restore-categories"],
+      });
+      setShowRestoreManyPopup(false); // Close the restore popup after success
+    },
+  });
+
   // Handle category final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -117,6 +134,13 @@ const DeletedCategories = () => {
     }
   };
 
+  const confirmRestoreMany = () => {
+    if (selectedItems) {
+      restoreManyMutation.mutate(selectedItems);
+      setShowRestoreManyPopup(true);
+    }
+  };
+
   const confirmDeleteMany = () => {
     if (selectedItems) {
       deleteManyMutation.mutate(selectedItems);
@@ -146,6 +170,10 @@ const DeletedCategories = () => {
     if (selectedCategory) {
       deleteMutation.mutate(selectedCategory.id);
     }
+  };
+
+  const handleRestoreMany = () => {
+    setShowRestoreManyPopup(true);
   };
 
   const filteredData = categoriesData?.items?.filter((category: CategoryType) =>
@@ -219,7 +247,7 @@ const DeletedCategories = () => {
             ))}
           </select>
         </div>
-        <div>
+        <div className="flex gap-4 items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
@@ -227,6 +255,15 @@ const DeletedCategories = () => {
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
+            </button>
+          )}
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-green-600 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              onClick={handleRestoreMany}
+            >
+              Restore {selectedItems.length}
             </button>
           )}
         </div>
@@ -317,6 +354,22 @@ const DeletedCategories = () => {
           cancelText="Cancel"
         >
           <p>Are you sure you want to restore {selectedCategory?.name}?</p>
+        </Popup>
+      )}
+
+      {/* Restore Many Confirmation Popup */}
+      {showRestoreManyPopup && (
+        <Popup
+          onClose={() => setShowRestoreManyPopup(false)}
+          onConfirm={confirmRestoreMany}
+          loading={restoreManyMutation.isPending}
+          confirmText="Restore"
+          loadingText="Restoring..."
+          cancelText="Cancel"
+        >
+          <p>
+            Are you sure you want to restore {selectedItems.length} categories?
+          </p>
         </Popup>
       )}
 

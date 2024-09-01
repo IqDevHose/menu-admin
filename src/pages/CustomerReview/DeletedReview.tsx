@@ -21,6 +21,8 @@ type itemReviewType = {
 const DeletedReview = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false); // Separate state for delete popup
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
+  const [showRestoreManyPopup, setShowRestoreManyPopup] = useState(false);
+
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -56,6 +58,21 @@ const DeletedReview = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
       setShowRestorePopup(false); // Close the restore popup after success
+    },
+  });
+
+  // Handle reviews restoration
+  const restoreManyMutation = useMutation({
+    mutationFn: async (selectedItemsIds: string[]) => {
+      await axiosInstance.put(`/customer-review/restore-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["restore-reviews"],
+      });
+      setShowRestoreManyPopup(false); // Close the restore popup after success
     },
   });
 
@@ -100,6 +117,13 @@ const DeletedReview = () => {
   const confirmRestore = () => {
     if (selectedItem) {
       restoreMutation.mutate(selectedItem.id);
+    }
+  };
+
+  const confirmRestoreMany = () => {
+    if (selectedItems) {
+      restoreManyMutation.mutate(selectedItems);
+      setShowRestoreManyPopup(true);
     }
   };
 
@@ -148,6 +172,10 @@ const DeletedReview = () => {
     setShowDeleteManyPopup(true);
   };
 
+  const handleRestoreMany = () => {
+    setShowRestoreManyPopup(true);
+  };
+
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -191,7 +219,7 @@ const DeletedReview = () => {
             />
           </div>
         </div>
-        <div>
+        <div className="flex gap-4 items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
@@ -199,6 +227,15 @@ const DeletedReview = () => {
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
+            </button>
+          )}
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-green-600 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              onClick={handleRestoreMany}
+            >
+              Restore {selectedItems.length}
             </button>
           )}
         </div>
@@ -290,6 +327,20 @@ const DeletedReview = () => {
           cancelText="Cancel"
         >
           <p>Are you sure you want to restore {selectedItem?.name}?</p>
+        </Popup>
+      )}
+
+      {/* Restore Many Confirmation Popup */}
+      {showRestoreManyPopup && (
+        <Popup
+          onClose={() => setShowRestoreManyPopup(false)}
+          onConfirm={confirmRestoreMany}
+          loading={restoreManyMutation.isPending}
+          confirmText="Restore"
+          loadingText="Restoring..."
+          cancelText="Cancel"
+        >
+          <p>Are you sure you want to restore {selectedItems.length} items?</p>
         </Popup>
       )}
 
