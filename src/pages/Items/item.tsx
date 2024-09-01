@@ -9,7 +9,7 @@ import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import exportCSVFile from "json-to-csv-export";
 import axiosInstance from "@/axiosInstance";
-import Papa from "papaparse";
+
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
 type itemReviewType = {

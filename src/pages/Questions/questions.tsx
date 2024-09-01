@@ -5,7 +5,7 @@ import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
@@ -150,12 +150,23 @@ const Questions = () => {
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination based on filtered data
+  const currentData = filteredData?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset the current page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   // Handle select all checkbox
   const handleSelectAll = () => {
-    if (selectedItems.length === filteredData.length) {
+    if (selectedItems.length === currentData.length) {
       setSelectedItems([]);
     } else {
-      const allIds = filteredData.map((item: any) => item.id);
+      const allIds = currentData.map((item: any) => item.id);
       setSelectedItems(allIds);
     }
   };
@@ -331,14 +342,15 @@ const Questions = () => {
       </table>
 
       {/* Use the Pagination component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
-
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-10">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
