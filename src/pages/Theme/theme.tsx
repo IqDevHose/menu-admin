@@ -71,7 +71,7 @@ const Theme = () => {
   });
 
   const { data: exportData } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["theme all"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
 

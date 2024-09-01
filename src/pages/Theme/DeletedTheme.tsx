@@ -132,8 +132,8 @@ const DeletedThemes = () => {
     }
   };
 
-  const filteredData = themesData?.items?.filter((theme: ThemeType) =>
-    theme.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = themesData?.items?.filter((theme: any) =>
+    theme.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(themesData?.totalItems / itemsPerPage);
@@ -239,9 +239,9 @@ const DeletedThemes = () => {
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(theme?.name, searchQuery)}
+                {highlightText(theme?.restaurant.name, searchQuery)}
               </td>
-              <td className="px-6 py-4">{theme?.description}</td>
+              <td className="px-6 py-4">{theme?.restaurant.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 {/* <Link to={`/themes/edit/${theme?.id}`} state={theme}>
                   <SquarePen className="text-blue-600" />
