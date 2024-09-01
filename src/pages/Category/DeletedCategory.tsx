@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -21,6 +21,8 @@ const DeletedCategories = () => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
     null
   );
+  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage delete many popup visibility
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +85,21 @@ const DeletedCategories = () => {
     },
   });
 
+  const deleteManyMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axiosInstance.delete(`/category/delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      setSelectedItems([]); // Clear selected items after successful deletion
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-categories"],
+      });
+    },
+  });
+
   // Handle restore and delete operations
   const handleRestoreClick = (category: CategoryType) => {
     setSelectedCategory(category);
@@ -100,6 +117,31 @@ const DeletedCategories = () => {
     }
   };
 
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteManyMutation.mutate(selectedItems);
+    }
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData?.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData?.map((item: any) => item.id) || [];
+      setSelectedItems(allIds);
+    }
+  };
+
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
+
   const confirmDelete = () => {
     if (selectedCategory) {
       deleteMutation.mutate(selectedCategory.id);
@@ -114,6 +156,10 @@ const DeletedCategories = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (isLoading) {
@@ -173,13 +219,30 @@ const DeletedCategories = () => {
             ))}
           </select>
         </div>
+        <div>
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Categories Table */}
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4"></th>
+            <th scope="col" className="px-6 py-3 w-4">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === filteredData?.length}
+                onChange={handleSelectAll}
+              />
+            </th>
             <th scope="col" className="px-6 py-3">
               #
             </th>
@@ -198,7 +261,13 @@ const DeletedCategories = () => {
               key={category.id}
               className="bg-white border-b hover:bg-gray-50"
             >
-              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(category.id)}
+                  onChange={() => handleSelectItem(category.id)}
+                />
+              </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
@@ -207,14 +276,14 @@ const DeletedCategories = () => {
               </td>
               <td className="px-6 py-4">{category?.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/categories/edit/${category?.id}`} state={category}>
+                {/* <Link to={`/categories/edit/${category?.id}`} state={category}>
                   <SquarePen className="text-blue-600" />
-                </Link>
+                </Link> */}
                 <button
                   className="font-medium text-green-600"
                   onClick={() => handleRestoreClick(category)}
                 >
-                  Restore
+                  <RotateCcw />
                 </button>
                 <button
                   className="font-medium text-red-600"
@@ -263,6 +332,24 @@ const DeletedCategories = () => {
           confirmButtonVariant="red"
         >
           <p>Are you sure you want to delete {selectedCategory?.name}?</p>
+        </Popup>
+      )}
+
+      {/* Delete Many Popup */}
+      {showDeleteManyPopup && (
+        <Popup
+          confirmText="Delete All"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteManyMutation.isPending}
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete {selectedItems.length} categories?
+            <span className="text-red-600"> *This action is irreversible.</span>
+          </p>
         </Popup>
       )}
     </div>

@@ -71,7 +71,7 @@ const Theme = () => {
   });
 
   const { data: exportData } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["theme all"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
 
@@ -137,7 +137,7 @@ const Theme = () => {
   };
 
   const filteredData = query.data?.items?.filter((item: any) =>
-    item?.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
+    item?.restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
   // Handle select all checkbox
   const handleSelectAll = () => {

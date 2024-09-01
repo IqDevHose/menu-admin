@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -20,6 +20,8 @@ const DeletedThemes = () => {
   const [showRestorePopup, setShowRestorePopup] = useState(false); // Separate state for restore popup
   const [selectedTheme, setSelectedTheme] = useState<ThemeType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage delete many popup visibility
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -66,6 +68,22 @@ const DeletedThemes = () => {
     },
   });
 
+  // Handle bulk delete operation
+  const deleteManyMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axiosInstance.delete(`/theme/delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      setSelectedItems([]); // Clear selected items after successful deletion
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-themes"],
+      });
+    },
+  });
+
   // Handle restore and delete operations
   const handleRestoreClick = (theme: ThemeType) => {
     setSelectedTheme(theme);
@@ -83,20 +101,49 @@ const DeletedThemes = () => {
     }
   };
 
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteManyMutation.mutate(selectedItems);
+    }
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData?.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData?.map((item: any) => item.id) || [];
+      setSelectedItems(allIds);
+    }
+  };
+
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
+
   const confirmDelete = () => {
     if (selectedTheme) {
       deleteMutation.mutate(selectedTheme.id);
     }
   };
 
-  const filteredData = themesData?.items?.filter((theme: ThemeType) =>
-    theme.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = themesData?.items?.filter((theme: any) =>
+    theme.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(themesData?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (isLoading) {
@@ -142,13 +189,30 @@ const DeletedThemes = () => {
             />
           </div>
         </div>
+        <div>
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Themes Table */}
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4"></th>
+            <th scope="col" className="px-6 py-3 w-4">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === filteredData?.length}
+                onChange={handleSelectAll}
+              />
+            </th>
             <th scope="col" className="px-6 py-3">
               #
             </th>
@@ -164,23 +228,29 @@ const DeletedThemes = () => {
         <tbody>
           {filteredData?.map((theme: any, index: number) => (
             <tr key={theme.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(theme.id)}
+                  onChange={() => handleSelectItem(theme.id)}
+                />
+              </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(theme?.name, searchQuery)}
+                {highlightText(theme?.restaurant.name, searchQuery)}
               </td>
-              <td className="px-6 py-4">{theme?.description}</td>
+              <td className="px-6 py-4">{theme?.restaurant.description}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/themes/edit/${theme?.id}`} state={theme}>
+                {/* <Link to={`/themes/edit/${theme?.id}`} state={theme}>
                   <SquarePen className="text-blue-600" />
-                </Link>
+                </Link> */}
                 <button
                   className="font-medium text-green-600"
                   onClick={() => handleRestoreClick(theme)}
                 >
-                  Restore
+                  <RotateCcw />
                 </button>
                 <button
                   className="font-medium text-red-600"
@@ -229,6 +299,24 @@ const DeletedThemes = () => {
           confirmButtonVariant="red"
         >
           <p>Are you sure you want to delete this theme?</p>
+        </Popup>
+      )}
+
+      {/* Delete Many Popup */}
+      {showDeleteManyPopup && (
+        <Popup
+          confirmText="Delete All"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteManyMutation.isPending}
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete {selectedItems.length} themes?
+            <span className="text-red-600"> *This action is irreversible.</span>
+          </p>
         </Popup>
       )}
     </div>
