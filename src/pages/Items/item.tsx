@@ -303,7 +303,7 @@ const Item = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white bg-red-700 hover:bg-red-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
