@@ -137,7 +137,7 @@ const Theme = () => {
   };
 
   const filteredData = query.data?.items?.filter((item: any) =>
-    item?.restaurant?.name.toLowerCase().includes(searchQuery.toLowerCase())
+    item?.restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
   // Handle select all checkbox
   const handleSelectAll = () => {

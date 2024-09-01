@@ -74,6 +74,7 @@ const DeletedRestaurants = () => {
     },
   });
 
+  // TODO:
   // Handle bulk delete operation
   const deleteManyMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
@@ -107,12 +108,14 @@ const DeletedRestaurants = () => {
     }
   };
 
+  // TODO:
   const confirmDeleteMany = () => {
     if (selectedItems) {
       deleteManyMutation.mutate(selectedItems);
     }
   };
 
+  // TODO:
   // Handle select all checkbox
   const handleSelectAll = () => {
     if (selectedItems.length === filteredData?.length) {
@@ -123,6 +126,7 @@ const DeletedRestaurants = () => {
     }
   };
 
+  // TODO:
   // Handle individual row checkbox
   const handleSelectItem = (id: string) => {
     setSelectedItems((prevSelectedItems) =>
@@ -149,6 +153,7 @@ const DeletedRestaurants = () => {
     setCurrentPage(newPage);
   };
 
+  // TODO:
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
   };

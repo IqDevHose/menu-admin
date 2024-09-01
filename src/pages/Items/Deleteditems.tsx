@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -26,6 +26,7 @@ const DeletedItems = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage delete many popup visibility
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -88,6 +89,22 @@ const DeletedItems = () => {
     },
   });
 
+  // Handle bulk delete operation
+  const deleteManyMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axiosInstance.delete(`/item/delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteManyPopup(false);
+      setSelectedItems([]); // Clear selected items after successful deletion
+      queryClient.invalidateQueries({
+        queryKey: ["findAll-deleted-items"],
+      });
+    },
+  });
+
   // Handle item final deletion
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -116,6 +133,31 @@ const DeletedItems = () => {
     }
   };
 
+  const confirmDeleteMany = () => {
+    if (selectedItems) {
+      deleteManyMutation.mutate(selectedItems);
+    }
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData?.length) {
+      setSelectedItems([]);
+    } else {
+      const allIds = filteredData?.map((item: any) => item.id) || [];
+      setSelectedItems(allIds);
+    }
+  };
+
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems((prevSelectedItems) =>
+      prevSelectedItems.includes(id)
+        ? prevSelectedItems.filter((itemId) => itemId !== id)
+        : [...prevSelectedItems, id]
+    );
+  };
+
   const confirmDelete = () => {
     if (selectedItem) {
       deleteMutation.mutate(selectedItem.id);
@@ -131,6 +173,10 @@ const DeletedItems = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+  };
+
+  const handleDeleteMany = () => {
+    setShowDeleteManyPopup(true);
   };
 
   if (isLoading) {
@@ -208,13 +254,30 @@ const DeletedItems = () => {
             ))}
           </select>
         </div>
+        <div>
+          {selectedItems.length > 0 && (
+            <button
+              type="button"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              onClick={handleDeleteMany}
+            >
+              Delete {selectedItems.length}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Items Table */}
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 w-4"></th>
+            <th scope="col" className="px-6 py-3 w-4">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === filteredData?.length}
+                onChange={handleSelectAll}
+              />
+            </th>
             <th scope="col" className="px-6 py-3">
               #
             </th>
@@ -233,7 +296,13 @@ const DeletedItems = () => {
         <tbody>
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(item.id)}
+                  onChange={() => handleSelectItem(item.id)}
+                />
+              </td>
               <td className="px-6 py-4">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
@@ -243,14 +312,14 @@ const DeletedItems = () => {
               <td className="px-6 py-4">{item?.description}</td>
               <td className="px-6 py-4">{item?.price}</td>
               <td className="px-6 py-4 flex gap-x-4">
-                <Link to={`/items/edit/${item?.id}`} state={item}>
+                {/* <Link to={`/items/edit/${item?.id}`} state={item}>
                   <SquarePen className="text-blue-600" />
-                </Link>
+                </Link> */}
                 <button
                   className="font-medium text-green-600"
                   onClick={() => handleRestoreClick(item)}
                 >
-                  Restore
+                  <RotateCcw />
                 </button>
                 <button
                   className="font-medium text-red-600"
@@ -299,6 +368,24 @@ const DeletedItems = () => {
           confirmButtonVariant="red"
         >
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
+        </Popup>
+      )}
+
+      {/* Delete Many Popup */}
+      {showDeleteManyPopup && (
+        <Popup
+          confirmText="Delete All"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          onClose={() => setShowDeleteManyPopup(false)}
+          onConfirm={confirmDeleteMany}
+          loading={deleteManyMutation.isPending}
+          confirmButtonVariant="red"
+        >
+          <p>
+            Are you sure you want to delete {selectedItems.length} items?
+            <span className="text-red-600"> *This action is irreversible.</span>
+          </p>
         </Popup>
       )}
     </div>
