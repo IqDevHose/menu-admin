@@ -16,6 +16,14 @@ type restaurantReviewType = {
   name: string;
 };
 
+interface ThemeType {
+  id: string;
+  name: string;
+  primary: string;
+  secondary: string;
+  bg: string;
+}
+
 interface DataItem {
   accessCode: string;
   createdAt: string;
@@ -25,6 +33,7 @@ interface DataItem {
   image: string | null;
   name: string;
   updatedAt: string;
+  theme: ThemeType
 }
 
 const flattenObject = (
@@ -34,7 +43,14 @@ const flattenObject = (
 ): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
-      const propName = parent ? `${parent}.${key}` : key;
+      // Determine the full key path
+      let propName = parent ? `${parent}.${key}` : key;
+
+      // Remove "theme." prefix from keys that belong to the theme object
+      if (parent === "theme") {
+        propName = key;
+      }
+
       if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
@@ -76,33 +92,34 @@ const Restaurant = () => {
     },
   });
 
-  const { data: exportData } = useQuery({
-    queryKey: ["items"],
-    queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
+// Assuming `headers` is being set in the component state
+const { data: exportData } = useQuery({
+  queryKey: ["items"],
+  queryFn: async () => {
+    const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
 
-      console.log(item.data.items);
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
+    console.log(item.data.items);
+    const heads: any[] = extractHeaders(item.data.items);
+    setHeaders(heads);
+    return item.data;
+  },
+});
 
-  const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) =>
-      flattenObject(item)
-    );
+const handleExport = () => {
+  const flattenedData = exportData.items.map((item: any) =>
+    flattenObject(item)
+  );
 
-    const dataToConvert = {
-      data: flattenedData,
-      filename: "restaurants",
-      delimiter: ",",
-      headers,
-    };
-
-    // console.log(dataToConvert)
-    exportCSVFile(dataToConvert);
+  const dataToConvert = {
+    data: flattenedData,
+    filename: "restaurants",
+    delimiter: ",",
+    headers,
   };
+
+  // Export the CSV file with the renamed headers
+  exportCSVFile(dataToConvert);
+};
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {

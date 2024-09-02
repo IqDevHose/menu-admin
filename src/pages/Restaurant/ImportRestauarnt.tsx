@@ -5,7 +5,7 @@ import axiosInstance from '@/axiosInstance';
 
 type Props = {}
 
-interface RestaurantItem {
+interface DataItem {
   accessCode: string;
   createdAt: string;
   deleted: boolean;
@@ -19,12 +19,22 @@ interface RestaurantItem {
   bg?: string;
 }
 
-// Utility function to flatten the JSON object
-const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  res: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
-      const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      // Determine the full key path
+      let propName = parent ? `${parent}.${key}` : key;
+
+      // Remove "theme." prefix from keys that belong to the theme object
+      if (parent === "theme") {
+        propName = key;
+      }
+
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
         res[propName] = obj[key];
@@ -34,9 +44,19 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
   return res;
 };
 
+interface HeadsType {
+  accessCode: string,
+  name: string
+  description: string
+  image: string,
+  primary: string,
+  secondary: string,
+  bg: string,
+}
+
 // Extract headers from the data
-const extractHeaders = (data: RestaurantItem[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+const extractHeaders = (data: DataItem[]): string[] => {
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -50,7 +70,7 @@ const ImportRestaurant = (props: Props) => {
   // Define expected headers explicitly
   const expectedHeaders = [
     'id', 'accessCode', 'name', 'description', 'image',
-    'createdAt', 'updatedAt', 'deleted', 'secondary', 'primary', 'bg'
+    'createdAt', 'updatedAt', 'deleted', 'secondary', 'primary', 'bg', 'restaurantId', 'theme'
   ];
 
   // Fetch headers from the API using react-query
@@ -58,38 +78,49 @@ const ImportRestaurant = (props: Props) => {
     queryKey: ["restaurant"],
     queryFn: async () => {
       const response = await axiosInstance.get(`/restaurant?page=all`);
-      const heads: any[] = extractHeaders(response.data.items);
+
+      const heads: string[] = extractHeaders(response.data.items);
+
       setHeaders(heads);
+      console.log("heads in the query", heads === expectedHeaders)
       return response.data;
     },
   });
 
+  const arraysEqual = (a: string[], b: string[]) => {
+    if (a.length !== b.length) return false;
+    a.sort();
+    b.sort();
+    return a.every((val, index) => val === b[index]);
+  };
+  
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-
+  
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
         complete: (result) => {
           let data = result.data;
-
+  
           // Convert `deleted` field to boolean
           data = data.map((item: any) => ({
             ...item,
-            deleted: item.deleted === 'true', // Convert to boolean
+            deleted: item.deleted === false
           }));
-
+  
           const csvHeads = result.meta.fields || [];
-          console.log('CSV Headers:', csvHeads);
-          console.log('Parsed Data:', data);
-
+          console.log("heads: ", headers, expectedHeaders)
+          // console.log('CSV Headers:', csvHeads);
+          // console.log('Parsed Data:', data);
+  
           setCsvHeaders(csvHeads);
           setParsedData(data);
-
-          // Explicitly compare CSV headers with expected headers
-          const headersMatch = expectedHeaders.every(header => csvHeads.includes(header)) && csvHeads.every(header => expectedHeaders.includes(header));
+  
+          // Compare CSV headers with expected headers using sorted arrays
+          const headersMatch = arraysEqual(expectedHeaders, csvHeads);
           setIsHeaderMatch(headersMatch);
         },
         error: (error) => {
@@ -123,7 +154,7 @@ const ImportRestaurant = (props: Props) => {
             htmlFor="file"
             className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5"
           >
-            <span className="flex gap-1">Import</span>
+            <span className="flex gap-1 ">Import</span>
           </label>
           <input
             id="file"
@@ -133,16 +164,20 @@ const ImportRestaurant = (props: Props) => {
             onChange={handleFileChange}
             className="hidden"
           />
-          {isHeaderMatch ? (
+          {
+            csvHeaders.length > 0 && (
             <button
               onClick={handleUpload}
               className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg py-2.5 px-5"
             >
               Upload Data
             </button>
-          ) : (
+            )
+          }
+
+          {/* {isHeaderMatch &&
             <span className="text-red-500">CSV headers do not match the expected headers.</span>
-          )}
+          } */}
         </div>
       </div>
     </div>
