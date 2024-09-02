@@ -119,16 +119,20 @@ const ImportCategory = (props: Props) => {
             onChange={handleFileChange}
             className="hidden text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           />
-          {isHeaderMatch ? (
+          {
+            csvHeaders.length > 0 && (
             <button
               onClick={handleUpload}
               className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg py-2.5 px-5"
             >
               Upload Data
             </button>
-          ) : (
+            )
+          }
+
+          {/* {isHeaderMatch &&
             <span className="text-red-500">CSV headers do not match the expected headers.</span>
-          )}
+          } */}
         </div>
       </div>
     </div>
