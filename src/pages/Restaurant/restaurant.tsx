@@ -33,7 +33,7 @@ interface DataItem {
   image: string | null;
   name: string;
   updatedAt: string;
-  theme: ThemeType
+  theme: ThemeType;
 }
 
 const flattenObject = (
@@ -92,34 +92,34 @@ const Restaurant = () => {
     },
   });
 
-// Assuming `headers` is being set in the component state
-const { data: exportData } = useQuery({
-  queryKey: ["items"],
-  queryFn: async () => {
-    const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
+  // Assuming `headers` is being set in the component state
+  const { data: exportData } = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
 
-    console.log(item.data.items);
-    const heads: any[] = extractHeaders(item.data.items);
-    setHeaders(heads);
-    return item.data;
-  },
-});
+      console.log(item.data.items);
+      const heads: any[] = extractHeaders(item.data.items);
+      setHeaders(heads);
+      return item.data;
+    },
+  });
 
-const handleExport = () => {
-  const flattenedData = exportData.items.map((item: any) =>
-    flattenObject(item)
-  );
+  const handleExport = () => {
+    const flattenedData = exportData.items.map((item: any) =>
+      flattenObject(item)
+    );
 
-  const dataToConvert = {
-    data: flattenedData,
-    filename: "restaurants",
-    delimiter: ",",
-    headers,
+    const dataToConvert = {
+      data: flattenedData,
+      filename: "restaurants",
+      delimiter: ",",
+      headers,
+    };
+
+    // Export the CSV file with the renamed headers
+    exportCSVFile(dataToConvert);
   };
-
-  // Export the CSV file with the renamed headers
-  exportCSVFile(dataToConvert);
-};
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
@@ -134,7 +134,7 @@ const handleExport = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(`/restaurant/delete-many`, {
+      return axiosInstance.put(`/restaurant/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
@@ -279,11 +279,11 @@ const handleExport = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 w-4">
-              {/* <input
+              <input
                 type="checkbox"
                 checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
-              /> */}
+              />
             </th>
             <th scope="col" className="px-6 py-3 w-4">
               #
@@ -307,11 +307,11 @@ const handleExport = () => {
           {filteredData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
-                {/* <input
+                <input
                   type="checkbox"
                   checked={selectedItems.includes(item.id)}
                   onChange={() => handleSelectItem(item.id)}
-                /> */}
+                />
               </td>
               <td className="px-6 py-4">{index + 1}</td>
               <td

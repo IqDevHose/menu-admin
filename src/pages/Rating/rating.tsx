@@ -116,7 +116,7 @@ const Rating = () => {
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
       console.log(selectedItemsIds);
-      return axiosInstance.delete(`/rating/soft-delete-many`, {
+      return axiosInstance.put(`/rating/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },

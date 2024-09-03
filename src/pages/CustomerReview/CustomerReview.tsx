@@ -196,8 +196,7 @@ const CustomerReview = () => {
   });
   const deleteMutation = useMutation({
     mutationFn: async (selectedItemsIds: string[]) => {
-      console.log("Attempting to delete these items:", selectedItemsIds); // Debugging statement
-      return axiosInstance.delete(`/customer-review/soft-delete-many`, {
+      return axiosInstance.put(`/customer-review/soft-delete-many`, {
         data: selectedItemsIds, // Ensure only selected items are sent
       });
     },
@@ -225,7 +224,6 @@ const CustomerReview = () => {
       console.log("No items selected for deletion."); // Debugging statement
     }
   };
-  
 
   const confirmDelete = () => {
     if (selectedCustomerReview) {
@@ -246,26 +244,27 @@ const CustomerReview = () => {
     setSelectedItems([]);
   };
   // Handle select all checkbox
-// Handle select all checkbox
-const handleSelectAll = () => {
-  if (selectedItems.length === filteredData.length) {
-    setSelectedItems([]); // Unselect all if everything is already selected
-  } else {
-    const allIds = filteredData.map((item: any) => item.id);
-    setSelectedItems(allIds); // Select all items
-  }
-  console.log("Selected items after select all:", selectedItems); // Debugging statement
-};
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredData.length) {
+      setSelectedItems([]); // Unselect all if everything is already selected
+    } else {
+      const allIds = filteredData.map((item: any) => item.id);
+      setSelectedItems(allIds); // Select all items
+    }
+    console.log("Selected items after select all:", selectedItems); // Debugging statement
+  };
 
-// Handle individual row checkbox
-const handleSelectItem = (id: string) => {
-  setSelectedItems((prevSelectedItems) =>
-    prevSelectedItems.includes(id)
-      ? prevSelectedItems.filter((itemId) => itemId !== id) // Remove from selected if already selected
-      : [...prevSelectedItems, id] // Add to selected if not selected
-  );
-  console.log("Selected items after individual selection:", selectedItems); // Debugging statement
-};
+  // Handle individual row checkbox
+  const handleSelectItem = (id: string) => {
+    setSelectedItems(
+      (prevSelectedItems) =>
+        prevSelectedItems.includes(id)
+          ? prevSelectedItems.filter((itemId) => itemId !== id) // Remove from selected if already selected
+          : [...prevSelectedItems, id] // Add to selected if not selected
+    );
+    console.log("Selected items after individual selection:", selectedItems); // Debugging statement
+  };
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
   };

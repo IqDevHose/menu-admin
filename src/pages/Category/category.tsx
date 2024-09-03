@@ -55,7 +55,8 @@ const extractHeaders = (data: DataCategory[]): string[] => {
 const Category = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
-  const [selectedCategory, setSelectedCategory] = useState<categoryReviewType | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<categoryReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState(""); // State to manage selected restaurant
   const [currentPage, setCurrentPage] = useState(1);
@@ -100,7 +101,11 @@ const Category = () => {
   };
 
   // Fetch categories based on selected restaurant
-  const { data: categoryData, isLoading, isError } = useQuery({
+  const {
+    data: categoryData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -125,7 +130,7 @@ const Category = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      return axiosInstance.delete(`/category/soft-delete-many`, {
+      return axiosInstance.put(`/category/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
@@ -170,9 +175,10 @@ const Category = () => {
   };
 
   // Filter data based on the search query
-  const filteredData = categoryData?.items.filter((item: any) =>
-    item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredData =
+    categoryData?.items.filter((item: any) =>
+      item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
   // Calculate total pages and slice data for the current page
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
