@@ -10,7 +10,7 @@ type CustomerReviewType = {
   email: string;
   birthday: string;
   phone: string;
-  restaurantId: string;
+  resturantId: string;
 };
 
 function AddCustomerReview() {
@@ -48,7 +48,7 @@ function AddCustomerReview() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (restaurantId) {
-      const newReview = { name, comment, email, birthday, phone, restaurantId };
+      const newReview = { name, comment, email, birthday, phone, resturantId: restaurantId };
       console.log("Submitting review:", newReview); // Log the data being sent
       mutation.mutate(newReview);
     } else {
