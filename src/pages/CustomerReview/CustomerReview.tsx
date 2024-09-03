@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -9,7 +9,7 @@ import satisfied from "../../assets/neutral.png";
 import sad from "../../assets/sad.png";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
-import Pagination from "@/components/Pagination";
+import Pagination from "@/components/Pagination"; // Import the Pagination component
 import RatingPopup from "@/components/RatingPopup";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
@@ -63,7 +63,7 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
-  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<customerReviewType | null>(
     null
   );
@@ -71,21 +71,32 @@ const CustomerReview = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const itemsPerPage = 10; // Set the number of items per page
   const [headers, setHeaders] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
 
-  // Fetch all customer reviews for export and filtering
+  const query = useQuery({
+    queryKey: ["customerReview", currentPage],
+    queryFn: async () => {
+      const customerReview = await axiosInstance.get(
+        `/customer-review?page=${currentPage}`
+      );
+
+      return customerReview.data;
+    },
+  });
+
   const { data: exportData } = useQuery({
-    queryKey: ["customerReviews-export"],
+    queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(
         `http://localhost:3000/customer-review?page=all`
       );
+
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -104,90 +115,25 @@ const CustomerReview = () => {
       headers,
     };
 
+    // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
   };
 
-  // Fetch customer reviews with pagination
-  const { data: customerData, isLoading, isError } = useQuery({
-    queryKey: ["customerReviews"],
-    queryFn: async () => {
-      const customerReview = await axiosInstance.get(
-        `/customer-review?page=all`
-      );
-
-      return customerReview.data;
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/customer-review/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customerReviews"] });
-      setShowPopup(false);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (selectedItemsIds: string[]) => {
-      return axiosInstance.delete(`/customer-review/soft-delete-many`, {
-        data: selectedItemsIds,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customerReviews"] });
-      setShowDeleteManyPopup(false);
-    },
-  });
-
-  const handleDeleteClick = (item: customerReviewType) => {
-    setSelectedCustomerReview(item);
-    setShowPopup(true);
-  };
-
-  const confirmDeleteMany = () => {
-    if (selectedItems.length > 0) {
-      deleteMutation.mutate(selectedItems);
-    }
-  };
-
-  const confirmDelete = () => {
-    if (selectedCustomerReview) {
-      mutation.mutate(selectedCustomerReview.id);
-    }
-  };
-
   function summation(ratings: { score: number; question: any }[]) {
-    // Check if ratings is an array and has elements
-    if (!Array.isArray(ratings) || ratings.length === 0) {
-      return (
-        <img
-          title="No ratings available"
-          width={24}
-          height={24}
-          src={happy}
-          alt="happy"
-          style={{ cursor: "pointer" }}
-          onClick={() => setShowChildPopup(true)} // Open the popup even if there's no data
-        />
-      );
-    }
-  
     let sum = 0;
     let count = 0;
-  
+
     for (let index = 0; index < ratings.length; index++) {
       sum += ratings[index].score;
       count += 1;
     }
     const average = sum / count;
-  
+
     const handleIconClick = () => {
       setSelectedChildData(ratings); // Pass the entire rating array to the popup
       setShowChildPopup(true);
     };
-  
+
     if (average >= 2.5) {
       return (
         <img
@@ -215,7 +161,7 @@ const CustomerReview = () => {
     } else if (isNaN(average)) {
       return (
         <img
-          title="No ratings available"
+          title={`${average}`}
           width={24}
           height={24}
           src={happy}
@@ -239,48 +185,92 @@ const CustomerReview = () => {
     }
   }
 
-  // Filter and paginate data based on search query
-  const filteredData = customerData?.items.filter((item: any) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const mutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axiosInstance.delete(`/customer-review/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customerReview"] });
+      setShowPopup(false);
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: async (selectedItemsIds: string[]) => {
+      console.log("Attempting to delete these items:", selectedItemsIds); // Debugging statement
+      return axiosInstance.delete(`/customer-review/soft-delete-many`, {
+        data: selectedItemsIds, // Ensure only selected items are sent
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
+      setShowDeleteManyPopup(false); // Close the delete popup
+      setSelectedItems([]); // Reset the selected items state after deletion
+      console.log("Items deleted successfully"); // Debugging statement
+    },
+    onError: (error) => {
+      console.error("Error deleting items:", error); // Handle error and provide feedback
+    },
+  });
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const handleDeleteClick = (item: customerReviewType) => {
+    setSelectedCustomerReview(item);
+    setShowPopup(true);
+  };
+
+  const confirmDeleteMany = () => {
+    if (selectedItems.length > 0) {
+      console.log("Deleting selected items:", selectedItems); // Debugging statement
+      deleteMutation.mutate(selectedItems); // Pass only selected items
+    } else {
+      console.log("No items selected for deletion."); // Debugging statement
+    }
+  };
+  
+
+  const confirmDelete = () => {
+    if (selectedCustomerReview) {
+      mutation.mutate(selectedCustomerReview.id);
+    }
+  };
+
+  // Filter the data based on the search query
+  const filteredData = query.data?.items.filter((item: any) =>
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
   };
+  // Handle select all checkbox
+// Handle select all checkbox
+const handleSelectAll = () => {
+  if (selectedItems.length === filteredData.length) {
+    setSelectedItems([]); // Unselect all if everything is already selected
+  } else {
+    const allIds = filteredData.map((item: any) => item.id);
+    setSelectedItems(allIds); // Select all items
+  }
+  console.log("Selected items after select all:", selectedItems); // Debugging statement
+};
 
-  const handleSelectAll = () => {
-    if (selectedItems.length === currentData.length) {
-      setSelectedItems([]);
-    } else {
-      const allIds = currentData.map((item: any) => item.id);
-      setSelectedItems(allIds);
-    }
-  };
-
-  const handleSelectItem = (id: string) => {
-    setSelectedItems((prevSelectedItems) =>
-      prevSelectedItems.includes(id)
-        ? prevSelectedItems.filter((itemId) => itemId !== id)
-        : [...prevSelectedItems, id]
-    );
-  };
-
+// Handle individual row checkbox
+const handleSelectItem = (id: string) => {
+  setSelectedItems((prevSelectedItems) =>
+    prevSelectedItems.includes(id)
+      ? prevSelectedItems.filter((itemId) => itemId !== id) // Remove from selected if already selected
+      : [...prevSelectedItems, id] // Add to selected if not selected
+  );
+  console.log("Selected items after individual selection:", selectedItems); // Debugging statement
+};
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
   };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  if (isLoading) {
+  if (query.isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -288,7 +278,7 @@ const CustomerReview = () => {
     );
   }
 
-  if (isError) {
+  if (query.isError) {
     return <div>Error</div>;
   }
 
@@ -364,7 +354,7 @@ const CustomerReview = () => {
             <th scope="col" className="px-6 py-3 w-4">
               <input
                 type="checkbox"
-                checked={selectedItems.length === currentData.length}
+                checked={selectedItems.length === filteredData?.length}
                 onChange={handleSelectAll}
               />
             </th>
@@ -393,8 +383,8 @@ const CustomerReview = () => {
           </tr>
         </thead>
         <tbody>
-          {currentData.length > 0 ? (
-            currentData.map((item: any, index: number) => (
+          {Array.isArray(query.data.items) &&
+            filteredData?.map((item: any, index: number) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <input
@@ -416,6 +406,7 @@ const CustomerReview = () => {
                 <td className="px-6 py-4">
                   {new Date(item.birthday).toLocaleDateString("en-CA")}
                 </td>
+
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
                     to={`/customerReviews/edit/${item.id}`}
@@ -424,6 +415,7 @@ const CustomerReview = () => {
                   >
                     <SquarePen />
                   </Link>
+
                   <button
                     className="font-medium text-red-600"
                     onClick={() => handleDeleteClick(item)}
@@ -432,26 +424,17 @@ const CustomerReview = () => {
                   </button>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={9} className="px-6 py-4 text-center">
-                No customer reviews found.
-              </td>
-            </tr>
-          )}
+            ))}
         </tbody>
       </table>
 
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
+      <div className="flex justify-center items-center mt-10">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       {showDeleteManyPopup && (
         <Popup
@@ -484,16 +467,15 @@ const CustomerReview = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
-
-      {/* Popup for customer review rating */}
+      {/* popup for customer review rating */}
       {showChildPopup && (
         <Popup
           onClose={() => setShowChildPopup(false)}
           loading={query.isLoading}
           confirmText="Close"
-          showOneBtn={true}
-          onConfirm={() => setShowChildPopup(false)}
-          confirmButtonVariant="red"
+          showOneBtn={true} // This ensures only one button is shown
+          onConfirm={() => setShowChildPopup(false)} // The close functionality
+          confirmButtonVariant="red" // You can choose the variant
         >
           <RatingPopup data={selectedChildData} />
         </Popup>

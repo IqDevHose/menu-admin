@@ -158,7 +158,7 @@ const DeletedReview = () => {
   };
 
   const filteredData = itemsData?.items?.filter((item: itemReviewType) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(itemsData?.totalItems / itemsPerPage);
