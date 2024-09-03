@@ -70,7 +70,7 @@ const Theme = () => {
     },
   });
 
-  const { data: exportData } = useQuery({
+  const { data: exportData, refetch } = useQuery({
     queryKey: ["theme all"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/theme?page=all`);
@@ -101,6 +101,7 @@ const Theme = () => {
       await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["theme"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
@@ -114,6 +115,7 @@ const Theme = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },

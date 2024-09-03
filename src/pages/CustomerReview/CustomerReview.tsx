@@ -90,7 +90,7 @@ const CustomerReview = () => {
     },
   });
 
-  const { data: exportData } = useQuery({
+  const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(
@@ -190,6 +190,7 @@ const CustomerReview = () => {
       await axiosInstance.delete(`/customer-review/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["customerReview"] });
       setShowPopup(false);
     },
@@ -201,6 +202,7 @@ const CustomerReview = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
       setShowDeleteManyPopup(false); // Close the delete popup
       setSelectedItems([]); // Reset the selected items state after deletion

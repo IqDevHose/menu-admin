@@ -33,6 +33,7 @@ const DeletedThemes = () => {
     data: themesData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["findAll-deleted-themes", currentPage],
     queryFn: async () => {
@@ -53,6 +54,7 @@ const DeletedThemes = () => {
       await axiosInstance.put(`/theme/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -66,6 +68,7 @@ const DeletedThemes = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-themes"],
       });
@@ -79,6 +82,7 @@ const DeletedThemes = () => {
       await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
@@ -92,6 +96,7 @@ const DeletedThemes = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({

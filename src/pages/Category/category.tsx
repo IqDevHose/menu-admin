@@ -105,6 +105,7 @@ const Category = () => {
     data: categoryData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
@@ -123,6 +124,7 @@ const Category = () => {
       await axiosInstance.delete(`/category/soft-delete/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setShowPopup(false);
     },
@@ -135,6 +137,7 @@ const Category = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setShowDeleteManyPopup(false);
     },

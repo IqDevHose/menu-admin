@@ -36,6 +36,7 @@ const DeletedQuestions = () => {
     data: questionsData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["findAll-deleted-questions", currentPage],
     queryFn: async () => {
@@ -56,6 +57,7 @@ const DeletedQuestions = () => {
       await axiosInstance.put(`/question/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-questions"],
       });
@@ -71,6 +73,7 @@ const DeletedQuestions = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-questions"],
       });
@@ -84,6 +87,7 @@ const DeletedQuestions = () => {
       await axiosInstance.delete(`/question/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-questions"],
       });
@@ -99,6 +103,7 @@ const DeletedQuestions = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({

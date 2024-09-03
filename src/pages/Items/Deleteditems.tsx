@@ -38,6 +38,7 @@ const DeletedItems = () => {
     data: itemsData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: [
       "findAll-deleted",
@@ -85,6 +86,7 @@ const DeletedItems = () => {
       await axiosInstance.put(`/item/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -98,6 +100,7 @@ const DeletedItems = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-items"],
       });
@@ -113,6 +116,7 @@ const DeletedItems = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -127,6 +131,7 @@ const DeletedItems = () => {
       await axiosInstance.delete(`/item/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },

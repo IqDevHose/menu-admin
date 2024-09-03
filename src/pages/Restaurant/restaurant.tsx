@@ -93,7 +93,7 @@ const Restaurant = () => {
   });
 
   // Assuming `headers` is being set in the component state
-  const { data: exportData } = useQuery({
+  const { data: exportData,refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
@@ -126,6 +126,7 @@ const Restaurant = () => {
       await axiosInstance.delete(`/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["restaurant"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
@@ -139,6 +140,7 @@ const Restaurant = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },

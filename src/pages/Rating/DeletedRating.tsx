@@ -34,6 +34,7 @@ const DeletedRatings = () => {
     data: ratingsData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["findAll-deleted-ratings", currentPage],
     queryFn: async () => {
@@ -54,6 +55,7 @@ const DeletedRatings = () => {
       await axiosInstance.put(`/rating/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -67,6 +69,7 @@ const DeletedRatings = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-ratings"],
       });
@@ -80,6 +83,7 @@ const DeletedRatings = () => {
       await axiosInstance.delete(`/rating/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
@@ -93,6 +97,7 @@ const DeletedRatings = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
