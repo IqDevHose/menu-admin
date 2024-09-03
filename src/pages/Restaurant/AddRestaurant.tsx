@@ -37,6 +37,7 @@ function AddRestaurant() {
   const [primary, setPrimary] = useState<string | null>("");
   const [secondary, setSecondary] = useState<string | null>("");
   const [categoriesData, setCategoriesData] = useState<categoryType[]>([]);
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [bg, setBg] = useState<string | null>("");
   const navigate = useNavigate();
@@ -293,11 +294,19 @@ function AddRestaurant() {
               </div>
             )}
           </div>
+          {uploadImageUrl ? (
+            <div className="p-4">
+              <img width={100} src={uploadImageUrl} alt="" />
+            </div>
+          ) : null}
           <input
             type="file"
             id="upload-image"
             onChange={(e) => {
-              if (e.target.files) setUploadImage(e.target.files[0]);
+              if (e.target.files) {
+                setUploadImage(e.target.files[0]);
+                setUploadImageUrl(URL.createObjectURL(e.target.files[0]));
+              }
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
