@@ -34,6 +34,7 @@ const DeletedRestaurants = () => {
     data: restaurantsData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["findAll-deleted-restaurants", currentPage],
     queryFn: async () => {
@@ -55,6 +56,7 @@ const DeletedRestaurants = () => {
       await axiosInstance.put(`/restaurant/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-restaurants"],
       });
@@ -71,6 +73,7 @@ const DeletedRestaurants = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-restaurants"],
       });
@@ -84,6 +87,7 @@ const DeletedRestaurants = () => {
       await axiosInstance.delete(`/restaurant/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-restaurants"],
       });
@@ -99,6 +103,7 @@ const DeletedRestaurants = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({

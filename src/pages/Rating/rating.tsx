@@ -77,7 +77,7 @@ const Rating = () => {
     },
   });
 
-  const { data: exportData } = useQuery({
+  const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/rating?page=all`);
@@ -108,6 +108,7 @@ const Rating = () => {
       await axiosInstance.delete(`/rating/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["rating"] });
       setShowPopup(false);
     },
@@ -121,6 +122,7 @@ const Rating = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },

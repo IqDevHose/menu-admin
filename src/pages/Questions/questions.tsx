@@ -20,7 +20,6 @@ type questionsReviewType = {
 };
 
 interface DataItem {
-  // answers: object
   createdAt: String;
   deleted: Boolean;
   description: String;
@@ -69,7 +68,13 @@ const Questions = () => {
   const queryClient = useQueryClient();
   const [headers, setHeaders] = useState<string[]>([]);
 
-  const query = useQuery({
+  // Modify useQuery to destructure refetch
+  const {
+    data: queryData,
+    isLoading,
+    isError,
+    refetch, // Destructure refetch to use later
+  } = useQuery({
     queryKey: ["questions", currentPage],
     queryFn: async () => {
       const questions = await axiosInstance.get(
@@ -84,21 +89,20 @@ const Questions = () => {
       await axiosInstance.delete(`/question/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["questions"] });
+      refetch(); // Refetch data after successful deletion
       setShowPopup(false); // Close the popup after successful deletion
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.put(`/question/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      setShowDeleteManyPopup(false);
-      return "Items deleted successfully";
+      refetch(); // Refetch data after successful deletion
+      setShowDeleteManyPopup(false); // Close the popup after successful deletion
     },
   });
 
@@ -106,7 +110,6 @@ const Questions = () => {
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/question?page=all`);
-
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -125,7 +128,6 @@ const Questions = () => {
       headers,
     };
 
-    // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
   };
 
@@ -146,7 +148,7 @@ const Questions = () => {
     }
   };
 
-  const filteredData = query.data?.items?.filter((item: any) =>
+  const filteredData = queryData?.items?.filter((item: any) =>
     item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -179,8 +181,9 @@ const Questions = () => {
         : [...prevSelectedItems, id]
     );
   };
+
   // Calculate the total number of pages
-  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(queryData?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -191,7 +194,7 @@ const Questions = () => {
     setShowDeleteManyPopup(true);
   };
 
-  if (query.isPending) {
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -199,7 +202,7 @@ const Questions = () => {
     );
   }
 
-  if (query.isError) {
+  if (isError) {
     return <div>Error</div>;
   }
 
@@ -301,7 +304,7 @@ const Questions = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData?.map((item: any, index: number) => (
+          {currentData?.map((item: any, index: number) => (
             <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">
                 <input

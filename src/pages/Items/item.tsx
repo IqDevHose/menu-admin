@@ -131,7 +131,7 @@ const Item = () => {
   });
 
   // Fetch restaurants
-  const { data: restaurants } = useQuery({
+  const { data: restaurants, refetch } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
       const res = await axios.get("http://localhost:3000/restaurant");
@@ -145,6 +145,7 @@ const Item = () => {
       await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["items"] });
       setShowPopup(false);
     },
@@ -158,6 +159,7 @@ const Item = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["items"] });
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";

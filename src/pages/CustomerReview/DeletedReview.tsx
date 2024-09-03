@@ -37,6 +37,7 @@ const DeletedReview = () => {
     data: itemsData,
     isLoading,
     isError,
+    refetch
   } = useQuery({
     queryKey: ["findAll-deleted-review", currentPage],
     queryFn: async () => {
@@ -56,6 +57,7 @@ const DeletedReview = () => {
       await axiosInstance.put(`/customer-review/restore/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -69,6 +71,7 @@ const DeletedReview = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({
         queryKey: ["restore-reviews"],
       });
@@ -82,6 +85,7 @@ const DeletedReview = () => {
       await axiosInstance.delete(`/customer-review/${id}`);
     },
     onSuccess: () => {
+      refetch()
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-review"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
@@ -95,6 +99,7 @@ const DeletedReview = () => {
       });
     },
     onSuccess: () => {
+      refetch()
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
