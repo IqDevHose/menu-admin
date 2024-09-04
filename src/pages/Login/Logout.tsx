@@ -13,10 +13,10 @@ function Logout() {
   return (
     <button
       onClick={handleSignOut}
-      className="px-2 py-3  text-sm font-medium text-white bg-red-600 border  border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+      className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group"
     >
-      <SquareArrowLeft className="inline mr-6   " />
-     LOG OUT   {"  "}
+      <SquareArrowLeft className="mr-2 mb-[2px]"/>
+      LOG OUT
     </button>
   );
 }

@@ -23,7 +23,12 @@ import { AvgRatingPerRestaurant } from '../../utils/types';
 type CustomerReviewType = {
   name: string;
   comment: string;
+  
 };
+
+type ItemsCustomerReviewType = {
+  items: CustomerReviewType[];
+}
 
 const Home: React.FC = () => {
   // Fetching overall dashboard statistics
@@ -49,7 +54,7 @@ const Home: React.FC = () => {
     queryKey: ['customerReview'],
     queryFn: async () => {
       const response = await axios.get(`http://localhost:3000/customer-review`);
-      return response.data as CustomerReviewType[]; // Type assertion here
+      return response.data as ItemsCustomerReviewType; // Type assertion here
     },
   });
 
@@ -253,16 +258,18 @@ const Home: React.FC = () => {
         {/* Restaurant Overview */}
         <div>
           <h2 className="text-lg font-medium mb-4 text-gray-800">
-            Restaurant Overview
+            Total Restaurants 
           </h2>
           <Row gutter={24}>
-            {avgRatingPerRestaurant.map((restaurant: AvgRatingPerRestaurant, index: number) => (
-              <Col key={index} xs={24} sm={12} lg={6}>
-                <Card hoverable>
-                  <h3 className="text-center text-lg">{restaurant.name}</h3> {/* Display the restaurant name */}
-                </Card>
-              </Col>
-            ))}
+        <Col xs={24} sm={12} lg={6}>
+            <Card hoverable>
+              <Statistic
+                title="Restaurants"
+                value={totalRestaurants}
+                valueStyle={{ color: '#3f8600' }}
+              />
+            </Card>
+          </Col>
           </Row>
         </div>
       </div>
@@ -273,7 +280,7 @@ const Home: React.FC = () => {
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
-            dataSource={customerReviewQuery?.data?.items?.slice(0, 4) as CustomerReviewType[]}
+            dataSource={customerReviewQuery?.data?.items?.slice(0, 4)}
             renderItem={(item: CustomerReviewType) => (
               <List.Item>
                 <List.Item.Meta

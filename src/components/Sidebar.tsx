@@ -19,7 +19,7 @@ const Sidebar = () => {
         className="w-80 h-screen "
         aria-label="Sidebar"
       >
-        <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-indigo-100">
+        <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-[#F3F8FF]">
           <div className="flex flex-col ">
             <ul className="space-y-2 font-medium">
               <li className="mb-3">
