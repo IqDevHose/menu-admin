@@ -47,6 +47,7 @@ const DeletedReview = () => {
       const item = await axiosInstance.get(`/customer-review/findAll-deleted`, {
         params,
       });
+      console.log(item)
       return item.data;
     },
   });

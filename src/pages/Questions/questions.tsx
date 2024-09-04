@@ -86,7 +86,7 @@ const Questions = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/question/${id}`);
+      await axiosInstance.delete(`/question/soft-delete/${id}`);
     },
     onSuccess: () => {
       refetch(); // Refetch data after successful deletion

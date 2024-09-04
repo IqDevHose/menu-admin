@@ -105,7 +105,7 @@ const Rating = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/rating/${id}`);
+      await axiosInstance.delete(`/rating/soft-delete/${id}`);
     },
     onSuccess: () => {
       refetch()

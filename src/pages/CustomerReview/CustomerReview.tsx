@@ -187,7 +187,7 @@ const CustomerReview = () => {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/customer-review/${id}`);
+      await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
     },
     onSuccess: () => {
       refetch()
