@@ -18,12 +18,20 @@ function EditItem() {
   console.log(record);
 
   const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(record.description);
+  const [description, setDescription] = useState<string | null>(
+    record.description
+  );
   const [price, setPrice] = useState<number | null>(record.price);
-  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
+  const [restaurantId, setRestaurantId] = useState<string | null>(
+    record.restaurantId
+  );
   const [uploadImage, setUploadImage] = useState<File | null>(null); // Handle file uploads
-  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(record.image);
-  const [categoryId, setCategoryId] = useState<string | null>(record.categoryId);
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
+    record.image
+  );
+  const [categoryId, setCategoryId] = useState<string | null>(
+    record.categoryId
+  );
 
   const { itemId } = useParams();
   const navigate = useNavigate();
@@ -50,7 +58,9 @@ function EditItem() {
     queryKey: ["categories", restaurantId],
     queryFn: async () => {
       if (restaurantId) {
-        const response = await axiosInstance.get(`/category?restaurantId=${restaurantId}`);
+        const response = await axiosInstance.get(
+          `/category?restaurantId=${restaurantId}`
+        );
         return response.data;
       } else {
         const response = await axiosInstance.get(`/category`);
@@ -226,19 +236,19 @@ function EditItem() {
           >
             Upload Image
           </label>
-          {uploadImageUrl ? 
-          <div className="p-2">
-            <img width={100} src={uploadImageUrl} alt="" />
-          </div>
-          : null}
+          {uploadImageUrl ? (
+            <div className="p-2">
+              <img width={100} src={uploadImageUrl} alt="" />
+            </div>
+          ) : null}
           <input
             type="file"
             id="upload-image"
             onChange={(e) => {
               if (e.target.files) {
-                setUploadImage(e.target.files[0])
+                setUploadImage(e.target.files[0]);
                 setUploadImageUrl(URL.createObjectURL(e.target.files[0]));
-              };
+              }
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
