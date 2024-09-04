@@ -338,7 +338,7 @@ const Category = () => {
                   {highlightText(item?.name || "", searchQuery)}
                 </td>
                 <td className="px-6 py-4">{item?.items?.length || 0}</td>
-                <td className="px-6 py-4">{item?.restaurant?.name || "N/A"}</td>
+                <td className="px-6 py-4">{item?.resturnat?.name || "N/A"}</td>
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
                     to={`/categories/edit/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.restaurant?.name}`}
