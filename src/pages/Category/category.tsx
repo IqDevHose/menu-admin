@@ -105,7 +105,7 @@ const Category = () => {
     data: categoryData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
@@ -124,22 +124,22 @@ const Category = () => {
       await axiosInstance.delete(`/category/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setShowPopup(false);
     },
   });
-
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
+      console.log(selectedItemsIds);
       return axiosInstance.put(`/category/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
       refetch()
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
       setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
     },
   });
 
@@ -201,6 +201,8 @@ const Category = () => {
 
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
+
+
   };
 
   if (isLoading) {
@@ -265,7 +267,7 @@ const Category = () => {
               type="button"
               className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
-            >
+              >
               Delete {selectedItems.length}
             </button>
           )}

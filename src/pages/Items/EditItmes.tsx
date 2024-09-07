@@ -98,7 +98,12 @@ function EditItem() {
     mutation.mutate(formData);
   };
 
-  if (isLoadingRestaurants) return <div>Loading restaurants...</div>;
+  if (isLoadingRestaurants) return;
+
+  <div className="w-full h-screen flex items-center justify-center">
+    <Spinner />
+  </div>;
+
   if (isErrorRestaurants) return <div>Error loading restaurants</div>;
 
   return (
