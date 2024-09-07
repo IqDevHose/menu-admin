@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
-import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component

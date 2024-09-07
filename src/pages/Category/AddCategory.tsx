@@ -1,7 +1,6 @@
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +13,7 @@ type CreateCategoryDto = {
 function AddCategory() {
   const [name, setName] = useState<string>("");
   const [restaurantId, setRestaurantId] = useState<string>("");
-  const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const [uploadImage, _] = useState<File | null>(null);
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
