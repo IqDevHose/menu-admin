@@ -11,8 +11,9 @@ import axiosInstance from "@/axiosInstance";
 
 type QuestionType = {
   id: string;
-  questionText: string;
-  answerText: string;
+  title: string;
+  enTitle: string;
+  description: string;
 };
 
 const DeletedQuestions = () => {
@@ -168,7 +169,7 @@ const DeletedQuestions = () => {
   };
 
   const filteredData = questionsData?.items?.filter((question: QuestionType) =>
-    question.questionText?.toLowerCase().includes(searchQuery.toLowerCase())
+    question.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(questionsData?.totalItems / itemsPerPage);
@@ -265,10 +266,10 @@ const DeletedQuestions = () => {
               #
             </th>
             <th scope="col" className="px-6 py-3">
-              Question
+              English Title
             </th>
             <th scope="col" className="px-6 py-3">
-              Answer
+              Arabic Title
             </th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
@@ -290,9 +291,9 @@ const DeletedQuestions = () => {
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </td>
               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(question?.questionText, searchQuery)}
+                {highlightText(question?.enTitle, searchQuery)}
               </td>
-              <td className="px-6 py-4">{question?.answerText}</td>
+              <td className="px-6 py-4">{question?.title}</td>
               <td className="px-6 py-4 flex gap-x-4">
                 {/* <Link to={`/questions/edit/${question?.id}`} state={question}>
                   <SquarePen className="text-blue-600" />
