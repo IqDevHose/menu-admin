@@ -49,7 +49,7 @@ const ImportCategory = (props: Props) => {
     queryKey: ["category"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/category?page=all`);
-      const heads: any[] = extractHeaders(item.data.items);
+      const heads: any[] = extractHeaders(item.data?.items);
       setHeaders(heads);
       return item.data;
     },

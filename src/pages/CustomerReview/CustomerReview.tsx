@@ -234,12 +234,12 @@ const CustomerReview = () => {
   };
 
   // Filter the data based on the search query
-  const filteredData = query.data?.items.filter((item: any) =>
+  const filteredData = query?.data?.items.filter((item: any) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(query?.data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -384,7 +384,7 @@ const CustomerReview = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(query.data.items) &&
+          {Array.isArray(query?.data.items) &&
             filteredData?.map((item: any, index: number) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="px-6 py-4">

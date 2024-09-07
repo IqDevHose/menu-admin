@@ -107,8 +107,8 @@ function EditCategory() {
             <option value="" disabled>
               Select a restaurant
             </option>
-            {restaurants && restaurants.items.length > 0 ? (
-              restaurants.items.map((restaurant: any) => (
+            {restaurants && restaurants?.items.length > 0 ? (
+              restaurants?.items.map((restaurant: any) => (
                 <option key={restaurant.id} value={restaurant.id}>
                   {restaurant.name}
                 </option>
