@@ -6,37 +6,37 @@ import EditRestaurant from "./pages/Restaurant/EditRestaurant";
 import Category from "./pages/Category/category";
 import Item from "./pages/Items/item";
 import CustomerReview from "./pages/CustomerReview/CustomerReview";
-import Rating from "./pages/Rating/rating";
+// import Rating from "./pages/Rating/rating";
 import Questions from "./pages/Questions/questions";
-import Theme from "./pages/Theme/theme";
-import EditRating from "./pages/Rating/EditRating";
+// import Theme from "./pages/Theme/theme";
+// import EditRating from "./pages/Rating/EditRating";
 import EditCustomerReview from "./pages/CustomerReview/EditCustomerReview";
 import EditCategory from "./pages/Category/EditCategory";
 import EditItmes from "./pages/Items/EditItmes";
 import EditQuestion from "./pages/Questions/EditQuestion";
 import AddItem from "./pages/Items/AddItem";
 import AddCustomerReview from "./pages/CustomerReview/AddCustomerReview";
-import AddRating from "./pages/Rating/AddRating";
+// import AddRating from "./pages/Rating/AddRating";
 import AddRestaurant from "./pages/Restaurant/AddRestaurant";
 import AddCategory from "./pages/Category/AddCategory";
 import AddQuestion from "./pages/Questions/AddQuestion";
-import EditTheme from "./pages/Theme/editTheme";
-import AddTheme from "./pages/Theme/AddTheme";
+// import EditTheme from "./pages/Theme/editTheme";
+// import AddTheme from "./pages/Theme/AddTheme";
 import DeletedItems from "./pages/Items/Deleteditems";
 import DeletedCategories from "./pages/Category/DeletedCategory";
 import DeletedQuestions from "./pages/Questions/DeletedQuestion";
-import DeletedThemes from "./pages/Theme/DeletedTheme";
+// import DeletedThemes from "./pages/Theme/DeletedTheme";
 import DeletedRestaurant from "./pages/Restaurant/DeletedRestaurant";
 import DeletedReview from "./pages/CustomerReview/DeletedReview";
-import DeletedRating from "./pages/Rating/DeletedRating";
+// import DeletedRating from "./pages/Rating/DeletedRating";
 import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./middlewares/ProtectedRoute";
 import ImportItem from "./pages/Items/Import";
 import ImportCategory from "./pages/Category/ImportCategory";
 import ImportRestaurant from "./pages/Restaurant/ImportRestauarnt";
-import ImportTheme from "./pages/Theme/ImportTheme";
-import ImportRating from "./pages/Rating/ImportRating";
+// import ImportTheme from "./pages/Theme/ImportTheme";
+// import ImportRating from "./pages/Rating/ImportRating";
 import ImportQuestion from "./pages/Questions/ImportQuestion";
 import ImportCustomerReview from "./pages/CustomerReview/ImportCustomerReview";
 
@@ -72,13 +72,13 @@ function App() {
           {/*end  restaurant */}
 
           {/* rating */}
-          <Route path="/ratings/*">
+          {/* <Route path="/ratings/*">
             <Route index element={<Rating />} />
             <Route path="edit/:ratingId" element={<EditRating />} />
             <Route path="add" element={<AddRating />} />
             <Route path="trash" element={<DeletedRating />} />
             <Route path="import" element={<ImportRating />} />
-          </Route>
+          </Route> */}
           {/* end rating */}
 
           {/* customerReviews */}
@@ -126,13 +126,13 @@ function App() {
           {/* end questions */}
 
           {/* themes */}
-          <Route path="/themes/*">
+          {/* <Route path="/themes/*">
             <Route index element={<Theme />} />
             <Route path="add" element={<AddTheme />} />
             <Route path="trash" element={<DeletedThemes />} />
             <Route path="edit/:themeId" element={<EditTheme />} />
             <Route path="import" element={<ImportTheme />} />
-          </Route>
+          </Route> */}
           {/*end theme */}
           {/* end sidebar */}
         </Route>

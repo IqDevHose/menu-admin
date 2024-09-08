@@ -108,7 +108,7 @@ const Rating = () => {
       await axiosInstance.delete(`/rating/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["rating"] });
       setShowPopup(false);
     },
@@ -116,13 +116,12 @@ const Rating = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.put(`/rating/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },

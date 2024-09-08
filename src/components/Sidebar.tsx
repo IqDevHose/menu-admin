@@ -95,7 +95,7 @@ const Sidebar = () => {
                   </span>
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   to={"/ratings"}
                   className={(navData) =>
@@ -109,7 +109,7 @@ const Sidebar = () => {
                     Rating
                   </span>
                 </NavLink>
-              </li>
+              </li> */}
               <li>
                 <NavLink
                   to={"/questions"}
@@ -125,7 +125,7 @@ const Sidebar = () => {
                   </span>
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   to={"/themes"}
                   className={(navData) =>
@@ -139,7 +139,7 @@ const Sidebar = () => {
                     Theme
                   </span>
                 </NavLink>
-              </li>
+              </li> */}
             </ul>
           </div>
           <div className="flex flex-col">

@@ -113,7 +113,6 @@ const Item = () => {
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
       const item = await axios.get(`http://localhost:3000/item`, { params });
-      console.log("🚀 ~ queryFn: ~ item:", item);
       return item.data;
     },
   });
@@ -238,7 +237,6 @@ const Item = () => {
   if (isError) {
     return <div>Error</div>;
   }
-  console.log(currentData);
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex justify-between ">

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import Papa from 'papaparse';
-import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '@/axiosInstance';
+import React, { useState } from "react";
+import Papa from "papaparse";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/axiosInstance";
 
-type Props = {}
+type Props = {};
 
 interface DataItem {
   accessCode: string;
@@ -45,13 +45,13 @@ const flattenObject = (
 };
 
 interface HeadsType {
-  accessCode: string,
-  name: string
-  description: string
-  image: string,
-  primary: string,
-  secondary: string,
-  bg: string,
+  accessCode: string;
+  name: string;
+  description: string;
+  image: string;
+  primary: string;
+  secondary: string;
+  bg: string;
 }
 
 // Extract headers from the data
@@ -69,8 +69,19 @@ const ImportRestaurant = (props: Props) => {
 
   // Define expected headers explicitly
   const expectedHeaders = [
-    'id', 'accessCode', 'name', 'description', 'image',
-    'createdAt', 'updatedAt', 'deleted', 'secondary', 'primary', 'bg', 'restaurantId', 'theme'
+    "id",
+    "accessCode",
+    "name",
+    "description",
+    "image",
+    "createdAt",
+    "updatedAt",
+    "deleted",
+    "secondary",
+    "primary",
+    "bg",
+    "restaurantId",
+    "theme",
   ];
 
   // Fetch headers from the API using react-query
@@ -82,7 +93,7 @@ const ImportRestaurant = (props: Props) => {
       const heads: string[] = extractHeaders(response.data.items);
 
       setHeaders(heads);
-      console.log("heads in the query", heads === expectedHeaders)
+      console.log("heads in the query", heads === expectedHeaders);
       return response.data;
     },
   });
@@ -93,38 +104,36 @@ const ImportRestaurant = (props: Props) => {
     b.sort();
     return a.every((val, index) => val === b[index]);
   };
-  
+
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-  
+
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
         complete: (result) => {
           let data = result.data;
-  
+
           // Convert `deleted` field to boolean
           data = data.map((item: any) => ({
             ...item,
-            deleted: item.deleted === false
+            deleted: item.deleted === false,
           }));
-  
+
           const csvHeads = result.meta.fields || [];
-          console.log("heads: ", headers, expectedHeaders)
-          // console.log('CSV Headers:', csvHeads);
-          // console.log('Parsed Data:', data);
-  
+          console.log("heads: ", headers, expectedHeaders);
+
           setCsvHeaders(csvHeads);
           setParsedData(data);
-  
+
           // Compare CSV headers with expected headers using sorted arrays
           const headersMatch = arraysEqual(expectedHeaders, csvHeads);
           setIsHeaderMatch(headersMatch);
         },
         error: (error) => {
-          console.error('Error parsing CSV file:', error);
+          console.error("Error parsing CSV file:", error);
         },
       });
     }
@@ -134,15 +143,18 @@ const ImportRestaurant = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/restaurant/import', parsedData);
-        console.log('Data uploaded successfully:', response.data);
+        const response = await axiosInstance.post(
+          "/restaurant/import",
+          parsedData
+        );
+        console.log("Data uploaded successfully:", response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
-        console.error('Error uploading data:', error);
+        console.error("Error uploading data:", error);
         // Handle error (e.g., show an error message)
       }
     } else {
-      console.log('Headers do not match. Upload aborted.');
+      console.log("Headers do not match. Upload aborted.");
     }
   };
 
@@ -164,16 +176,14 @@ const ImportRestaurant = (props: Props) => {
             onChange={handleFileChange}
             className="hidden"
           />
-          {
-            csvHeaders.length > 0 && (
+          {csvHeaders.length > 0 && (
             <button
               onClick={handleUpload}
               className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg py-2.5 px-5"
             >
               Upload Data
             </button>
-            )
-          }
+          )}
 
           {/* {isHeaderMatch &&
             <span className="text-red-500">CSV headers do not match the expected headers.</span>

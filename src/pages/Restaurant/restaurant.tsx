@@ -87,18 +87,16 @@ const Restaurant = () => {
     queryFn: async () => {
       const res = await axiosInstance.get(`/restaurant?page=${currentPage}`);
 
-      // console.log(res.data)
       return res.data;
     },
   });
 
   // Assuming `headers` is being set in the component state
-  const { data: exportData,refetch } = useQuery({
+  const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
 
-      console.log(item.data.items);
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -126,7 +124,7 @@ const Restaurant = () => {
       await axiosInstance.delete(`/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["restaurant"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
@@ -134,13 +132,12 @@ const Restaurant = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.put(`/restaurant/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },

@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
-import Papa from 'papaparse';
-import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '@/axiosInstance';
+import React, { useState } from "react";
+import Papa from "papaparse";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/axiosInstance";
 
-type Props = {}
+type Props = {};
 
 interface DataCategory {
-    createdAt: String;
-    deleted: boolean
-    icon: String
-    id: String
-    name: String
-    orderNumber: String
-    resturantId: String;
-    updatedAt: String
-  }
+  createdAt: String;
+  deleted: boolean;
+  icon: String;
+  id: String;
+  name: String;
+  orderNumber: String;
+  resturantId: String;
+  updatedAt: String;
+}
 
 // Utility function to flatten the JSON object
-const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  res: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
         res[propName] = obj[key];
@@ -33,7 +37,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 
 // Extract headers from the data
 const extractHeaders = (data: DataCategory[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -67,17 +71,17 @@ const ImportCustomerReview = (props: Props) => {
           const data = result.data;
           const csvHeads = result.meta.fields || [];
 
-          console.log(csvHeads);
-          console.log(data);
           setCsvHeaders(csvHeads);
           setParsedData(data);
 
           // Check if the CSV headers match the expected headers
-          const headersMatch = csvHeads.every(header => headers.includes(header)) && headers.every(header => csvHeads.includes(header));
+          const headersMatch =
+            csvHeads.every((header) => headers.includes(header)) &&
+            headers.every((header) => csvHeads.includes(header));
           setIsHeaderMatch(headersMatch);
         },
         error: (error) => {
-          console.error('Error parsing CSV file:', error);
+          console.error("Error parsing CSV file:", error);
         },
       });
     }
@@ -87,15 +91,18 @@ const ImportCustomerReview = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/customer-review/import', parsedData);
-        console.log('Data uploaded successfully:', response.data);
+        const response = await axiosInstance.post(
+          "/customer-review/import",
+          parsedData
+        );
+        console.log("Data uploaded successfully:", response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
-        console.error('Error uploading data:', error);
+        console.error("Error uploading data:", error);
         // Handle error (e.g., show an error message)
       }
     } else {
-      console.log('Headers do not match. Upload aborted.');
+      console.log("Headers do not match. Upload aborted.");
     }
   };
 
@@ -107,9 +114,7 @@ const ImportCustomerReview = (props: Props) => {
             htmlFor="file"
             className="text-white cursor-pointer bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           >
-            <span className="flex gap-1 ">
-              Import
-            </span>
+            <span className="flex gap-1 ">Import</span>
           </label>
           <input
             id="file"
@@ -119,16 +124,14 @@ const ImportCustomerReview = (props: Props) => {
             onChange={handleFileChange}
             className="hidden text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
           />
-          {
-            csvHeaders.length > 0 && (
+          {csvHeaders.length > 0 && (
             <button
               onClick={handleUpload}
               className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg py-2.5 px-5"
             >
               Upload Data
             </button>
-            )
-          }
+          )}
 
           {/* {isHeaderMatch &&
             <span className="text-red-500">CSV headers do not match the expected headers.</span>
@@ -137,6 +140,6 @@ const ImportCustomerReview = (props: Props) => {
       </div>
     </div>
   );
-}
+};
 
 export default ImportCustomerReview;

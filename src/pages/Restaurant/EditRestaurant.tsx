@@ -31,7 +31,6 @@ type restaurantType = {
 function EditRestaurant() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 

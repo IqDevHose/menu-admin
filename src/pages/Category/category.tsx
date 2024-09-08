@@ -131,13 +131,12 @@ const Category = () => {
   });
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.put(`/category/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },
@@ -201,8 +200,6 @@ const Category = () => {
 
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
-
-
   };
 
   if (isLoading) {
@@ -267,7 +264,7 @@ const Category = () => {
               type="button"
               className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
-              >
+            >
               Delete {selectedItems.length}
             </button>
           )}

@@ -16,7 +16,6 @@ type customerReviewType = {
 function EditCustomerReview() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
 
   const [name, setName] = useState<string | null>(record.name || null);
   const [comment, setComment] = useState<string | null>(record.comment);
@@ -36,7 +35,6 @@ function EditCustomerReview() {
       const customerReview = await axiosInstance.get(
         `/customer-review/${customerReviewId}`
       );
-      console.log(customerReview.data);
       return customerReview.data;
     },
   });

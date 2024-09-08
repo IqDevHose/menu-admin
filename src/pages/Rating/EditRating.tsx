@@ -13,7 +13,6 @@ type ratingType = {
 function EditRating() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
   const [name, setName] = useState<string | null>(record.name);
   const [score, setScore] = useState<number | null>(record.score);
   const [comment, setComment] = useState<string | null>(record.comment);

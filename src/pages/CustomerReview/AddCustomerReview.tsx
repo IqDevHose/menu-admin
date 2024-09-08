@@ -37,7 +37,6 @@ function AddCustomerReview() {
 
   const mutation = useMutation({
     mutationFn: (newReview: CustomerReviewType) => {
-      console.log(newReview);
       return axiosInstance.post(`/customer-review`, newReview);
     },
     onSuccess: () => {
@@ -48,7 +47,14 @@ function AddCustomerReview() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (restaurantId) {
-      const newReview = { name, comment, email, birthday, phone, resturantId: restaurantId };
+      const newReview = {
+        name,
+        comment,
+        email,
+        birthday,
+        phone,
+        resturantId: restaurantId,
+      };
       console.log("Submitting review:", newReview); // Log the data being sent
       mutation.mutate(newReview);
     } else {

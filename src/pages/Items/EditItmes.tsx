@@ -17,7 +17,6 @@ function EditItem() {
     queryKey: ["item"],
     queryFn: async () => {
       const response = await axiosInstance.get(`/item/${itemId}`);
-      console.log(response);
       return response.data;
     },
   });

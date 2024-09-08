@@ -14,7 +14,6 @@ type themeType = {
 function EditTheme() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
   const { themeId } = useParams();
   const [name, setName] = useState<string | null>(record.name);
   const [primary, setPrimary] = useState<string | null>(record.primary);

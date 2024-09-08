@@ -1,25 +1,28 @@
+import React, { useState } from "react";
+import Papa from "papaparse";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/axiosInstance";
 
-import React, { useState } from 'react';
-import Papa from 'papaparse';
-import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '@/axiosInstance';
-
-type Props = {}
+type Props = {};
 
 interface ThemeData {
-    bg: String;
-    deleted: boolean;
-    id: String;
-    primary: String;
-    restaurantId: String;
-    secondary: String;
-  }
+  bg: String;
+  deleted: boolean;
+  id: String;
+  primary: String;
+  restaurantId: String;
+  secondary: String;
+}
 // Utility function to flatten the JSON object
-const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string, any> = {}): Record<string, any> => {
+const flattenObject = (
+  obj: Record<string, any>,
+  parent = "",
+  res: Record<string, any> = {}
+): Record<string, any> => {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       const propName = parent ? `${parent}.${key}` : key;
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         flattenObject(obj[key], propName, res);
       } else {
         res[propName] = obj[key];
@@ -31,7 +34,7 @@ const flattenObject = (obj: Record<string, any>, parent = '', res: Record<string
 
 // Extract headers from the data
 const extractHeaders = (data: ThemeData[]): string[] => {
-  const flattenedData = data.map(item => flattenObject(item));
+  const flattenedData = data.map((item) => flattenObject(item));
   const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
   return headers;
 };
@@ -67,23 +70,23 @@ const ImportTheme = (props: Props) => {
           // Convert `deleted` field to boolean, `price` to float
           data = data.map((item: any) => ({
             ...item,
-            deleted: item.deleted === 'true',  // Convert to boolean
-            price: parseFloat(item.price),     // Convert to float
+            deleted: item.deleted === "true", // Convert to boolean
+            price: parseFloat(item.price), // Convert to float
           }));
 
           const csvHeads = result.meta.fields || [];
-          console.log('CSV Headers:', csvHeads);
-          console.log('Parsed Data:', data);
 
           setCsvHeaders(csvHeads);
           setParsedData(data);
 
           // Check if the CSV headers match the expected headers
-          const headersMatch = csvHeads.every(header => headers.includes(header)) && headers.every(header => csvHeads.includes(header));
+          const headersMatch =
+            csvHeads.every((header) => headers.includes(header)) &&
+            headers.every((header) => csvHeads.includes(header));
           setIsHeaderMatch(headersMatch);
         },
         error: (error) => {
-          console.error('Error parsing CSV file:', error);
+          console.error("Error parsing CSV file:", error);
         },
       });
     }
@@ -93,15 +96,15 @@ const ImportTheme = (props: Props) => {
   const handleUpload = async () => {
     if (parsedData.length > 0 && isHeaderMatch) {
       try {
-        const response = await axiosInstance.post('/theme/import', parsedData);
-        console.log('Data uploaded successfully:', response.data);
+        const response = await axiosInstance.post("/theme/import", parsedData);
+        console.log("Data uploaded successfully:", response.data);
         // Handle success (e.g., show a success message)
       } catch (error) {
-        console.error('Error uploading data:', error);
+        console.error("Error uploading data:", error);
         // Handle error (e.g., show an error message)
       }
     } else {
-      console.log('Headers do not match. Upload aborted.');
+      console.log("Headers do not match. Upload aborted.");
     }
   };
 
@@ -123,16 +126,14 @@ const ImportTheme = (props: Props) => {
             onChange={handleFileChange}
             className="hidden"
           />
-          {
-            csvHeaders.length > 0 && (
+          {csvHeaders.length > 0 && (
             <button
               onClick={handleUpload}
               className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg py-2.5 px-5"
             >
               Upload Data
             </button>
-            )
-          }
+          )}
 
           {/* {isHeaderMatch &&
             <span className="text-red-500">CSV headers do not match the expected headers.</span>

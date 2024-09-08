@@ -101,7 +101,7 @@ const Theme = () => {
       await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["theme"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
@@ -109,13 +109,12 @@ const Theme = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (selectedItemsIds: string[]) => {
-      console.log(selectedItemsIds);
       return axiosInstance.put(`/theme/soft-delete-many`, {
         data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },
