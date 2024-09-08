@@ -125,7 +125,7 @@ function EditQuestion() {
           />
         </div>
 
-        {/* Answer */}
+        {/* Answer
         <div className="mb-4">
           <label
             htmlFor="answer"
@@ -142,7 +142,7 @@ function EditQuestion() {
             placeholder="Enter answer"
             required
           />
-        </div>
+        </div> */}
 
         {/* Restaurant Select */}
         <div className="mb-4">
