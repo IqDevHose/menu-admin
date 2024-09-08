@@ -16,7 +16,7 @@ type questionType = {
 function AddQuestion() {
   const [description, setDescription] = useState<string | null>("");
   const [restaurantId, setRestaurantId] = useState<string | null>("");
-  const [answer, setAnswer] = useState<string | null>(""); // Single answer
+  const [answer, setAnswer] = useState<string >(""); // Single answer
   const [title, setTitle] = useState<string | null>("");
   const [enTitle, setEnTitle] = useState<string | null>("");
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ function AddQuestion() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent page reload
 
-    if (!title || !restaurantId || !answer) {
+    if (!title || !restaurantId ) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -130,7 +130,7 @@ function AddQuestion() {
           />
         </div>
 
-        {/* Answer */}
+        {/* Answer
         <div className="mb-4">
           <label
             htmlFor="answer"
@@ -145,9 +145,9 @@ function AddQuestion() {
             onChange={(e) => setAnswer(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="Enter answer"
-            required
+           
           />
-        </div>
+        </div> */}
 
         {/* Restaurant Select */}
         <div className="mb-4">
