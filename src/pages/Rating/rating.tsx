@@ -80,7 +80,7 @@ const Rating = () => {
   const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/rating?page=all`);
+      const item = await axiosInstance.get(`/rating?page=all`);
 
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);

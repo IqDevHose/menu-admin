@@ -109,7 +109,7 @@ const Questions = () => {
   const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/question?page=all`);
+      const item = await axiosInstance.get(`/question?page=all`);
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;

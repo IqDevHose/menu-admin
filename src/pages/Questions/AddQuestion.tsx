@@ -29,7 +29,7 @@ function AddQuestion() {
   } = useQuery({
     queryKey: ["restaurant"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/restaurant");
+      const response = await axiosInstance.get(`/restaurant`);
       return response.data;
     },
   });

@@ -78,7 +78,7 @@ const Category = () => {
   const { data: exportData } = useQuery({
     queryKey: ["categories-export"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/category?page=all`);
+      const item = await axiosInstance.get(`/category?page=all`);
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;

@@ -93,8 +93,8 @@ const CustomerReview = () => {
   const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(
-        `http://localhost:3000/customer-review?page=all`
+      const item = await axiosInstance.get(
+        `/customer-review?page=all`
       );
 
       const heads: any[] = extractHeaders(item.data.items);

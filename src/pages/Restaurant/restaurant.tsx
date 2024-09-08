@@ -95,7 +95,7 @@ const Restaurant = () => {
   const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/restaurant?page=all`);
+      const item = await axiosInstance.get(`/restaurant?page=all`);
 
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);

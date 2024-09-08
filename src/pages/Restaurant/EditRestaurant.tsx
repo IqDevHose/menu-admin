@@ -61,7 +61,7 @@ function EditRestaurant() {
   const { data: categories, isLoading } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:3000/category");
+      const response = await axiosInstance.get("/category");
       return response.data;
     },
   });

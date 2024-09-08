@@ -77,7 +77,7 @@ const Item = () => {
   const { data: exportData } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/item?page=all`);
+      const item = await axiosInstance.get(`/item?page=all`);
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
       return item.data;
@@ -112,7 +112,7 @@ const Item = () => {
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      const item = await axios.get(`http://localhost:3000/item`, { params });
+      const item = await axiosInstance.get(`/item`, { params });
       return item.data;
     },
   });
@@ -122,8 +122,8 @@ const Item = () => {
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       if (!selectedRestaurant) return []; // Return empty array if no restaurant is selected
-      const res = await axios.get(
-        `http://localhost:3000/category?restaurantId=${selectedRestaurant}`
+      const res = await axiosInstance.get(
+        `/category?restaurantId=${selectedRestaurant}`
       );
       return res.data;
     },
@@ -134,7 +134,7 @@ const Item = () => {
   const { data: restaurants, refetch } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/restaurant");
+      const res = await axiosInstance.get("/restaurant");
       return res.data;
     },
   });
@@ -142,7 +142,7 @@ const Item = () => {
   // Mutation to delete a single item
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
+      await axiosInstance.delete(`/item/soft-delete/${id}`);
     },
     onSuccess: () => {
       refetch();

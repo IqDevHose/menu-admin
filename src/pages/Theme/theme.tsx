@@ -73,7 +73,7 @@ const Theme = () => {
   const { data: exportData, refetch } = useQuery({
     queryKey: ["theme all"],
     queryFn: async () => {
-      const item = await axios.get(`http://localhost:3000/theme?page=all`);
+      const item = await axiosInstance.get(`/theme?page=all`);
 
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);

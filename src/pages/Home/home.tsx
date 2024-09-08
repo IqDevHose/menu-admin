@@ -53,7 +53,7 @@ const Home: React.FC = () => {
   const customerReviewQuery = useQuery({
     queryKey: ['customerReview'],
     queryFn: async () => {
-      const response = await axios.get(`http://localhost:3000/customer-review`);
+      const response = await axiosInstance.get(`/customer-review`);
       return response.data as ItemsCustomerReviewType; // Type assertion here
     },
   });
