@@ -1,6 +1,6 @@
 import axiosInstance from "@/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 
@@ -13,28 +13,36 @@ type itemType = {
 };
 
 function EditItem() {
-  const location = useLocation();
-  const record = location.state;
-  console.log(record);
-
-  const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(
-    record.description
-  );
-  const [price, setPrice] = useState<number | null>(record.price);
-  const [restaurantId, setRestaurantId] = useState<string | null>(
-    record.restaurantId
-  );
+  const { data: record } = useQuery({
+    queryKey: ["item"],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/item/${itemId}`);
+      console.log(response);
+      return response.data;
+    },
+  });
+  const [name, setName] = useState<string | null>();
+  const [description, setDescription] = useState<string | null>();
+  const [price, setPrice] = useState<number | null>();
+  const [restaurantId, setRestaurantId] = useState<string | null>();
   const [uploadImage, setUploadImage] = useState<File | null>(null); // Handle file uploads
-  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
-    record.image
-  );
-  const [categoryId, setCategoryId] = useState<string | null>(
-    record.categoryId
-  );
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>();
+  const [categoryId, setCategoryId] = useState<string | null>();
 
   const { itemId } = useParams();
   const navigate = useNavigate();
+
+  // Use Effect to update state when record is fetched
+  useEffect(() => {
+    if (record) {
+      setName(record.name);
+      setDescription(record.description);
+      setPrice(record.price);
+      setRestaurantId(record.category.restaurantId);
+      setCategoryId(record.categoryId);
+      setUploadImageUrl(record.image);
+    }
+  }, [record]);
 
   // Fetch restaurants from the server
   const {

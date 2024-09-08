@@ -113,6 +113,7 @@ const Item = () => {
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
       const item = await axios.get(`http://localhost:3000/item`, { params });
+      console.log("🚀 ~ queryFn: ~ item:", item);
       return item.data;
     },
   });
@@ -145,7 +146,7 @@ const Item = () => {
       await axios.delete(`http://localhost:3000/item/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["items"] });
       setShowPopup(false);
     },
@@ -159,7 +160,7 @@ const Item = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["items"] });
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
@@ -237,7 +238,7 @@ const Item = () => {
   if (isError) {
     return <div>Error</div>;
   }
-
+  console.log(currentData);
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex justify-between ">
@@ -314,7 +315,7 @@ const Item = () => {
           <Link to="/items/add">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
+              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5 text-nowrap"
             >
               <span className="hidden xl:inline">Add Item</span>
               <span className="inline xl:hidden">+</span>
