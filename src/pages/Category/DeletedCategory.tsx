@@ -275,7 +275,9 @@ const DeletedCategories = () => {
       </div>
 
       {filteredData?.length === 0 ? (
-        <div className="text-center py-20 text-xl">No deleted categories.</div>
+        <div className="text-center py-10">
+          <p className="text-gray-500">No deleted categories.</p>
+        </div>
       ) : (
         <>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
