@@ -122,7 +122,6 @@ const CustomerReview = () => {
       headers,
     };
 
-    // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
   };
 
@@ -213,10 +212,6 @@ const CustomerReview = () => {
       queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
       setShowDeleteManyPopup(false); // Close the delete popup
       setSelectedItems([]); // Reset the selected items state after deletion
-      console.log("Items deleted successfully"); // Debugging statement
-    },
-    onError: (error) => {
-      console.error("Error deleting items:", error); // Handle error and provide feedback
     },
   });
 
@@ -227,10 +222,7 @@ const CustomerReview = () => {
 
   const confirmDeleteMany = () => {
     if (selectedItems.length > 0) {
-      console.log("Deleting selected items:", selectedItems); // Debugging statement
       deleteMutation.mutate(selectedItems); // Pass only selected items
-    } else {
-      console.log("No items selected for deletion."); // Debugging statement
     }
   };
 
@@ -252,8 +244,7 @@ const CustomerReview = () => {
     setCurrentPage(newPage);
     setSelectedItems([]);
   };
-  // Handle select all checkbox
-  // Handle select all checkbox
+
   const handleSelectAll = () => {
     if (selectedItems.length === filteredData.length) {
       setSelectedItems([]); // Unselect all if everything is already selected
@@ -261,10 +252,8 @@ const CustomerReview = () => {
       const allIds = filteredData.map((item: any) => item.id);
       setSelectedItems(allIds); // Select all items
     }
-    console.log("Selected items after select all:", selectedItems); // Debugging statement
   };
 
-  // Handle individual row checkbox
   const handleSelectItem = (id: string) => {
     setSelectedItems(
       (prevSelectedItems) =>
@@ -272,8 +261,8 @@ const CustomerReview = () => {
           ? prevSelectedItems.filter((itemId) => itemId !== id) // Remove from selected if already selected
           : [...prevSelectedItems, id] // Add to selected if not selected
     );
-    console.log("Selected items after individual selection:", selectedItems); // Debugging statement
   };
+
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
   };
@@ -369,93 +358,102 @@ const CustomerReview = () => {
           ></DropdownMenuDemo>
         </div>
       </div>
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Comment
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Avg Rating
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Phone
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Email
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Birthday
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(query?.data.items) &&
-            filteredData?.map((item: any, index: number) => (
-              <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
+
+      {/* Conditional rendering when no items are found */}
+      {filteredData?.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500">No customer reviews found.</p>
+        </div>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
                   <input
                     type="checkbox"
-                    checked={selectedItems.includes(item.id)}
-                    onChange={() => handleSelectItem(item.id)}
+                    checked={selectedItems.length === filteredData?.length}
+                    onChange={handleSelectAll}
                   />
-                </td>
-                <td className="px-6 py-4">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </td>
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  {highlightText(item.name || "", searchQuery)}
-                </td>
-                <td className="px-6 py-4">{item.comment}</td>
-                <td className="px-6 py-4">{summation(item.rating)}</td>
-                <td className="px-6 py-4">{item.phone}</td>
-                <td className="px-6 py-4">{item.email}</td>
-                <td className="px-6 py-4">
-                  {new Date(item.birthday).toLocaleDateString("en-CA")}
-                </td>
-
-                <td className="px-6 py-4 flex gap-x-4">
-                  <Link
-                    to={`/customerReviews/edit/${item.id}`}
-                    className="font-medium text-blue-600"
-                    state={item}
-                  >
-                    <SquarePen />
-                  </Link>
-
-                  <button
-                    className="font-medium text-red-600"
-                    onClick={() => handleDeleteClick(item)}
-                  >
-                    <Trash2 />
-                  </button>
-                </td>
+                </th>
+                <th scope="col" className="px-6 py-3 w-4">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3 w-4">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Comment
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Avg Rating
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Phone
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Email
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Birthday
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
               </tr>
-            ))}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {filteredData?.map((item: any, index: number) => (
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleSelectItem(item.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(item.name || "", searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{item.comment}</td>
+                  <td className="px-6 py-4">{summation(item.rating)}</td>
+                  <td className="px-6 py-4">{item.phone}</td>
+                  <td className="px-6 py-4">{item.email}</td>
+                  <td className="px-6 py-4">
+                    {new Date(item.birthday).toLocaleDateString("en-CA")}
+                  </td>
 
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    <Link
+                      to={`/customerReviews/edit/${item.id}`}
+                      className="font-medium text-blue-600"
+                      state={item}
+                    >
+                      <SquarePen />
+                    </Link>
+
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(item)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="flex justify-center items-center mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </>
+      )}
 
       {showDeleteManyPopup && (
         <Popup
@@ -488,6 +486,7 @@ const CustomerReview = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
+
       {/* popup for customer review rating */}
       {showChildPopup && (
         <Popup

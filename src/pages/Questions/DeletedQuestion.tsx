@@ -56,7 +56,7 @@ const DeletedQuestions = () => {
       await axiosInstance.put(`/question/restore/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-questions"],
       });
@@ -72,7 +72,7 @@ const DeletedQuestions = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["restore-questions"],
       });
@@ -86,7 +86,7 @@ const DeletedQuestions = () => {
       await axiosInstance.delete(`/question/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-questions"],
       });
@@ -102,7 +102,7 @@ const DeletedQuestions = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -249,79 +249,85 @@ const DeletedQuestions = () => {
         </div>
       </div>
 
-      {/* Questions Table */}
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              English Title
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Arabic Title
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData?.map((question: any, index: number) => (
-            <tr
-              key={question.id}
-              className="bg-white border-b hover:bg-gray-50"
-            >
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(question.id)}
-                  onChange={() => handleSelectItem(question.id)}
-                />
-              </td>
-              <td className="px-6 py-4">
-                {(currentPage - 1) * itemsPerPage + index + 1}
-              </td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(question?.enTitle, searchQuery)}
-              </td>
-              <td className="px-6 py-4">{question?.title}</td>
-              <td className="px-6 py-4 flex gap-x-4">
-                {/* <Link to={`/questions/edit/${question?.id}`} state={question}>
-                  <SquarePen className="text-blue-600" />
-                </Link> */}
-                <button
-                  className="font-medium text-green-600"
-                  onClick={() => handleRestoreClick(question)}
+      {/* Conditional rendering for no questions */}
+      {filteredData?.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500">No deleted questions found.</p>
+        </div>
+      ) : (
+        <>
+          {/* Questions Table */}
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.length === filteredData?.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  English Title
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Arabic Title
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData?.map((question: any, index: number) => (
+                <tr
+                  key={question.id}
+                  className="bg-white border-b hover:bg-gray-50"
                 >
-                  <RotateCcw />
-                </button>
-                <button
-                  className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(question)}
-                >
-                  <Trash2 />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(question.id)}
+                      onChange={() => handleSelectItem(question.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(question?.enTitle, searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{question?.title}</td>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    <button
+                      className="font-medium text-green-600"
+                      onClick={() => handleRestoreClick(question)}
+                    >
+                      <RotateCcw />
+                    </button>
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(question)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* Pagination Component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          {/* Pagination Component */}
+          <div className="flex justify-center items-center mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </>
+      )}
 
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (

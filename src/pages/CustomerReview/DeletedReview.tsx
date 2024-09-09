@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
-import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
@@ -246,80 +244,86 @@ const DeletedReview = () => {
         </div>
       </div>
 
-      {/* Items Table */}
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Description
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData?.map((item: any, index: number) => (
-            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(item.id)}
-                  onChange={() => handleSelectItem(item.id)}
-                />
-              </td>
-              <td className="px-6 py-4">
-                {(currentPage - 1) * itemsPerPage + index + 1}
-              </td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(item?.name, searchQuery)}
-              </td>
-              <td className="px-6 py-4">{item?.description}</td>
-              <td className="px-6 py-4">{item?.price}</td>
-              <td className="px-6 py-4 flex gap-x-4">
-                {/* <Link to={`/items/edit/${item?.id}`} state={item}>
-                  <SquarePen className="text-blue-600" />
-                </Link> */}
-                <button
-                  className="font-medium text-green-600"
-                  onClick={() => handleRestoreClick(item)}
-                >
-                  <RotateCcw />
-                </button>
-                <button
-                  className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(item)}
-                >
-                  <Trash2 />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Conditional rendering when no items are found */}
+      {filteredData?.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500">No deleted reviews found.</p>
+        </div>
+      ) : (
+        <>
+          {/* Items Table */}
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.length === filteredData?.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData?.map((item: any, index: number) => (
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleSelectItem(item.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(item?.name, searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{item?.description}</td>
+                  <td className="px-6 py-4">{item?.price}</td>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    <button
+                      className="font-medium text-green-600"
+                      onClick={() => handleRestoreClick(item)}
+                    >
+                      <RotateCcw />
+                    </button>
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(item)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* Pagination Component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          {/* Pagination Component */}
+          <div className="flex justify-center items-center mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </>
+      )}
 
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
