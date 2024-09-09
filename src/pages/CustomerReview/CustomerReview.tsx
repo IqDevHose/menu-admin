@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -68,6 +68,7 @@ const CustomerReview = () => {
     null
   );
   const [selectedChildData, setSelectedChildData] = useState<any[]>([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(""); // State for selected restaurant
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
@@ -79,17 +80,40 @@ const CustomerReview = () => {
 
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["customerReview", currentPage],
+  const { data: customerReviews } = useQuery({
+    queryKey: ["customerReviews", selectedRestaurant],
     queryFn: async () => {
-      const customerReview = await axiosInstance.get(
-        `/customer-review?page=${currentPage}`
+      if (!selectedRestaurant) return []; // Return empty array if no restaurant is selected
+      const res = await axiosInstance.get(
+        `/customer-review?restaurantId=${selectedRestaurant}`
       );
+      return res.data;
+    },
+    enabled: !!selectedRestaurant, // Only fetch customer reviews when a restaurant is selected
+  });
+  
 
+  const query = useQuery({
+    queryKey: ["customerReview", currentPage, selectedRestaurant],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", currentPage.toString());
+  
+      if (selectedRestaurant) {
+        params.append("restaurantId", selectedRestaurant);
+      }
+  
+      const customerReview = await axiosInstance.get(`/customer-review`, { params });
+      
+      // Log the response to check if the correct reviews are being returned
+      console.log('Customer reviews response:', customerReview.data);
+  
       return customerReview.data;
     },
   });
-
+  
+  
+  
   const { data: exportData, refetch } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
@@ -102,6 +126,16 @@ const CustomerReview = () => {
       return item.data;
     },
   });
+      // Fetch restaurants
+    const { data: restaurants } = useQuery({
+      queryKey: ["restaurants"],
+      queryFn: async () => {
+        const res = await axiosInstance.get("/restaurant");
+        return res.data;
+      },
+    });
+
+
 
   const handleExport = () => {
     const flattenedData = exportData.items.map((item: any) =>
@@ -118,6 +152,11 @@ const CustomerReview = () => {
     // console.log(dataToConvert)
     exportCSVFile(dataToConvert);
   };
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset the current page when filters change
+  }, [ selectedRestaurant]);
+  
 
   function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
@@ -232,11 +271,14 @@ const CustomerReview = () => {
       mutation.mutate(selectedCustomerReview.id);
     }
   };
-
-  // Filter the data based on the search query
-  const filteredData = query?.data?.items.filter((item: any) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = query?.data?.items.filter((item: any) => {
+    return (
+      item.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (!selectedRestaurant || item.restaurantId === selectedRestaurant) // Ensure filtering by selected restaurant
+    );
+  });
+  
+  
 
   // Calculate the total number of pages
   const totalPages = Math.ceil(query?.data?.totalItems / itemsPerPage);
@@ -286,9 +328,7 @@ const CustomerReview = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
-        <label htmlFor="table-search" className="sr-only">
-          Search
-        </label>
+        <div className="flex gap-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
             <svg
@@ -314,11 +354,28 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
+         
+         {/* Restaurant Filter */}
+         <select
+            value={selectedRestaurant}
+            onChange={(e) => {
+              setSelectedRestaurant(e.target.value);
+            }}
+            className="p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">All Restaurants</option>
+            {restaurants?.items?.map((restaurant: any) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg px-3 py-2.5"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
@@ -359,27 +416,13 @@ const CustomerReview = () => {
                 onChange={handleSelectAll}
               />
             </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Comment
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Avg Rating
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Phone
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Email
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Birthday
-            </th>
+            <th scope="col" className="px-6 py-3 w-4">#</th>
+            <th scope="col" className="px-6 py-3 w-4">Name</th>
+            <th scope="col" className="px-6 py-3">Comment</th>
+            <th scope="col" className="px-6 py-3">Avg Rating</th>
+            <th scope="col" className="px-6 py-3">Phone</th>
+            <th scope="col" className="px-6 py-3">Email</th>
+            <th scope="col" className="px-6 py-3">Birthday</th>
             <th scope="col" className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -407,7 +450,6 @@ const CustomerReview = () => {
                 <td className="px-6 py-4">
                   {new Date(item.birthday).toLocaleDateString("en-CA")}
                 </td>
-
                 <td className="px-6 py-4 flex gap-x-4">
                   <Link
                     to={`/customerReviews/edit/${item.id}`}
@@ -416,7 +458,6 @@ const CustomerReview = () => {
                   >
                     <SquarePen />
                   </Link>
-
                   <button
                     className="font-medium text-red-600"
                     onClick={() => handleDeleteClick(item)}
@@ -428,7 +469,7 @@ const CustomerReview = () => {
             ))}
         </tbody>
       </table>
-
+  
       <div className="flex justify-center items-center mt-10">
         <Pagination
           currentPage={currentPage}
@@ -436,7 +477,7 @@ const CustomerReview = () => {
           onPageChange={handlePageChange}
         />
       </div>
-
+  
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -453,7 +494,7 @@ const CustomerReview = () => {
           </p>
         </Popup>
       )}
-
+  
       {/* Delete Confirmation Popup */}
       {showPopup && (
         <Popup
@@ -468,7 +509,8 @@ const CustomerReview = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
-      {/* popup for customer review rating */}
+  
+      {/* Popup for customer review rating */}
       {showChildPopup && (
         <Popup
           onClose={() => setShowChildPopup(false)}
@@ -483,6 +525,7 @@ const CustomerReview = () => {
       )}
     </div>
   );
-};
+}
+  
 
 export default CustomerReview;
