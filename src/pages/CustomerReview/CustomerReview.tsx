@@ -81,7 +81,7 @@ const CustomerReview = () => {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["customerReview", currentPage],
+    queryKey: ["customerReview", currentPage, selectedRestaurant],
     queryFn: async () => {
       const customerReview = await axiosInstance.get(
         `/customer-review?page=${currentPage}&restaurantId=${selectedRestaurant}`
