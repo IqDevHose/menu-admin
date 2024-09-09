@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
@@ -286,14 +286,14 @@ const Category = () => {
             }}
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />

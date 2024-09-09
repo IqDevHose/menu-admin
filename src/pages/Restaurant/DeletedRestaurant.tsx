@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -303,7 +303,7 @@ const DeletedRestaurants = () => {
                       className="font-medium text-green-600"
                       onClick={() => handleRestoreClick(restaurant)}
                     >
-                      <RotateCcw />
+                      <RotateCw />
                     </button>
                     <button
                       className="font-medium text-red-600"

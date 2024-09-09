@@ -3,7 +3,7 @@ import Spinner from "@/components/Spinner";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
@@ -265,14 +265,14 @@ const Questions = () => {
             }}
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />

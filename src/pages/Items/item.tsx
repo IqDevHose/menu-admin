@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -309,15 +309,11 @@ const Item = () => {
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
-              <span className="hidden xl:flex items-center gap-1">
-                {" "}
+              <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
-                Delete {selectedItems.length}
-              </span>
-              <span className="inline xl:hidden">
-                {" "}
-                <Trash2 size={16} />
-              </span>
+                <span className="hidden xl:flex">Delete</span>
+                <span className="hidden xl:flex">{selectedItems.length}</span>
+              </div>
             </button>
           )}
 
@@ -331,14 +327,14 @@ const Item = () => {
             }}
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />

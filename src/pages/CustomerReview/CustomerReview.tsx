@@ -2,7 +2,7 @@ import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
@@ -355,14 +355,14 @@ const CustomerReview = () => {
             }}
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCcw
+              <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
               />
