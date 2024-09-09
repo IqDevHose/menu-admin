@@ -15,7 +15,6 @@ import {
 import { Card, Row, Col, Statistic, Divider, List, Avatar, Select } from 'antd';
 import Spinner from '@/components/Spinner';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import axiosInstance from "@/axiosInstance";
 import { Link } from 'react-router-dom';
 import { AvgRatingPerRestaurant } from '../../utils/types';
@@ -23,15 +22,13 @@ import { AvgRatingPerRestaurant } from '../../utils/types';
 type CustomerReviewType = {
   name: string;
   comment: string;
-  
 };
 
 type ItemsCustomerReviewType = {
   items: CustomerReviewType[];
-}
+};
 
 const Home: React.FC = () => {
-  // Fetching overall dashboard statistics
   const statsQuery = useQuery({
     queryKey: ['dashboard'],
     queryFn: async () => {
@@ -40,27 +37,24 @@ const Home: React.FC = () => {
     },
   });
 
-  // Fetching all average ratings for restaurants
   const avgRatingsQuery = useQuery({
     queryKey: ['all-average'],
     queryFn: async () => {
       const response = await axiosInstance.get(`/dashboard/all-average`);
-      return response.data as AvgRatingPerRestaurant[]; // Type assertion here
+      return response.data as AvgRatingPerRestaurant[];
     },
   });
 
-  // Fetching recent customer reviews
   const customerReviewQuery = useQuery({
     queryKey: ['customerReview'],
     queryFn: async () => {
       const response = await axiosInstance.get(`/customer-review`);
-      return response.data as ItemsCustomerReviewType; // Type assertion here
+      return response.data as ItemsCustomerReviewType;
     },
   });
 
   const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>('all');
 
-  // Fetching specific restaurant stats when a restaurant is selected
   const restaurantStatsQuery = useQuery({
     queryKey: ['restaurantStats', selectedRestaurant],
     queryFn: async () => {
@@ -70,14 +64,13 @@ const Home: React.FC = () => {
       }
       return null;
     },
-    enabled: selectedRestaurant !== 'all', // Only run this query when a specific restaurant is selected
+    enabled: selectedRestaurant !== 'all',
   });
 
   const handleRestaurantChange = (value: string) => {
     setSelectedRestaurant(value);
   };
 
-  // Check for loading or error states
   if (statsQuery.isLoading || avgRatingsQuery.isLoading || restaurantStatsQuery.isLoading || customerReviewQuery.isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -90,7 +83,6 @@ const Home: React.FC = () => {
     return <div>Error loading statistics.</div>;
   }
 
-  // Destructure and extract data from the fetched dashboard data
   const {
     totalRestaurants,
     totalRatings,
@@ -103,20 +95,16 @@ const Home: React.FC = () => {
   const specificRestaurantData = restaurantStatsQuery.data || {};
   const topReviewedItems = specificRestaurantData.topReviewedItems || [];
 
-  // Create a restaurant list from avgRatingPerRestaurant data for the dropdown
   const restaurantList = avgRatingPerRestaurant.map((avgRating: AvgRatingPerRestaurant) => ({
     id: avgRating.id,
     name: avgRating.name,
   }));
 
-
-  // Filter data based on selected restaurant
   const filteredAvgRatingData =
     selectedRestaurant === 'all'
       ? avgRatingPerRestaurant
       : avgRatingPerRestaurant.filter((data: AvgRatingPerRestaurant) => data.id === selectedRestaurant);
 
-  // Calculate totals based on selected restaurant
   const filteredTotalReviews =
     selectedRestaurant === 'all'
       ? totalCustomerReview
@@ -144,7 +132,6 @@ const Home: React.FC = () => {
       <div className="flex-1">
         <div className="flex items-center space-x-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-          {/* Restaurant Selection */}
           <Select
             placeholder="Select a restaurant"
             style={{ width: 200 }}
@@ -163,7 +150,6 @@ const Home: React.FC = () => {
         </div>
 
         <Row gutter={24}>
-          {/* Total Reviews, Ratings, Categories, Items */}
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
@@ -203,7 +189,6 @@ const Home: React.FC = () => {
         </Row>
 
         <Row gutter={24} className="mt-6">
-          {/* Average Rating per Restaurant */}
           <Col xs={24} lg={12}>
             <Card hoverable>
               <h2 className="text-lg font-medium mb-4 text-gray-800">
@@ -222,61 +207,58 @@ const Home: React.FC = () => {
             </Card>
           </Col>
 
-          {/* Ratings Distribution (Pie Chart) */}
-          <Col xs={24} lg={12}>
-            <Card hoverable>
-              <h2 className="text-lg font-medium mb-4 text-gray-800">
-                Ratings Distribution
-              </h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={filteredAvgRatingData}
-                    dataKey="averageRating"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                  >
-                    {filteredAvgRatingData.map((entry: AvgRatingPerRestaurant, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name) => [`${value}`, `${name}`]} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
+          {/* Conditionally render nothing when a specific restaurant is selected */}
+          {selectedRestaurant === 'all' && (
+            <Col xs={24} lg={12}>
+              <Card hoverable>
+                <h2 className="text-lg font-medium mb-4 text-gray-800">
+                  Ratings Distribution
+                </h2>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={filteredAvgRatingData}
+                      dataKey="averageRating"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      fill="#8884d8"
+                    >
+                      {filteredAvgRatingData.map((entry: AvgRatingPerRestaurant, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value, name) => [`${value}`, `${name}`]} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+          )}
         </Row>
 
         <Divider className="my-8" />
 
-        {/* Top Reviewed Items */}
-       {/* Restaurant Overview */}
-        {/* Restaurant Overview */}
         <div>
           <h2 className="text-lg font-medium mb-4 text-gray-800">
-            Total Restaurants 
+            Total Restaurants
           </h2>
           <Row gutter={24}>
-        <Col xs={24} sm={12} lg={6}>
-            <Card hoverable>
-              <Statistic
-                title="Restaurants"
-                value={totalRestaurants}
-                valueStyle={{ color: '#3f8600' }}
-              />
-            </Card>
-          </Col>
+            <Col xs={24} sm={12} lg={6}>
+              <Card hoverable>
+                <Statistic
+                  title="Restaurants"
+                  value={totalRestaurants}
+                  valueStyle={{ color: '#3f8600' }}
+                />
+              </Card>
+            </Col>
           </Row>
         </div>
       </div>
 
-      {/* Sidebar Content */}
       <div className="w-80 pl-4">
-        {/* Recent Activity */}
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
@@ -292,11 +274,10 @@ const Home: React.FC = () => {
           />
         </Card>
 
-        {/* Quick Links */}
         <Card title="Quick Links" className="mb-6">
           <List
             dataSource={[
-              { title: "View all Restaurant", link: "/restaurants" },
+              { title: "View all Restaurants", link: "/restaurants" },
               { title: "View All Reviews", link: "/customerReviews" },
               { title: "Manage Categories", link: "/categories" },
               { title: "Manage Items", link: "/items" },
@@ -309,7 +290,6 @@ const Home: React.FC = () => {
           />
         </Card>
 
-        {/* Notifications */}
         <Card title="Notifications">
           <p>No new notifications.</p>
         </Card>
