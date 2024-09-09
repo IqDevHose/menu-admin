@@ -37,7 +37,7 @@ const DeletedCategories = () => {
     data: categoriesData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["findAll-deleted-categories", currentPage, selectedRestaurant],
     queryFn: async () => {
@@ -68,7 +68,7 @@ const DeletedCategories = () => {
       await axiosInstance.put(`/category/restore/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-categories"],
       });
@@ -84,7 +84,7 @@ const DeletedCategories = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["restore-categories"],
       });
@@ -98,7 +98,7 @@ const DeletedCategories = () => {
       await axiosInstance.delete(`/category/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-categories"],
       });
@@ -113,7 +113,7 @@ const DeletedCategories = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -274,79 +274,86 @@ const DeletedCategories = () => {
         </div>
       </div>
 
-      {/* Categories Table */}
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Description
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData?.map((category: any, index: number) => (
-            <tr
-              key={category.id}
-              className="bg-white border-b hover:bg-gray-50"
-            >
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(category.id)}
-                  onChange={() => handleSelectItem(category.id)}
-                />
-              </td>
-              <td className="px-6 py-4">
-                {(currentPage - 1) * itemsPerPage + index + 1}
-              </td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(category?.name, searchQuery)}
-              </td>
-              <td className="px-6 py-4">{category?.description}</td>
-              <td className="px-6 py-4 flex gap-x-4">
-                {/* <Link to={`/categories/edit/${category?.id}`} state={category}>
-                  <SquarePen className="text-blue-600" />
-                </Link> */}
-                <button
-                  className="font-medium text-green-600"
-                  onClick={() => handleRestoreClick(category)}
+      {filteredData?.length === 0 ? (
+        <div className="text-center py-20 text-xl">No deleted categories.</div>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.length === filteredData?.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData?.map((category: any, index: number) => (
+                <tr
+                  key={category.id}
+                  className="bg-white border-b hover:bg-gray-50"
                 >
-                  <RotateCcw />
-                </button>
-                <button
-                  className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(category)}
-                >
-                  <Trash2 />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(category.id)}
+                      onChange={() => handleSelectItem(category.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(category?.name, searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{category?.description}</td>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    {/* <Link to={`/categories/edit/${category?.id}`} state={category}>
+                <SquarePen className="text-blue-600" />
+              </Link> */}
+                    <button
+                      className="font-medium text-green-600"
+                      onClick={() => handleRestoreClick(category)}
+                    >
+                      <RotateCcw />
+                    </button>
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(category)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* Pagination Component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          {/* Pagination Component */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-10">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      )}
 
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (

@@ -34,7 +34,7 @@ const DeletedRestaurants = () => {
     data: restaurantsData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["findAll-deleted-restaurants", currentPage],
     queryFn: async () => {
@@ -56,7 +56,7 @@ const DeletedRestaurants = () => {
       await axiosInstance.put(`/restaurant/restore/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-restaurants"],
       });
@@ -64,7 +64,6 @@ const DeletedRestaurants = () => {
     },
   });
 
-  // TODO:
   // Handle restaurant restoration
   const restoreManyMutation = useMutation({
     mutationFn: async (selectedItemsIds: string[]) => {
@@ -73,7 +72,7 @@ const DeletedRestaurants = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["restore-restaurants"],
       });
@@ -87,7 +86,7 @@ const DeletedRestaurants = () => {
       await axiosInstance.delete(`/restaurant/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["findAll-deleted-restaurants"],
       });
@@ -103,7 +102,7 @@ const DeletedRestaurants = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -135,7 +134,6 @@ const DeletedRestaurants = () => {
     }
   };
 
-  // TODO:
   const confirmRestoreMany = () => {
     if (selectedItems) {
       restoreManyMutation.mutate(selectedItems);
@@ -183,7 +181,6 @@ const DeletedRestaurants = () => {
     setShowDeleteManyPopup(true);
   };
 
-  // TODO:
   const handleRestoreMany = () => {
     setShowRestoreManyPopup(true);
   };
@@ -253,83 +250,83 @@ const DeletedRestaurants = () => {
         </div>
       </div>
 
-      {/* Restaurants Table */}
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === filteredData?.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Description
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData?.map((restaurant: any, index: number) => (
-            <tr
-              key={restaurant.id}
-              className="bg-white border-b hover:bg-gray-50"
-            >
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(restaurant.id)}
-                  onChange={() => handleSelectItem(restaurant.id)}
-                />
-              </td>
-              <td className="px-6 py-4">
-                {(currentPage - 1) * itemsPerPage + index + 1}
-              </td>
-              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {highlightText(restaurant?.name, searchQuery)}
-              </td>
-              <td className="px-6 py-4">{restaurant?.description}</td>
-              <td className="px-6 py-4 flex gap-x-4">
-                {/* <Link to={`/edit-restaurant/${restaurant?.id}`} state={restaurant}>
-                <Link
-                  to={`/edit-restaurant/${restaurant?.id}`}
-                  state={restaurant}
+      {filteredData?.length === 0 ? (
+        <div className="text-center py-20 text-xl">No deleted restaurants.</div>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.length === filteredData?.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData?.map((restaurant: any, index: number) => (
+                <tr
+                  key={restaurant.id}
+                  className="bg-white border-b hover:bg-gray-50"
                 >
-                  <SquarePen className="text-blue-600" />
-                </Link> */}
-                <button
-                  className="font-medium text-green-600"
-                  onClick={() => handleRestoreClick(restaurant)}
-                >
-                  <RotateCcw />
-                </button>
-                <button
-                  className="font-medium text-red-600"
-                  onClick={() => handleDeleteClick(restaurant)}
-                >
-                  <Trash2 />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(restaurant.id)}
+                      onChange={() => handleSelectItem(restaurant.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(restaurant?.name, searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{restaurant?.description}</td>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    <button
+                      className="font-medium text-green-600"
+                      onClick={() => handleRestoreClick(restaurant)}
+                    >
+                      <RotateCcw />
+                    </button>
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(restaurant)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* Pagination Component */}
-      <div className="flex justify-center items-center mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          {/* Pagination Component */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-10">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      )}
 
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
