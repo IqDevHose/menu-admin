@@ -334,15 +334,11 @@ const CustomerReview = () => {
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
-              <span className="hidden xl:flex items-center gap-1">
-                {" "}
+              <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
-                Delete {selectedItems.length}
-              </span>
-              <span className="inline xl:hidden">
-                {" "}
-                <Trash2 size={16} />
-              </span>
+                <span className="hidden xl:flex">Delete</span>
+                <span className="hidden xl:flex">{selectedItems.length}</span>
+              </div>
             </button>
           )}
           <button
