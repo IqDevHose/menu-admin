@@ -9,7 +9,7 @@ const getToken = (): string | null => {
 // https://grand-mellienum-surveys-backend.onrender.com
 // Create an Axios instance
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000", // Replace with your API base URL
+  baseURL: import.meta.env.VITE_API_URL, // Replace with your API base URL
 });
 
 // Add a request interceptor to include the JWT token if it exists
