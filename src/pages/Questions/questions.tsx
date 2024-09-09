@@ -3,7 +3,7 @@ import Spinner from "@/components/Spinner";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import { highlightText } from "@/utils/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
@@ -73,6 +73,7 @@ const Questions = () => {
     isLoading,
     isError,
     refetch, // Destructure refetch to use later
+    isRefetching,
   } = useQuery({
     queryKey: ["questions", currentPage],
     queryFn: async () => {
@@ -246,19 +247,47 @@ const Questions = () => {
               Delete {selectedItems.length}
             </button>
           )}
+          <button
+            type="button"
+            disabled={isRefetching}
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+            onClick={() => {
+              console.log("aaaa");
+              refetch();
+            }}
+          >
+            <span className="hidden xl:flex items-center gap-1">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
+            </span>
+            <span className="inline xl:hidden">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
+            </span>
+          </button>
           <Link to={"/questions/add"}>
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
             >
-              <span className="hidden xl:inline">Add Question</span>
-              <span className="inline xl:hidden">+</span>
+              <span className="hidden xl:flex items-center gap-1">
+                <Plus size={16} />
+                Add Question
+              </span>
+              <span className="inline xl:hidden">
+                <Plus size={16} />
+              </span>
             </button>
           </Link>
           <Link to={"/questions/trash"}>
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
@@ -313,7 +342,10 @@ const Questions = () => {
             </thead>
             <tbody>
               {currentData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                <tr
+                  key={item.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"

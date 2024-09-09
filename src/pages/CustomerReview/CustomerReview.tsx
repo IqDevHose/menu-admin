@@ -2,7 +2,7 @@ import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import happy from "../../assets/smile.png";
 import satisfied from "../../assets/neutral.png";
@@ -97,12 +97,14 @@ const CustomerReview = () => {
       return res.data;
     },
   });
-  const { data: exportData, refetch } = useQuery({
+  const {
+    data: exportData,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["customer-review-all"],
     queryFn: async () => {
-      const item = await axiosInstance.get(
-        `/customer-review?page=all`
-      );
+      const item = await axiosInstance.get(`/customer-review?page=all`);
 
       const heads: any[] = extractHeaders(item.data.items);
       setHeaders(heads);
@@ -196,7 +198,7 @@ const CustomerReview = () => {
       await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["customerReview"] });
       setShowPopup(false);
     },
@@ -208,7 +210,7 @@ const CustomerReview = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
       setShowDeleteManyPopup(false); // Close the delete popup
       setSelectedItems([]); // Reset the selected items state after deletion
@@ -281,39 +283,38 @@ const CustomerReview = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
+      <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4 ">
         <label htmlFor="table-search" className="sr-only">
           Search
         </label>
         <div className="flex gap-4 items-center">
-
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
-            <svg
-              className="w-5 h-5 text-gray-500"
-              aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-gray-500"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="table-search"
+              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for items"
+            />
           </div>
-          <input
-            type="text"
-            id="table-search"
-            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for items"
-          />
-        </div>
-        {/* Restaurant Filter */}
-        <select
+          {/* Restaurant Filter */}
+          <select
             value={selectedRestaurant}
             onChange={(e) => setSelectedRestaurant(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg"
@@ -326,7 +327,7 @@ const CustomerReview = () => {
             ))}
           </select>
         </div>
-        <div className="gap-2 flex justify-center items-start">
+        <div className="gap-2 flex justify-center items-center">
           {selectedItems.length > 0 && (
             <button
               type="button"
@@ -336,22 +337,49 @@ const CustomerReview = () => {
               Delete {selectedItems.length}
             </button>
           )}
+          <button
+            type="button"
+            disabled={isRefetching}
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+            onClick={() => {
+              console.log("aaaa");
+              refetch();
+            }}
+          >
+            <span className="hidden xl:flex items-center gap-1">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
+            </span>
+            <span className="inline xl:hidden">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
+            </span>
+          </button>
           <Link to="/customerReviews/add">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-sm"
             >
-              <span className="hidden xl:inline">Add Customer Review</span>
-              <span className="inline xl:hidden">+</span>
+              <span className="hidden xl:flex items-center gap-1">
+                <Plus size={16} /> Add Review
+              </span>
+              <span className="inline xl:hidden">
+                <Plus size={16} />
+              </span>
             </button>
           </Link>
           <Link to="/customerReviews/trash">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg py-2.5 mb-2 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-sm"
             >
               <span className="flex gap-1 items-center">
-                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
+                <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
@@ -400,13 +428,16 @@ const CustomerReview = () => {
                 <th scope="col" className="px-6 py-3">
                   Birthday
                 </th>
-                
+
                 <th scope="col" className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody>
               {filteredData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                <tr
+                  key={item.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -415,7 +446,8 @@ const CustomerReview = () => {
                     />
                   </td>
                   <td className="px-6 py-4">
-                    {new Date(item.createdAt).toLocaleDateString()} - {new Date(item.createdAt).toLocaleTimeString()}
+                    {new Date(item.createdAt).toLocaleDateString()} -{" "}
+                    {new Date(item.createdAt).toLocaleTimeString()}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {highlightText(item.name || "", searchQuery)}

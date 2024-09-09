@@ -1,4 +1,5 @@
-import { CreditCard, Mail, User, Cog } from "lucide-react";
+import { Cog, CloudDownload, CloudUpload } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +18,8 @@ export function DropdownMenuDemo({ handleExport, link }: DropdownMenuDemoType) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="text-white flex items-center gap-1 bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5">
-          <Cog size={20} />
+        <button className="text-white w-10 h-10 xl:w-auto flex items-center text-sm  gap-1 bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3">
+          <Cog size={16} />
           <p className="hidden xl:inline">Actions</p>
         </button>
       </DropdownMenuTrigger>
@@ -28,23 +29,23 @@ export function DropdownMenuDemo({ handleExport, link }: DropdownMenuDemoType) {
         <DropdownMenuGroup>
           <Link to={link}>
             <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
+              <CloudDownload className="mr-2 h-5 w-5" />
               Import
             </DropdownMenuItem>
           </Link>
           <label htmlFor="btn">
             <DropdownMenuItem>
-              <Mail className="mr-2 h-4 w-4" />
+              <CloudUpload className="mr-2 h-5 w-5" />
               <button id="btn" onClick={handleExport}>
                 Export
               </button>
             </DropdownMenuItem>
           </label>
           <label htmlFor="print">
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <CreditCard className="mr-2 h-4 w-4" />
               <span id="print">Print</span>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </label>
         </DropdownMenuGroup>
       </DropdownMenuContent>

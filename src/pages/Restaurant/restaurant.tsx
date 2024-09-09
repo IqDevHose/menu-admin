@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -92,7 +92,11 @@ const Restaurant = () => {
   });
 
   // Assuming `headers` is being set in the component state
-  const { data: exportData, refetch } = useQuery({
+  const {
+    data: exportData,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["restaurants-all"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/restaurant?page=all`);
@@ -238,32 +242,63 @@ const Restaurant = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-start gap-x-2">
+        <div className="flex items-center gap-x-2">
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white  bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
               Delete {selectedItems.length}
             </button>
           )}
+
+          <button
+            type="button"
+            disabled={isRefetching}
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+            onClick={() => {
+              console.log("aaaa");
+              refetch();
+            }}
+          >
+            <span className="hidden xl:flex items-center gap-1">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
+            </span>
+            <span className="inline xl:hidden">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
+            </span>
+          </button>
           <Link to="/restaurants/add">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3 "
             >
-              <span className="hidden xl:inline">Add Restaurant</span>
-              <span className="inline xl:hidden">+</span>
+              <span className="hidden xl:flex items-center gap-1">
+                {" "}
+                <Plus size={16} />
+                Add Restaurant
+              </span>
+              <span className="inline xl:hidden">
+                {" "}
+                <Plus size={16} />
+              </span>
             </button>
           </Link>
           <Link to="/restaurants/trash">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  py-2.5  mb-2 px-5"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3 "
             >
               <span className="flex gap-1 items-center">
-                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
+                <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
