@@ -51,7 +51,7 @@ const ImportItem = (props: Props) => {
 
   // Fetch headers from the API using react-query
   const { data } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["items-all"],
     queryFn: async () => {
       const response = await axiosInstance.get(`/item?page=all`);
       const heads: any[] = extractHeaders(response.data.items);

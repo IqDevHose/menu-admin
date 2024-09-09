@@ -72,6 +72,7 @@ const CustomerReview = () => {
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
+  const [selectedRestaurant, setSelectedRestaurant] = useState(""); // State to manage selected restaurant
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const itemsPerPage = 10; // Set the number of items per page
@@ -83,15 +84,21 @@ const CustomerReview = () => {
     queryKey: ["customerReview", currentPage],
     queryFn: async () => {
       const customerReview = await axiosInstance.get(
-        `/customer-review?page=${currentPage}`
+        `/customer-review?page=${currentPage}&restaurantId=${selectedRestaurant}`
       );
 
       return customerReview.data;
     },
   });
-
+  const { data: restaurants } = useQuery({
+    queryKey: ["restaurants"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/restaurant");
+      return res.data;
+    },
+  });
   const { data: exportData, refetch } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["customer-review-all"],
     queryFn: async () => {
       const item = await axiosInstance.get(
         `/customer-review?page=all`
@@ -314,6 +321,19 @@ const CustomerReview = () => {
             placeholder="Search for items"
           />
         </div>
+        {/* Restaurant Filter */}
+        <select
+            value={selectedRestaurant}
+            onChange={(e) => setSelectedRestaurant(e.target.value)}
+            className="p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">All Restaurants</option>
+            {restaurants?.items.map((restaurant: any) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </option>
+            ))}
+          </select>
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button

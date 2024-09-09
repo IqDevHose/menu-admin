@@ -107,7 +107,7 @@ const Questions = () => {
   });
 
   const { data: exportData } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["questions-all"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/question?page=all`);
       const heads: any[] = extractHeaders(item.data.items);

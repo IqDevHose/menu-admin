@@ -78,7 +78,7 @@ const Rating = () => {
   });
 
   const { data: exportData, refetch } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["ratings-all"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/rating?page=all`);
 

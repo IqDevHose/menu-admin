@@ -93,7 +93,7 @@ const Restaurant = () => {
 
   // Assuming `headers` is being set in the component state
   const { data: exportData, refetch } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["restaurants-all"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/restaurant?page=all`);
 
