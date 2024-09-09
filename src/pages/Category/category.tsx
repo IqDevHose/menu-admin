@@ -294,84 +294,87 @@ const Category = () => {
           ></DropdownMenuDemo>
         </div>
       </div>
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 w-4">
-              <input
-                type="checkbox"
-                checked={selectedItems.length === currentData.length}
-                onChange={handleSelectAll}
-              />
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              #
-            </th>
-            <th scope="col" className="px-6 py-3 w-4">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Items No.
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Restaurant
-            </th>
-            <th scope="col" className="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentData.length > 0 ? (
-            currentData.map((item: any, index: number) => (
-              <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
+      {currentData.length === 0 ? (
+        <div className="text-center py-20 text-xl">No categories found.</div>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 w-4">
                   <input
                     type="checkbox"
-                    checked={selectedItems.includes(item.id)}
-                    onChange={() => handleSelectItem(item.id)}
+                    checked={selectedItems.length === currentData.length}
+                    onChange={handleSelectAll}
                   />
-                </td>
-                <td className="px-6 py-4">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </td>
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  {highlightText(item?.name || "", searchQuery)}
-                </td>
-                <td className="px-6 py-4">{item?.items?.length || 0}</td>
-                <td className="px-6 py-4">{item?.resturnat?.name || "N/A"}</td>
-                <td className="px-6 py-4 flex gap-x-4">
-                  <Link
-                    to={`/categories/edit/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.restaurant?.name}`}
-                    className="font-medium text-blue-600"
-                  >
-                    <SquarePen />
-                  </Link>
-                  <button
-                    className="font-medium text-red-600"
-                    onClick={() => handleDeleteClick(item)}
-                  >
-                    <Trash2 />
-                  </button>
-                </td>
+                </th>
+                <th scope="col" className="px-6 py-3 w-4">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3 w-4">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Items No.
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Restaurant
+                </th>
+                <th scope="col" className="px-6 py-3"></th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={6} className="px-6 py-4 text-center">
-                No categories found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {currentData.map((item: any, index: number) => (
+                <tr
+                  key={item.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleSelectItem(item.id)}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {highlightText(item?.name || "", searchQuery)}
+                  </td>
+                  <td className="px-6 py-4">{item?.items?.length || 0}</td>
+                  <td className="px-6 py-4">
+                    {item?.resturnat?.name || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 flex gap-x-4">
+                    <Link
+                      to={`/categories/edit/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.restaurant?.name}`}
+                      className="font-medium text-blue-600"
+                    >
+                      <SquarePen />
+                    </Link>
+                    <button
+                      className="font-medium text-red-600"
+                      onClick={() => handleDeleteClick(item)}
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-10">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {showDeleteManyPopup && (
