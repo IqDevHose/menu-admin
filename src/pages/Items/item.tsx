@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -104,6 +104,8 @@ const Item = () => {
     data: itemsData,
     isLoading,
     isError,
+    refetch,
+    isRefetching,
   } = useQuery({
     queryKey: ["items", selectedCategory, selectedRestaurant],
     queryFn: async () => {
@@ -131,7 +133,7 @@ const Item = () => {
   });
 
   // Fetch restaurants
-  const { data: restaurants, refetch } = useQuery({
+  const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
       const res = await axiosInstance.get("/restaurant");
@@ -267,7 +269,7 @@ const Item = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-  
+
           {/* Category Filter */}
           <select
             value={selectedCategory}
@@ -282,7 +284,7 @@ const Item = () => {
               </option>
             ))}
           </select>
-  
+
           {/* Restaurant Filter */}
           <select
             value={selectedRestaurant}
@@ -310,30 +312,59 @@ const Item = () => {
               Delete {selectedItems.length}
             </button>
           )}
+
+          <button
+            type="button"
+            disabled={isRefetching}
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+            onClick={() => {
+              console.log("aaaa");
+              refetch();
+            }}
+          >
+            <span className="hidden xl:flex items-center gap-1">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
+            </span>
+            <span className="inline xl:hidden">
+              <RotateCcw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
+            </span>
+          </button>
+
           <Link to="/items/add">
             <button
               type="button"
-              className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-5 text-nowrap"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
             >
-              <span className="hidden xl:inline">Add Item</span>
-              <span className="inline xl:hidden">+</span>
+              <span className="hidden xl:flex items-center gap-1">
+                <Plus size={16} /> Add Item
+              </span>
+              <span className="inline xl:hidden">
+                <Plus size={16} />
+              </span>
             </button>
           </Link>
           <Link to="/items/trash">
             <button
               type="button"
-              className="text-white  bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-5 "
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 "
             >
               <span className="flex gap-1 items-center">
-                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
+                <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-  
+
           <DropdownMenuDemo handleExport={handleExport} link="/items/import" />
         </div>
       </div>
-  
+
       {/* Conditional rendering when there are no items */}
       {currentData && currentData.length === 0 ? (
         <div className="w-full text-center py-10">
@@ -403,7 +434,7 @@ const Item = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -416,7 +447,7 @@ const Item = () => {
           )}
         </>
       )}
-  
+
       {/* Delete Confirmation Popup for Multiple Items */}
       {showDeleteManyPopup && (
         <Popup
@@ -434,7 +465,7 @@ const Item = () => {
           </p>
         </Popup>
       )}
-  
+
       {/* Delete Confirmation Popup for Single Item */}
       {showPopup && (
         <Popup
@@ -451,7 +482,6 @@ const Item = () => {
       )}
     </div>
   );
-}
-  
+};
 
 export default Item;
