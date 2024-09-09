@@ -306,10 +306,18 @@ const Item = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-red-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
-              Delete {selectedItems.length}
+              <span className="hidden xl:flex items-center gap-1">
+                {" "}
+                <Trash2 size={16} />
+                Delete {selectedItems.length}
+              </span>
+              <span className="inline xl:hidden">
+                {" "}
+                <Trash2 size={16} />
+              </span>
             </button>
           )}
 

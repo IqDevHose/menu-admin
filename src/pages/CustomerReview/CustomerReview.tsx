@@ -283,7 +283,7 @@ const CustomerReview = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4 ">
+      <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
         </label>
@@ -331,10 +331,18 @@ const CustomerReview = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg px-3 py-2.5"
+              className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
             >
-              Delete {selectedItems.length}
+              <span className="hidden xl:flex items-center gap-1">
+                {" "}
+                <Trash2 size={16} />
+                Delete {selectedItems.length}
+              </span>
+              <span className="inline xl:hidden">
+                {" "}
+                <Trash2 size={16} />
+              </span>
             </button>
           )}
           <button
