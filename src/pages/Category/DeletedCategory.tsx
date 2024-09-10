@@ -8,7 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import axiosInstance from "@/axiosInstance";
-
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 type CategoryType = {
   id: string;
   name: string;
@@ -209,6 +210,11 @@ const DeletedCategories = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="restore-many-tooltip" place="top-end" />
+      <ReactTooltip id="restore-tooltip" place="top" />
+      <ReactTooltip id="delete-tooltip" place="top" />
+
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -258,6 +264,8 @@ const DeletedCategories = () => {
               type="button"
               className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete all selected"
             >
               Delete {selectedItems.length}
             </button>
@@ -267,6 +275,8 @@ const DeletedCategories = () => {
               type="button"
               className="text-white bg-green-600 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleRestoreMany}
+              data-tooltip-id="restore-many-tooltip"
+              data-tooltip-content="Restore all selected"
             >
               Restore {selectedItems.length}
             </button>
@@ -329,12 +339,16 @@ const DeletedCategories = () => {
                     <button
                       className="font-medium text-green-600"
                       onClick={() => handleRestoreClick(category)}
+                      data-tooltip-id="restore-tooltip"
+                      data-tooltip-content="Restore"
                     >
                       <RotateCw />
                     </button>
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(category)}
+                      data-tooltip-id="delete-tooltip"
+                      data-tooltip-content="Delete"
                     >
                       <Trash2 />
                     </button>
