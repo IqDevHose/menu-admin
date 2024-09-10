@@ -8,6 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import axiosInstance from "@/axiosInstance";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; 
 
 type RestaurantType = {
   id: string;
@@ -196,9 +198,13 @@ const DeletedRestaurants = () => {
   if (isError) {
     return <div>Error</div>;
   }
-
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="restore-many-tooltip" place="top-end" />
+      <ReactTooltip id="restore-tooltip" place="top" />
+      <ReactTooltip id="delete-tooltip" place="top" />
+  
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -232,8 +238,10 @@ const DeletedRestaurants = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white bg-red-700 hover:bg-gray-900 focus:outline-none font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete all selected"
             >
               Delete {selectedItems.length}
             </button>
@@ -241,15 +249,17 @@ const DeletedRestaurants = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white bg-green-600 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white bg-green-600 hover:bg-gray-900 focus:outline-none font-medium rounded-lg px-3 py-2.5"
               onClick={handleRestoreMany}
+              data-tooltip-id="restore-many-tooltip"
+              data-tooltip-content="Restore all selected"
             >
               Restore {selectedItems.length}
             </button>
           )}
         </div>
       </div>
-
+  
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No deleted restaurants found.</p>
@@ -302,12 +312,16 @@ const DeletedRestaurants = () => {
                     <button
                       className="font-medium text-green-600"
                       onClick={() => handleRestoreClick(restaurant)}
+                      data-tooltip-id="restore-tooltip"
+                      data-tooltip-content="Restore"
                     >
                       <RotateCw />
                     </button>
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(restaurant)}
+                      data-tooltip-id="delete-tooltip"
+                      data-tooltip-content="Delete"
                     >
                       <Trash2 />
                     </button>
@@ -316,7 +330,7 @@ const DeletedRestaurants = () => {
               ))}
             </tbody>
           </table>
-
+  
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -329,7 +343,7 @@ const DeletedRestaurants = () => {
           )}
         </>
       )}
-
+  
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
         <Popup
@@ -343,7 +357,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to restore {selectedRestaurant?.name}?</p>
         </Popup>
       )}
-
+  
       {/* Restore Many Confirmation Popup */}
       {showRestoreManyPopup && (
         <Popup
@@ -357,7 +371,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to restore {selectedItems.length} items?</p>
         </Popup>
       )}
-
+  
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
         <Popup
@@ -372,7 +386,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to delete {selectedRestaurant?.name}?</p>
         </Popup>
       )}
-
+  
       {/* Delete Many Popup */}
       {showDeleteManyPopup && (
         <Popup
@@ -392,6 +406,7 @@ const DeletedRestaurants = () => {
       )}
     </div>
   );
+  
 };
 
 export default DeletedRestaurants;
