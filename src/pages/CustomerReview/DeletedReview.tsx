@@ -9,7 +9,6 @@ import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
-
 type itemReviewType = {
   id: string;
   name: string;
@@ -197,10 +196,10 @@ const DeletedReview = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <ReactTooltip id="delete-many-tooltip" place="top" />
-      <ReactTooltip id="restore-many-tooltip" place="top" />
+      <ReactTooltip id="restore-many-tooltip" place="top-end" />
       <ReactTooltip id="restore-tooltip" place="top" />
       <ReactTooltip id="delete-tooltip" place="top" />
-  
+
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -255,7 +254,7 @@ const DeletedReview = () => {
           )}
         </div>
       </div>
-  
+
       {/* Conditional rendering when no items are found */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
@@ -291,7 +290,10 @@ const DeletedReview = () => {
             </thead>
             <tbody>
               {filteredData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                <tr
+                  key={item.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -329,7 +331,7 @@ const DeletedReview = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           <div className="flex justify-center items-center mt-10">
             <Pagination

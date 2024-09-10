@@ -10,7 +10,6 @@ import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
-
 type itemReviewType = {
   id: string;
   name: string;
@@ -40,7 +39,7 @@ const DeletedItems = () => {
     data: itemsData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: [
       "findAll-deleted",
@@ -227,10 +226,10 @@ const DeletedItems = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       <ReactTooltip id="delete-many-tooltip" place="top" />
-      <ReactTooltip id="restore-many-tooltip" place="top" />
+      <ReactTooltip id="restore-many-tooltip" place="top-end" />
       <ReactTooltip id="restore-tooltip" place="top" />
       <ReactTooltip id="delete-tooltip" place="top" />
-  
+
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -259,7 +258,7 @@ const DeletedItems = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-  
+
           {/* Category Filter */}
           <select
             value={selectedCategory}
@@ -274,7 +273,7 @@ const DeletedItems = () => {
               </option>
             ))}
           </select>
-  
+
           {/* Restaurant Filter */}
           <select
             value={selectedRestaurant}
@@ -317,7 +316,7 @@ const DeletedItems = () => {
           )}
         </div>
       </div>
-  
+
       {/* Conditional rendering when no items are found */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
@@ -394,7 +393,7 @@ const DeletedItems = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           <div className="flex justify-center items-center mt-10">
             <Pagination
@@ -405,7 +404,7 @@ const DeletedItems = () => {
           </div>
         </>
       )}
-  
+
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
         <Popup
@@ -419,7 +418,7 @@ const DeletedItems = () => {
           <p>Are you sure you want to restore {selectedItem?.name}?</p>
         </Popup>
       )}
-  
+
       {/* Restore Many Confirmation Popup */}
       {showRestoreManyPopup && (
         <Popup
@@ -433,7 +432,7 @@ const DeletedItems = () => {
           <p>Are you sure you want to restore {selectedItems.length} items?</p>
         </Popup>
       )}
-  
+
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
         <Popup
@@ -448,7 +447,7 @@ const DeletedItems = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
-  
+
       {/* Delete Many Popup */}
       {showDeleteManyPopup && (
         <Popup
@@ -467,7 +466,7 @@ const DeletedItems = () => {
         </Popup>
       )}
     </div>
-  );  
+  );
 };
 
 export default DeletedItems;
