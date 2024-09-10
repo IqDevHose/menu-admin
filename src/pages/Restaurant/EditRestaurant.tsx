@@ -118,6 +118,9 @@ function EditRestaurant() {
     if (uploadImage) {
       formData.append("image", uploadImage);
     }
+    else{
+      formData.append("image", uploadImageUrl || '')
+    }
 
     // Append categories as JSON string
     formData.append("categories", JSON.stringify(categoriesData));

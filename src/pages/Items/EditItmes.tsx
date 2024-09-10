@@ -86,6 +86,9 @@ function EditItem() {
     if (uploadImage) {
       formData.append("image", uploadImage);
     }
+    else{
+      formData.append("image", uploadImageUrl || '')
+    }
 
     mutation.mutate(formData);
   };
