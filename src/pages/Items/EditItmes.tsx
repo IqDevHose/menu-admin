@@ -15,13 +15,14 @@ type itemType = {
 function EditItem() {
   const location = useLocation();
   const record = location.state;
+  console.log(record);
   const [name, setName] = useState<string | null>(record.name);
   const [description, setDescription] = useState<string | null>(record.description);
   const [price, setPrice] = useState<number | null>(record.price);
   const [restaurantId, setRestaurantId] = useState<string | null>(record.category.restaurantId);
   const [uploadImage, setUploadImage] = useState<File | null>(null); // Handle file uploads
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(record.image);
-  const [categoryId, setCategoryId] = useState<string | null>(record.category.categoryId);
+  const [categoryId, setCategoryId] = useState<string | null>(record.category.id);
 
   const { itemId } = useParams();
   const navigate = useNavigate();
