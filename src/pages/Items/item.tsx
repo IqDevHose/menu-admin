@@ -57,8 +57,8 @@ const flattenObject = (
 
 // Extract headers from the data
 const extractHeaders = (data: DataItem[]): string[] => {
-  const flattenedData = data.map((item) => flattenObject(item));
-  const headers = Array.from(new Set(flattenedData.flatMap(Object.keys)));
+  // const flattenedData = data.map((item) => flattenObject(item));
+  const headers = Array.from(new Set(data.flatMap(Object.keys)));
   return headers;
 };
 
@@ -81,7 +81,11 @@ const Item = () => {
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/item?page=all`);
-      const heads: any[] = extractHeaders(item.data.items);
+      const dataExcludedCategory = item.data.items.map((item:any) => {
+        const {category,...rest} = item
+        return rest
+      })
+      const heads: any[] = extractHeaders(dataExcludedCategory);
       setHeaders(heads);
       return item.data;
     },
@@ -91,9 +95,13 @@ const Item = () => {
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)
     );
-
+console.log(flattenedData,exportData)
+const dataExcludedCategory = exportData.items.map((items:any)=>{
+  const {category, ...rest} = items
+  return rest
+})
     const dataToConvert = {
-      data: flattenedData,
+      data: dataExcludedCategory,
       filename: "items",
       delimiter: ",",
       headers,
