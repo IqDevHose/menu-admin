@@ -3,7 +3,7 @@ import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 type categoryType = {
   name: string | null;
@@ -12,12 +12,10 @@ type categoryType = {
 };
 
 function EditCategory() {
-  let [searchParams, setSearchParams] = useSearchParams();
-
-  const [name, setName] = useState<string | null>(searchParams.get("name"));
-  const [restaurantId, setRestaurantId] = useState<string | null>(
-    searchParams.get("restaurantId")
-  );
+  const location = useLocation();
+  const record = location.state;
+  const [name, setName] = useState<string | null>(record.name);
+  const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
   const [uploadImage, setUploadImage] = useState<string | null>(null); // Base64 encoded string
   const { categoryId } = useParams();
   const navigate = useNavigate();

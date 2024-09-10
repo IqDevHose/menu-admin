@@ -242,6 +242,7 @@ const Item = () => {
   if (isError) {
     return <div>Error</div>;
   }
+  // console.log(currentData)
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       {/* Tooltip initialization */}
@@ -424,6 +425,7 @@ const Item = () => {
             </thead>
             <tbody>
               {currentData?.map((item: any, index: number) => (
+                <>
                 <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
@@ -459,6 +461,7 @@ const Item = () => {
                     </button>
                   </td>
                 </tr>
+                </>
               ))}
             </tbody>
           </table>
