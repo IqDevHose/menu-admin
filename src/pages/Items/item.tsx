@@ -9,6 +9,9 @@ import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import exportCSVFile from "json-to-csv-export";
 import axiosInstance from "@/axiosInstance";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
+
 
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
@@ -241,7 +244,15 @@ const Item = () => {
   }
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex justify-between ">
+      {/* Tooltip initialization */}
+      <ReactTooltip id="delete-many-tooltip" place="top"  />
+      <ReactTooltip id="reload-tooltip" place="top"  />
+      <ReactTooltip id="add-item-tooltip" place="top"  />
+      <ReactTooltip id="trash-tooltip" place="top"  />
+      <ReactTooltip id="edit-item-tooltip" place="top"  />
+      <ReactTooltip id="delete-item-tooltip" place="top"  />
+  
+      <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
           <div className="relative">
@@ -269,7 +280,7 @@ const Item = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-
+  
           {/* Category Filter */}
           <select
             value={selectedCategory}
@@ -284,7 +295,7 @@ const Item = () => {
               </option>
             ))}
           </select>
-
+  
           {/* Restaurant Filter */}
           <select
             value={selectedRestaurant}
@@ -302,12 +313,15 @@ const Item = () => {
             ))}
           </select>
         </div>
+  
         <div className="gap-2 flex items-start justify-center">
           {selectedItems.length > 0 && (
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete selected items"
             >
               <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
@@ -316,15 +330,16 @@ const Item = () => {
               </div>
             </button>
           )}
-
+  
           <button
             type="button"
             disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
             onClick={() => {
-              console.log("aaaa");
               refetch();
             }}
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload items"
           >
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
@@ -340,11 +355,13 @@ const Item = () => {
               />
             </span>
           </button>
-
+  
           <Link to="/items/add">
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="add-item-tooltip"
+              data-tooltip-content="Add new item"
             >
               <span className="hidden xl:flex items-center gap-1">
                 <Plus size={16} /> Add Item
@@ -354,21 +371,24 @@ const Item = () => {
               </span>
             </button>
           </Link>
+  
           <Link to="/items/trash">
             <button
               type="button"
-              className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 "
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed items"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-
+  
           <DropdownMenuDemo handleExport={handleExport} link="/items/import" />
         </div>
       </div>
-
+  
       {/* Conditional rendering when there are no items */}
       {currentData && currentData.length === 0 ? (
         <div className="w-full text-center py-10">
@@ -404,10 +424,7 @@ const Item = () => {
             </thead>
             <tbody>
               {currentData?.map((item: any, index: number) => (
-                <tr
-                  key={item.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -424,12 +441,19 @@ const Item = () => {
                   <td className="px-6 py-4">{item?.description}</td>
                   <td className="px-6 py-4">{item?.price}</td>
                   <td className="px-6 py-4 flex gap-x-4">
-                    <Link to={`/items/edit/${item.id}`} state={item}>
+                    <Link
+                      to={`/items/edit/${item.id}`}
+                      state={item}
+                      data-tooltip-id="edit-item-tooltip"
+                      data-tooltip-content="Edit item"
+                    >
                       <SquarePen className="text-blue-600" />
                     </Link>
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(item)}
+                      data-tooltip-id="delete-item-tooltip"
+                      data-tooltip-content="Delete item"
                     >
                       <Trash2 />
                     </button>
@@ -438,7 +462,7 @@ const Item = () => {
               ))}
             </tbody>
           </table>
-
+  
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -451,7 +475,7 @@ const Item = () => {
           )}
         </>
       )}
-
+  
       {/* Delete Confirmation Popup for Multiple Items */}
       {showDeleteManyPopup && (
         <Popup
@@ -469,7 +493,7 @@ const Item = () => {
           </p>
         </Popup>
       )}
-
+  
       {/* Delete Confirmation Popup for Single Item */}
       {showPopup && (
         <Popup

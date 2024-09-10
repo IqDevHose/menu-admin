@@ -10,6 +10,8 @@ import { highlightText } from "@/utils/utils";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
 
 type categoryReviewType = {
   id: string;
@@ -214,9 +216,16 @@ const Category = () => {
   if (isError) {
     return <div>Error</div>;
   }
-
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      {/* Tooltip initialization */}
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="reload-tooltip" place="top" />
+      <ReactTooltip id="add-category-tooltip" place="top" />
+      <ReactTooltip id="trash-tooltip" place="top" />
+      <ReactTooltip id="edit-category-tooltip" place="top" />
+      <ReactTooltip id="delete-category-tooltip" place="top" />
+  
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -258,13 +267,16 @@ const Category = () => {
               </option>
             ))}
           </select>
-        </div>{" "}
+        </div>
+  
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete selected categories"
             >
               <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
@@ -280,6 +292,8 @@ const Category = () => {
             onClick={() => {
               refetch();
             }}
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload categories"
           >
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
@@ -295,10 +309,13 @@ const Category = () => {
               />
             </span>
           </button>
+  
           <Link to={"/categories/add"}>
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="add-category-tooltip"
+              data-tooltip-content="Add new category"
             >
               <span className="hidden xl:flex items-center gap-1">
                 <Plus size={16} /> Add Category
@@ -308,23 +325,27 @@ const Category = () => {
               </span>
             </button>
           </Link>
+  
           <Link to={"/categories/trash"}>
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 text-sm"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed categories"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-
+  
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/categories/import"
           ></DropdownMenuDemo>
         </div>
       </div>
+  
       {currentData.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No categories found.</p>
@@ -358,10 +379,7 @@ const Category = () => {
             </thead>
             <tbody>
               {currentData.map((item: any, index: number) => (
-                <tr
-                  key={item.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -377,18 +395,22 @@ const Category = () => {
                   </td>
                   <td className="px-6 py-4">{item?.items?.length || 0}</td>
                   <td className="px-6 py-4">
-                    {item?.resturnat?.name || "N/A"}
+                    {item?.restaurant?.name || "N/A"}
                   </td>
                   <td className="px-6 py-4 flex gap-x-4">
                     <Link
                       to={`/categories/edit/${item.id}?name=${item.name}&restaurantId=${item.restaurantId}&restaurantName=${item.restaurant?.name}`}
                       className="font-medium text-blue-600"
+                      data-tooltip-id="edit-category-tooltip"
+                      data-tooltip-content="Edit category"
                     >
                       <SquarePen />
                     </Link>
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(item)}
+                      data-tooltip-id="delete-category-tooltip"
+                      data-tooltip-content="Delete category"
                     >
                       <Trash2 />
                     </button>
@@ -397,7 +419,7 @@ const Category = () => {
               ))}
             </tbody>
           </table>
-
+  
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
               <Pagination
@@ -409,7 +431,7 @@ const Category = () => {
           )}
         </>
       )}
-
+  
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -426,7 +448,7 @@ const Category = () => {
           </p>
         </Popup>
       )}
-
+  
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}

@@ -14,6 +14,8 @@ import RatingPopup from "@/components/RatingPopup";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
 
 type customerReviewType = {
   id: string;
@@ -21,6 +23,7 @@ type customerReviewType = {
   comment: string;
   email: string;
   blue: string;
+  
 };
 
 interface DataItem {
@@ -283,6 +286,14 @@ const CustomerReview = () => {
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      {/* Tooltip initialization */}
+      <ReactTooltip id="delete-many-tooltip" place="top"  />
+      <ReactTooltip id="reload-tooltip" place="top"  />
+      <ReactTooltip id="add-review-tooltip" place="top"  />
+      <ReactTooltip id="trash-tooltip" place="top"  />
+      <ReactTooltip id="edit-review-tooltip" place="top"  />
+      <ReactTooltip id="delete-review-tooltip" place="top"  />
+
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
@@ -313,7 +324,6 @@ const CustomerReview = () => {
               placeholder="Search for items"
             />
           </div>
-          {/* Restaurant Filter */}
           <select
             value={selectedRestaurant}
             onChange={(e) => setSelectedRestaurant(e.target.value)}
@@ -331,8 +341,10 @@ const CustomerReview = () => {
           {selectedItems.length > 0 && (
             <button
               type="button"
-              className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
+              className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none font-medium rounded-lg px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete selected reviews"
             >
               <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
@@ -345,29 +357,23 @@ const CustomerReview = () => {
             type="button"
             disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
-            onClick={() => {
-              console.log("aaaa");
-              refetch();
-            }}
+            onClick={() => refetch()}
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload reviews"
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCw
-                size={16}
-                className={isRefetching ? `animate-spin` : ""}
-              />{" "}
-              Reload
+              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCw
-                size={16}
-                className={isRefetching ? `animate-spin` : ""}
-              />
+              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
             </span>
           </button>
           <Link to="/customerReviews/add">
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-sm"
+              data-tooltip-id="add-review-tooltip"
+              data-tooltip-content="Add new review"
             >
               <span className="hidden xl:flex items-center gap-1">
                 <Plus size={16} /> Add Review
@@ -381,6 +387,8 @@ const CustomerReview = () => {
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-sm"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed reviews"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
@@ -394,7 +402,6 @@ const CustomerReview = () => {
         </div>
       </div>
 
-      {/* Conditional rendering when no items are found */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No customer reviews found.</p>
@@ -438,10 +445,7 @@ const CustomerReview = () => {
             </thead>
             <tbody>
               {filteredData?.map((item: any, index: number) => (
-                <tr
-                  key={item.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -463,19 +467,21 @@ const CustomerReview = () => {
                   <td className="px-6 py-4">
                     {new Date(item.birthday).toLocaleDateString("en-CA")}
                   </td>
-
                   <td className="px-6 py-4 flex gap-x-4">
                     <Link
                       to={`/customerReviews/edit/${item.id}`}
                       className="font-medium text-blue-600"
                       state={item}
+                      data-tooltip-id="edit-review-tooltip"
+                      data-tooltip-content="Edit review"
                     >
                       <SquarePen />
                     </Link>
-
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(item)}
+                      data-tooltip-id="delete-review-tooltip"
+                      data-tooltip-content="Delete review"
                     >
                       <Trash2 />
                     </button>
@@ -533,9 +539,9 @@ const CustomerReview = () => {
           onClose={() => setShowChildPopup(false)}
           loading={query.isLoading}
           confirmText="Close"
-          showOneBtn={true} // This ensures only one button is shown
-          onConfirm={() => setShowChildPopup(false)} // The close functionality
-          confirmButtonVariant="red" // You can choose the variant
+          showOneBtn={true}
+          onConfirm={() => setShowChildPopup(false)}
+          confirmButtonVariant="red"
         >
           <RatingPopup data={selectedChildData} />
         </Popup>

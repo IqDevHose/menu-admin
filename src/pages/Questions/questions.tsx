@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
 
 type questionsReviewType = {
   id: string;
@@ -205,9 +207,16 @@ const Questions = () => {
   if (isError) {
     return <div>Error</div>;
   }
-
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      {/* Tooltip initialization */}
+      <ReactTooltip id="delete-many-tooltip" place="top"  />
+      <ReactTooltip id="reload-tooltip" place="top"  />
+      <ReactTooltip id="add-question-tooltip" place="top"  />
+      <ReactTooltip id="trash-tooltip" place="top"  />
+      <ReactTooltip id="edit-question-tooltip" place="top"  />
+      <ReactTooltip id="delete-question-tooltip" place="top"  />
+  
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
@@ -237,12 +246,15 @@ const Questions = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+  
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete selected questions"
             >
               <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
@@ -251,14 +263,16 @@ const Questions = () => {
               </div>
             </button>
           )}
+  
           <button
             type="button"
             disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
             onClick={() => {
-              console.log("aaaa");
               refetch();
             }}
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload questions"
           >
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
@@ -274,37 +288,43 @@ const Questions = () => {
               />
             </span>
           </button>
+  
           <Link to={"/questions/add"}>
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="add-question-tooltip"
+              data-tooltip-content="Add new question"
             >
               <span className="hidden xl:flex items-center gap-1">
-                <Plus size={16} />
-                Add Question
+                <Plus size={16} /> Add Question
               </span>
               <span className="inline xl:hidden">
                 <Plus size={16} />
               </span>
             </button>
           </Link>
+  
           <Link to={"/questions/trash"}>
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed questions"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
+  
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/questions/import"
           ></DropdownMenuDemo>
         </div>
       </div>
-
+  
       {/* Conditional rendering when no items are found */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
@@ -346,10 +366,7 @@ const Questions = () => {
             </thead>
             <tbody>
               {currentData?.map((item: any, index: number) => (
-                <tr
-                  key={item.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -371,7 +388,11 @@ const Questions = () => {
                   <td className="px-6 py-4">{item.description}</td>
                   <td className="px-6 py-4">{item?.answer}</td>
                   <td className="px-6 py-4 flex gap-x-4">
-                    <button className="font-medium text-blue-600">
+                    <button
+                      className="font-medium text-blue-600"
+                      data-tooltip-id="edit-question-tooltip"
+                      data-tooltip-content="Edit question"
+                    >
                       <Link to={`/questions/edit/${item.id}`} state={item}>
                         <SquarePen />
                       </Link>
@@ -379,6 +400,8 @@ const Questions = () => {
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(item)}
+                      data-tooltip-id="delete-question-tooltip"
+                      data-tooltip-content="Delete question"
                     >
                       <Trash2 />
                     </button>
@@ -387,7 +410,7 @@ const Questions = () => {
               ))}
             </tbody>
           </table>
-
+  
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -400,7 +423,7 @@ const Questions = () => {
           )}
         </>
       )}
-
+  
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -417,7 +440,7 @@ const Questions = () => {
           </p>
         </Popup>
       )}
-
+  
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
@@ -433,6 +456,7 @@ const Questions = () => {
       )}
     </div>
   );
+  
 };
 
 export default Questions;

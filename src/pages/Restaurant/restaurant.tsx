@@ -10,6 +10,8 @@ import Pagination from "@/components/Pagination";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'; 
 
 type restaurantReviewType = {
   id: string;
@@ -210,9 +212,16 @@ const Restaurant = () => {
   if (query.isError) {
     return <div>Error</div>;
   }
-
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+      {/* Tooltip initialization */}
+      <ReactTooltip id="delete-many-tooltip" place="top"  />
+      <ReactTooltip id="reload-tooltip" place="top"  />
+      <ReactTooltip id="add-restaurant-tooltip" place="top"  />
+      <ReactTooltip id="trash-tooltip" place="top"  />
+      <ReactTooltip id="edit-restaurant-tooltip" place="top"  />
+      <ReactTooltip id="delete-restaurant-tooltip" place="top"  />
+  
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
@@ -248,6 +257,8 @@ const Restaurant = () => {
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-red-600 hover:bg-red-700 focus:outline-none  font-medium rounded-lg  px-3 py-2.5"
               onClick={handleDeleteMany}
+              data-tooltip-id="delete-many-tooltip"
+              data-tooltip-content="Delete selected restaurants"
             >
               <div className="flex items-center flex-nowrap gap-1">
                 <Trash2 size={16} />
@@ -256,7 +267,7 @@ const Restaurant = () => {
               </div>
             </button>
           )}
-
+  
           <button
             type="button"
             disabled={isRefetching}
@@ -264,6 +275,8 @@ const Restaurant = () => {
             onClick={() => {
               refetch();
             }}
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload restaurants"
           >
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
@@ -279,33 +292,36 @@ const Restaurant = () => {
               />
             </span>
           </button>
+  
           <Link to="/restaurants/add">
             <button
               type="button"
-              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3 "
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3"
+              data-tooltip-id="add-restaurant-tooltip"
+              data-tooltip-content="Add new restaurant"
             >
               <span className="hidden xl:flex items-center gap-1">
-                {" "}
-                <Plus size={16} />
-                Add Restaurant
+                <Plus size={16} /> Add Restaurant
               </span>
               <span className="inline xl:hidden">
-                {" "}
                 <Plus size={16} />
               </span>
             </button>
           </Link>
+  
           <Link to="/restaurants/trash">
             <button
               type="button"
-              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3 "
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 text-sm font-medium rounded-lg py-2 xl:py-2.5 px-3"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed restaurants"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={16} /> <p className="hidden xl:inline">Trash</p>
               </span>
             </button>
           </Link>
-
+  
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/restaurants/import"
@@ -348,10 +364,7 @@ const Restaurant = () => {
             </thead>
             <tbody>
               {filteredData?.map((item: any, index: number) => (
-                <tr
-                  key={item.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -371,13 +384,20 @@ const Restaurant = () => {
                   <td className="px-6 py-4">{item.categories.length}</td>
                   <td className="px-6 py-4 flex gap-x-4">
                     <button className="font-medium text-blue-600">
-                      <Link to={`/restaurants/edit/${item.id}`} state={item}>
+                      <Link
+                        to={`/restaurants/edit/${item.id}`}
+                        state={item}
+                        data-tooltip-id="edit-restaurant-tooltip"
+                        data-tooltip-content="Edit restaurant"
+                      >
                         <SquarePen />
                       </Link>
                     </button>
                     <button
                       className="font-medium text-red-600"
                       onClick={() => handleDeleteClick(item)}
+                      data-tooltip-id="delete-restaurant-tooltip"
+                      data-tooltip-content="Delete restaurant"
                     >
                       <Trash2 />
                     </button>
@@ -386,7 +406,7 @@ const Restaurant = () => {
               ))}
             </tbody>
           </table>
-
+  
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -399,7 +419,7 @@ const Restaurant = () => {
           )}
         </>
       )}
-
+  
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -431,6 +451,7 @@ const Restaurant = () => {
       )}
     </div>
   );
+  
 };
 
 export default Restaurant;
