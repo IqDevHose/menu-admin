@@ -171,15 +171,15 @@ function summation(ratings: { score: number; question: any }[]) {
 
   // Display different icons based on the average rating
   if (average >= 4.5) {
-    return <FaFaceLaughBeam size={24} color="green" onClick={handleIconClick} className="cursor-pointer" />;
+    return <FaFaceLaughBeam size={24} color="green" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
   } else if (average > 3 && average < 4.5) {
-    return <FaSmile size={24} color="green" onClick={handleIconClick} className="cursor-pointer" />;
+    return <FaSmile size={24} color="green" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
   } else if (average > 2 && average <= 3) {
-    return <FaFaceSmile size={24} color="orange" onClick={handleIconClick} className="cursor-pointer" />;
+    return <FaFaceSmile size={24} color="orange" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
   } else if (average > 1 && average <= 2) {
-    return <FaFaceFrown size={24} color="red" onClick={handleIconClick} className="cursor-pointer" />;
+    return <FaFaceFrown size={24} color="red" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
   } else {
-    return <FaFaceAngry size={24} color="red" onClick={handleIconClick} className="cursor-pointer" />;
+    return <FaFaceAngry size={24} color="red" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
   }
 }
 
