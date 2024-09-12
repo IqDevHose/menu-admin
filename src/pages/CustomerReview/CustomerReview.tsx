@@ -16,6 +16,8 @@ import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
+import { FaFaceAngry, FaFaceFrown, FaFaceLaughBeam, FaFaceSmile } from "react-icons/fa6";
+import { FaSmile } from "react-icons/fa";
 
 type customerReviewType = {
   id: string;
@@ -137,71 +139,52 @@ const CustomerReview = () => {
     exportCSVFile(dataToConvert);
   };
 
-  function summation(ratings: { score: number; question: any }[]) {
-    let sum = 0;
-    let count = 0;
+ 
 
-    for (let index = 0; index < ratings.length; index++) {
-      sum += ratings[index].score;
+function summation(ratings: { score: number; question: any }[]) {
+  let sum = 0;
+  let count = 0;
+
+  if (!ratings || ratings.length === 0) {
+    return <FaFaceFrown size={24} color="gray" title="No ratings" />;
+  }
+
+  for (let index = 0; index < ratings.length; index++) {
+    const score = ratings[index]?.score;
+    if (typeof score === "number" && !isNaN(score)) {
+      sum += score;
       count += 1;
     }
-    const average = sum / count;
-
-    const handleIconClick = () => {
-      setSelectedChildData(ratings); // Pass the entire rating array to the popup
-      setShowChildPopup(true);
-    };
-
-    if (average >= 2.5) {
-      return (
-        <img
-          title={`${average}`}
-          width={24}
-          height={24}
-          src={happy}
-          alt="happy"
-          onClick={handleIconClick}
-          style={{ cursor: "pointer" }}
-        />
-      );
-    } else if (average > 1 && average <= 2.5) {
-      return (
-        <img
-          title={`${average}`}
-          width={24}
-          height={24}
-          src={satisfied}
-          alt="satisfied"
-          onClick={handleIconClick}
-          style={{ cursor: "pointer" }}
-        />
-      );
-    } else if (isNaN(average)) {
-      return (
-        <img
-          title={`${average}`}
-          width={24}
-          height={24}
-          src={happy}
-          alt="happy"
-          onClick={handleIconClick}
-          style={{ cursor: "pointer" }}
-        />
-      );
-    } else if (average <= 1) {
-      return (
-        <img
-          title={`${average}`}
-          width={24}
-          height={24}
-          src={sad}
-          alt="sad"
-          onClick={handleIconClick}
-          style={{ cursor: "pointer" }}
-        />
-      );
-    }
   }
+
+  if (count === 0) {
+    return <FaFaceFrown size={24} color="gray" title="No valid ratings" />;
+  }
+
+  // Calculate the average score out of 5
+  const average = sum / count;
+
+  const handleIconClick = () => {
+    setSelectedChildData(ratings); // Pass the entire rating array to the popup
+    setShowChildPopup(true);
+  };
+
+  // Display different icons based on the average rating
+  if (average >= 4.5) {
+    return <FaFaceLaughBeam size={24} color="green" onClick={handleIconClick} className="cursor-pointer" />;
+  } else if (average > 3 && average < 4.5) {
+    return <FaSmile size={24} color="green" onClick={handleIconClick} className="cursor-pointer" />;
+  } else if (average > 2 && average <= 3) {
+    return <FaFaceSmile size={24} color="orange" onClick={handleIconClick} className="cursor-pointer" />;
+  } else if (average > 1 && average <= 2) {
+    return <FaFaceFrown size={24} color="red" onClick={handleIconClick} className="cursor-pointer" />;
+  } else {
+    return <FaFaceAngry size={24} color="red" onClick={handleIconClick} className="cursor-pointer" />;
+  }
+}
+
+
+
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {

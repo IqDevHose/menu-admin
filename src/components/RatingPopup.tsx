@@ -1,7 +1,12 @@
-import React from 'react';
-import happy from "../assets/smile.png";
-import satisfied from "../assets/neutral.png";
-import sad from "../assets/sad.png";
+import { FaSmile, FaMeh, FaFrown, FaGrinBeam,  } from 'react-icons/fa';
+import { FaFaceAngry } from "react-icons/fa6";
+import { FaFaceMeh } from "react-icons/fa6";
+import { FaFaceFrown } from "react-icons/fa6";
+import { FaFaceSmile } from "react-icons/fa6";
+import { FaFaceLaughBeam } from "react-icons/fa6";
+
+
+
 
 const RatingPopup = ({ data }: { data: any[] }) => {
   // Check if data is an array and has elements
@@ -10,46 +15,18 @@ const RatingPopup = ({ data }: { data: any[] }) => {
   }
 
   const getIcon = (score: number) => {
-    if (score >= 2.5) {
-      return (
-        <img
-          title={`${score}`}
-          width={24}
-          height={24}
-          src={happy}
-          alt="happy"
-        />
-      );
-    } else if (score > 1 && score <= 2.5) {
-      return (
-        <img
-          title={`${score}`}
-          width={24}
-          height={24}
-          src={satisfied}
-          alt="satisfied"
-        />
-      );
+    if (score >= 4.5) {
+      return <FaFaceLaughBeam   size={24} color="green" title={`${score}`} />;
+    } else if (score >= 3 && score < 4.5) {
+      return <FaSmile size={24} color="green" title={`${score}`} />;
+    } else if (score >= 2 && score < 3) {
+      return <FaFaceSmile  size={24} color="orange" title={`${score}`} />;
+    } else if (score >= 1 && score < 2) {
+      return <FaFaceFrown size={24} color="red" title={`${score}`} />;
+    } else if (score < 1) {
+      return <FaFaceAngry size={24} color="darkred" title={`${score}`} />;
     } else if (isNaN(score)) {
-      return (
-        <img
-          title={`${score}`}
-          width={24}
-          height={24}
-          src={happy}
-          alt="happy"
-        />
-      );
-    } else if (score <= 1) {
-      return (
-        <img
-          title={`${score}`}
-          width={24}
-          height={24}
-          src={sad}
-          alt="sad"
-        />
-      );
+      return <FaFaceMeh  size={24} color="yellow" title="N/A" />;
     }
   };
 
