@@ -146,7 +146,7 @@ const CustomerReview = () => {
   
     // Handle case where no ratings are provided
     if (!ratings || ratings.length === 0) {
-      return <FaRegStar size={24} color="gray" title="No ratings" />;
+      return <FaRegStar size={16} color="gray" title="No ratings" />;
     }
   
     // Sum up all the valid ratings
@@ -160,11 +160,14 @@ const CustomerReview = () => {
   
     // Handle case where there are no valid ratings
     if (count === 0) {
-      return <FaRegStar size={24} color="gray" title="No valid ratings" />;
+      return <FaRegStar size={16} color="gray" title="No valid ratings" />;
     }
   
     // Calculate the average score out of 5
     const average = sum / count;
+    const fullStars = Math.floor(average); // Full stars based on the integer part
+    const halfStar = average % 1 >= 0.5; // Check if there should be a half star
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Calculate empty stars
   
     // Function to handle star click
     const handleStarClick = () => {
@@ -172,40 +175,39 @@ const CustomerReview = () => {
       setShowChildPopup(true);
     };
   
-    // Display a full, half, or empty star based on the average rating
+    // Display multiple stars based on the average rating
     return (
       <>
-        {average >= 4.5 ? (
-          <FaStar
-            size={24}
-            className="cursor-pointer text-yellow-300"
-            onClick={handleStarClick}
-            data-tooltip-id="rating-tooltip"
-            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
-          />
-        ) : average >= 3 && average < 4.5 ? (
-          <FaStarHalfAlt
-            size={24}
-            className="cursor-pointer text-yellow-300"
-            onClick={handleStarClick}
-            data-tooltip-id="rating-tooltip"
-            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
-          />
-        ) : (
-          <FaRegStar
-            size={24}
-            className="cursor-pointer text-yellow-300"
-            onClick={handleStarClick}
-            data-tooltip-id="rating-tooltip"
-            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
-          />
-        )}
+        <div
+          onClick={handleStarClick}
+          data-tooltip-id="rating-tooltip"
+          data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
+          className="cursor-pointer flex items-center"
+        >
+          {/* Render full stars */}
+          {Array(fullStars)
+            .fill(0)
+            .map((_, index) => (
+              <FaStar key={`full-${index}`} size={16} className="text-yellow-300" />
+            ))}
+          
+          {/* Render half star */}
+          {halfStar && <FaStarHalfAlt size={16} className="text-yellow-300" />}
+  
+          {/* Render empty stars */}
+          {Array(emptyStars)
+            .fill(0)
+            .map((_, index) => (
+              <FaRegStar key={`empty-${index}`} size={16} className="text-gray-300" />
+            ))}
+        </div>
+        
         {/* Initialize the tooltip */}
         <ReactTooltip id="rating-tooltip" place="top" />
       </>
     );
   }
-
+  
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
