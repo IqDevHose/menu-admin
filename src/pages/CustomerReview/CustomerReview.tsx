@@ -17,7 +17,7 @@ import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
 import { FaFaceAngry, FaFaceFrown, FaFaceLaughBeam, FaFaceSmile } from "react-icons/fa6";
-import { FaSmile } from "react-icons/fa";
+import { FaRegStar, FaSmile, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 type customerReviewType = {
   id: string;
@@ -140,51 +140,71 @@ const CustomerReview = () => {
   };
 
  
-
-function summation(ratings: { score: number; question: any }[]) {
-  let sum = 0;
-  let count = 0;
-
-  if (!ratings || ratings.length === 0) {
-    return <FaFaceFrown size={24} color="gray" title="No ratings" />;
-  }
-
-  for (let index = 0; index < ratings.length; index++) {
-    const score = ratings[index]?.score;
-    if (typeof score === "number" && !isNaN(score)) {
-      sum += score;
-      count += 1;
+  function summation(ratings: { score: number; question: any }[]) {
+    let sum = 0;
+    let count = 0;
+  
+    // Handle case where no ratings are provided
+    if (!ratings || ratings.length === 0) {
+      return <FaRegStar size={24} color="gray" title="No ratings" />;
     }
+  
+    // Sum up all the valid ratings
+    for (let index = 0; index < ratings.length; index++) {
+      const score = ratings[index]?.score;
+      if (typeof score === "number" && !isNaN(score)) {
+        sum += score;
+        count += 1;
+      }
+    }
+  
+    // Handle case where there are no valid ratings
+    if (count === 0) {
+      return <FaRegStar size={24} color="gray" title="No valid ratings" />;
+    }
+  
+    // Calculate the average score out of 5
+    const average = sum / count;
+  
+    // Function to handle star click
+    const handleStarClick = () => {
+      setSelectedChildData(ratings); // Pass the entire rating array to the popup
+      setShowChildPopup(true);
+    };
+  
+    // Display a full, half, or empty star based on the average rating
+    return (
+      <>
+        {average >= 4.5 ? (
+          <FaStar
+            size={24}
+            className="cursor-pointer text-yellow-300"
+            onClick={handleStarClick}
+            data-tooltip-id="rating-tooltip"
+            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
+          />
+        ) : average >= 3 && average < 4.5 ? (
+          <FaStarHalfAlt
+            size={24}
+            className="cursor-pointer text-yellow-300"
+            onClick={handleStarClick}
+            data-tooltip-id="rating-tooltip"
+            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
+          />
+        ) : (
+          <FaRegStar
+            size={24}
+            className="cursor-pointer text-yellow-300"
+            onClick={handleStarClick}
+            data-tooltip-id="rating-tooltip"
+            data-tooltip-content={`Average rating: ${average.toFixed(1)} / 5`}
+          />
+        )}
+        {/* Initialize the tooltip */}
+        <ReactTooltip id="rating-tooltip" place="top" />
+      </>
+    );
   }
-
-  if (count === 0) {
-    return <FaFaceFrown size={24} color="gray" title="No valid ratings" />;
-  }
-
-  // Calculate the average score out of 5
-  const average = sum / count;
-
-  const handleIconClick = () => {
-    setSelectedChildData(ratings); // Pass the entire rating array to the popup
-    setShowChildPopup(true);
-  };
-
-  // Display different icons based on the average rating
-  if (average >= 4.5) {
-    return <FaFaceLaughBeam size={24} color="green" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
-  } else if (average > 3 && average < 4.5) {
-    return <FaSmile size={24} color="green" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
-  } else if (average > 2 && average <= 3) {
-    return <FaFaceSmile size={24} color="orange" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
-  } else if (average > 1 && average <= 2) {
-    return <FaFaceFrown size={24} color="red" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
-  } else {
-    return <FaFaceAngry size={24} color="red" onClick={handleIconClick} title={`${average}`} className="cursor-pointer" />;
-  }
-}
-
-
-
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {

@@ -1,12 +1,5 @@
-import { FaSmile, FaMeh, FaFrown, FaGrinBeam,  } from 'react-icons/fa';
-import { FaFaceAngry } from "react-icons/fa6";
-import { FaFaceMeh } from "react-icons/fa6";
-import { FaFaceFrown } from "react-icons/fa6";
-import { FaFaceSmile } from "react-icons/fa6";
-import { FaFaceLaughBeam } from "react-icons/fa6";
-
-
-
+import React from "react";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 const RatingPopup = ({ data }: { data: any[] }) => {
   // Check if data is an array and has elements
@@ -14,20 +7,30 @@ const RatingPopup = ({ data }: { data: any[] }) => {
     return <div>No data available</div>;
   }
 
-  const getIcon = (score: number) => {
-    if (score >= 4.5) {
-      return <FaFaceLaughBeam   size={24} color="green" title={`${score}`} />;
-    } else if (score >= 3 && score < 4.5) {
-      return <FaSmile size={24} color="green" title={`${score}`} />;
-    } else if (score >= 2 && score < 3) {
-      return <FaFaceSmile  size={24} color="orange" title={`${score}`} />;
-    } else if (score >= 1 && score < 2) {
-      return <FaFaceFrown size={24} color="red" title={`${score}`} />;
-    } else if (score < 1) {
-      return <FaFaceAngry size={24} color="darkred" title={`${score}`} />;
-    } else if (isNaN(score)) {
-      return <FaFaceMeh  size={24} color="yellow" title="N/A" />;
-    }
+  // Function to get the appropriate star rating based on the score
+  const getStarRating = (score: number) => {
+    const fullStars = Math.floor(score); // Full stars based on integer part of score
+    const halfStar = score - fullStars >= 0.5; // If the decimal part >= 0.5, show half star
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Remaining empty stars
+
+    return (
+      <div className="flex items-center">
+        {/* Full stars */}
+        {Array(fullStars)
+          .fill(0)
+          .map((_, index) => (
+            <FaStar key={`full-${index}`} size={24}  className="text-yellow-300" />
+          ))}
+        {/* Half star */}
+        {halfStar && <FaStarHalfAlt size={24}  className="text-yellow-300" />}
+        {/* Empty stars */}
+        {Array(emptyStars)
+          .fill(0)
+          .map((_, index) => (
+            <FaRegStar key={`empty-${index}`} size={24} className="text-yellow-300" />
+          ))}
+      </div>
+    );
   };
 
   return (
@@ -48,7 +51,7 @@ const RatingPopup = ({ data }: { data: any[] }) => {
                 {item.question.title || "N/A"} {/* Displaying the question title */}
               </td>
               <td className="px-6 py-4 flex items-center gap-x-2">
-                {getIcon(item.score)} {/* Displaying the appropriate icon */}
+                {getStarRating(item.score)} {/* Displaying the star rating */}
                 <span>{item.score}</span>
               </td>
             </tr>
