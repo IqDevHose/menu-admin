@@ -128,8 +128,14 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
       const item = await axiosInstance.get(`/item`, { params });
       return item.data;
     },
+    refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
+
   });
 
+  const handleReload = async () => { 
+    await queryClient.invalidateQueries({ queryKey: ["items", selectedCategory, selectedRestaurant] });
+    refetch(); // Optionally trigger refetch after invalidation
+  }
   // Fetch categories based on the selected restaurant
   const { data: categories } = useQuery({
     queryKey: ["categories", selectedRestaurant],
@@ -344,9 +350,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
             type="button"
             disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
-            onClick={() => {
-              refetch();
-            }}
+            onClick={handleReload}
             data-tooltip-id="reload-tooltip"
             data-tooltip-content="Reload items"
           >

@@ -89,10 +89,17 @@ const CustomerReview = () => {
       const customerReview = await axiosInstance.get(
         `/customer-review?page=${currentPage}&restaurantId=${selectedRestaurant}`
       );
-
       return customerReview.data;
     },
+    refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
   });
+
+  const handleReload = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["customerReview", currentPage, selectedRestaurant] });
+    refetch(); // Optionally trigger refetch after invalidation
+  };
+  
+  
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
@@ -353,21 +360,21 @@ const CustomerReview = () => {
               </div>
             </button>
           )}
-          <button
-            type="button"
-            disabled={isRefetching}
-            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
-            onClick={() => refetch()}
-            data-tooltip-id="reload-tooltip"
-            data-tooltip-content="Reload reviews"
-          >
-            <span className="hidden xl:flex items-center gap-1">
-              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
-            </span>
-            <span className="inline xl:hidden">
-              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
-            </span>
-          </button>
+         <button
+        type="button"
+        disabled={isRefetching}
+        className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+        onClick={handleReload} // Updated to handleReload
+        data-tooltip-id="reload-tooltip"
+        data-tooltip-content="Reload reviews"
+      >
+        <span className="hidden xl:flex items-center gap-1">
+          <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
+        </span>
+        <span className="inline xl:hidden">
+          <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
+        </span>
+      </button>
           <Link to="/customerReviews/add">
             <button
               type="button"

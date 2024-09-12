@@ -68,7 +68,12 @@ const Theme = () => {
       const theme = await axiosInstance.get(`/theme?page=${currentPage}`);
       return theme.data;
     },
+    refetchOnWindowFocus: true
   });
+  
+  const handleReload = async() => {
+    await queryClient.invalidateQueries({queryKey: ["theme"]})
+  }
 
   const { data: exportData, refetch } = useQuery({
     queryKey: ["theme all"],
@@ -79,8 +84,10 @@ const Theme = () => {
       setHeaders(heads);
       return item.data;
     },
+    
   });
 
+  
   const handleExport = () => {
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)

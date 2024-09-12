@@ -84,7 +84,13 @@ const Questions = () => {
       );
       return questions.data;
     },
+    refetchOnWindowFocus: true
   });
+
+  const handleReload = async () => { 
+    await queryClient.invalidateQueries({ queryKey: ["questions"] });
+    refetch(); // Optionally trigger refetch after invalidation
+  }
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
@@ -268,9 +274,7 @@ const Questions = () => {
             type="button"
             disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
-            onClick={() => {
-              refetch();
-            }}
+            onClick={handleReload}
             data-tooltip-id="reload-tooltip"
             data-tooltip-content="Reload questions"
           >
