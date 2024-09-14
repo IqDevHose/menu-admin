@@ -58,7 +58,7 @@ function AddRestaurant() {
         },
         onUploadProgress: (event) => {
           setProgress(
-            event.total ? Math.round((100 * event.loaded) / event.total) : 0
+            event.total ? Math.round((100 * event.loaded) / event.total!) : 0
           );
         },
       });

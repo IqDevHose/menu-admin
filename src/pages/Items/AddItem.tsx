@@ -51,7 +51,9 @@ function AddItem() {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (event) => {
-          setProgress(Math.round((100 * event.loaded) / event.total ));
+          setProgress(
+            event.total ? Math.round((100 * event.loaded) / event.total) : 0
+          );
         },
       });
     },
