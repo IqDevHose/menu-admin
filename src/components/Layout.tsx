@@ -20,9 +20,9 @@ const Layout = () => {
       )}
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-auto bg-white">
+      <div className="flex flex-col overflow-auto h-screen w-full bg-white ">
         {/* Top bar with burger icon to toggle sidebar on mobile */}
-        <div className="p-4 flex items-center bg-gray-100">
+        <div className="p-4 flex items-center md:hidden">
           <div className="block md:hidden">
             <MenuOutlined
               onClick={toggleSidebar}
@@ -32,7 +32,7 @@ const Layout = () => {
         </div>
 
         {/* Main content rendered by the router */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-1 md:p-6 ">
           <Outlet />
         </div>
       </div>
