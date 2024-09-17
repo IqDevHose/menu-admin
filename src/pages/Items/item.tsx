@@ -267,7 +267,7 @@ const Item = () => {
       <ReactTooltip id="edit-item-tooltip" place="top" />
       <ReactTooltip id="delete-item-tooltip" place="top" />
 
-      <div className="flex justify-between">
+      <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
           <div className="relative">

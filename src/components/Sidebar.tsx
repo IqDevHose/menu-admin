@@ -9,24 +9,24 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import Logout from "@/pages/Login/Logout";
-import useGlobalSidebar from "../../store/index"; // Zustand store
+import { useGlobalSidebar } from "@/store";
 
 const Sidebar = () => {
-  const { isSidebarOpen, toggleSidebar } = useGlobalSidebar(); // Zustand state
+  const { isSidebarOpen, toggleSidebar } = useGlobalSidebar();
 
   return (
     <aside
       id="separator-sidebar"
       className={`${
         isSidebarOpen ? "block" : "hidden"
-      } md:block absolute md:relative z-50 w-80 h-screen bg-[#F3F8FF]`}
+      } lg:block fixed top-0 left-0 md:relative z-50 w-80 h-screen bg-[#F3F8FF]`}
       aria-label="Sidebar"
     >
       <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto">
         <div className="flex flex-col">
           {/* Close button visible on mobile */}
-          <div className="flex justify-end mb-4 md:hidden">
-            <button onClick={toggleSidebar}>
+          <div className="flex justify-end mb-4 lg:hidden">
+            <button onClick={()=>toggleSidebar(!isSidebarOpen)}>
               <X className="text-gray-800 cursor-pointer" size={24} />
             </button>
           </div>
@@ -36,7 +36,7 @@ const Sidebar = () => {
             <li className="mb-3">
               <NavLink
                 to="/"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-800"
@@ -52,7 +52,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/restaurants"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -68,7 +68,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/categories"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -84,7 +84,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/items"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -100,7 +100,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/customerReviews"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -116,7 +116,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/questions"
-                onClick={toggleSidebar} // Close sidebar on item click
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"

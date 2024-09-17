@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar"; // Sidebar component
 import { MenuOutlined } from "@ant-design/icons"; // Burger icon for mobile
-import useGlobalSidebar from "../../store/index"; // Zustand store for global state
+import { useGlobalSidebar } from "@/store";
 
 const Layout = () => {
   const { isSidebarOpen, toggleSidebar } = useGlobalSidebar();
@@ -14,18 +14,18 @@ const Layout = () => {
       {/* Background overlay (only visible on mobile when sidebar is open) */}
       {isSidebarOpen && (
         <div
-          onClick={toggleSidebar}
-          className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
+          onClick={()=>toggleSidebar(!isSidebarOpen)}
+          className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
         ></div>
       )}
 
       {/* Main content area */}
-      <div className="flex flex-col overflow-hidden h-screen w-full bg-white ">
+      <div className="flex flex-col  h-screen w-full bg-white  ">
         {/* Top bar with burger icon to toggle sidebar on mobile */}
-        <div className="p-4 flex items-center md:hidden">
-          <div className="block md:hidden">
+        <div className="px-8 py-2 flex items-center lg:hidden">
+          <div className="block lg:hidden">
             <MenuOutlined
-              onClick={toggleSidebar}
+              onClick={()=>toggleSidebar(!isSidebarOpen)}
               className="text-xl text-gray-800 cursor-pointer"
             />
           </div>
