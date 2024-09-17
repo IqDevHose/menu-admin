@@ -1,4 +1,4 @@
-import {  Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
+import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -330,7 +330,7 @@ const Restaurant = () => {
             handleExport={handleExport}
             link="/restaurants/import"
           ></DropdownMenuDemo>
-          
+
         </div>
       </div>
       {filteredData?.length === 0 ? (
@@ -339,78 +339,71 @@ const Restaurant = () => {
         </div>
       ) : (
         <>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === filteredData?.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3 w-4">
-                  #
-                </th>
-                <th scope="col" className="px-6 py-3 w-4">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Access code
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Categories No.
-                </th>
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 w-4">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.length === filteredData?.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">{index + 1}</td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                  >
-                    {highlightText(item.name, searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{item.description}</td>
-                  <td className="px-6 py-4">{item.accessCode}</td>
-                  <td className="px-6 py-4">{item.categories.length}</td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    <button className="font-medium text-blue-600">
-                      <Link
-                        to={`/restaurants/edit/${item.id}`}
-                        state={item}
-                        data-tooltip-id="edit-restaurant-tooltip"
-                        data-tooltip-content="Edit restaurant"
-                      >
-                        <SquarePen />
-                      </Link>
-                    </button>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(item)}
-                      data-tooltip-id="delete-restaurant-tooltip"
-                      data-tooltip-content="Delete restaurant"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">#</th>
+                  <th scope="col" className="px-6 py-3 w-4">Name</th>
+                  <th scope="col" className="px-6 py-3">Description</th>
+                  <th scope="col" className="px-6 py-3">Access code</th>
+                  <th scope="col" className="px-6 py-3">Categories No.</th>
+                  <th scope="col" className="px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredData?.map((item: any, index: number) => (
+                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">{index + 1}</td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    >
+                      {highlightText(item.name, searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{item.description}</td>
+                    <td className="px-6 py-4">{item.accessCode}</td>
+                    <td className="px-6 py-4">{item.categories.length}</td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      <button className="font-medium text-blue-600">
+                        <Link
+                          to={`/restaurants/edit/${item.id}`}
+                          state={item}
+                          data-tooltip-id="edit-restaurant-tooltip"
+                          data-tooltip-content="Edit restaurant"
+                        >
+                          <SquarePen />
+                        </Link>
+                      </button>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(item)}
+                        data-tooltip-id="delete-restaurant-tooltip"
+                        data-tooltip-content="Delete restaurant"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
 
           {/* Pagination Component */}
           {totalPages > 1 && (
