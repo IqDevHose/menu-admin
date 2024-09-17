@@ -1,4 +1,5 @@
 import axiosInstance from "@/axiosInstance";
+import IconSelector from "@/components/IconSelector";
 import Spinner from "@/components/Spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -49,7 +50,11 @@ function AddCategory() {
 
     mutation.mutate(newCategory);
   };
-
+  const handleIconSelect = (title: string) => {
+    // setSelectedIconTitle(title);
+    // Here you can store the title in the database via an API call
+    console.log("Selected Icon Title:", title);
+  };
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -147,6 +152,7 @@ function AddCategory() {
             {mutation.isPending ? "Adding... " : "Add Category"}
           </button>
         </div>
+        <IconSelector onIconSelect={handleIconSelect} />
       </form>
     </div>
   );
