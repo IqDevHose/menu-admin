@@ -16,7 +16,7 @@ const Sidebar = () => {
     <>
       <aside
         id="separator-sidebar"
-        className="w-80 h-screen "
+        className="w-80 h-screen hidden md:block"
         aria-label="Sidebar"
       >
         <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-[#F3F8FF]">

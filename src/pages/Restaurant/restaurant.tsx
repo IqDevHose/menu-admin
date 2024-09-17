@@ -1,5 +1,4 @@
-import axios from "axios";
-import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
+import {  Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -11,7 +10,7 @@ import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; 
+import 'react-tooltip/dist/react-tooltip.css';
 
 type restaurantReviewType = {
   id: string;
@@ -95,7 +94,7 @@ const Restaurant = () => {
   });
 
 
-  const handleReload = async() => {
+  const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["restaurant"] });
     refetch()
   }
@@ -222,13 +221,13 @@ const Restaurant = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
       {/* Tooltip initialization */}
-      <ReactTooltip id="delete-many-tooltip" place="top"  />
-      <ReactTooltip id="reload-tooltip" place="top"  />
-      <ReactTooltip id="add-restaurant-tooltip" place="top"  />
-      <ReactTooltip id="trash-tooltip" place="top"  />
-      <ReactTooltip id="edit-restaurant-tooltip" place="top"  />
-      <ReactTooltip id="delete-restaurant-tooltip" place="top"  />
-  
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="reload-tooltip" place="top" />
+      <ReactTooltip id="add-restaurant-tooltip" place="top" />
+      <ReactTooltip id="trash-tooltip" place="top" />
+      <ReactTooltip id="edit-restaurant-tooltip" place="top" />
+      <ReactTooltip id="delete-restaurant-tooltip" place="top" />
+
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
@@ -274,7 +273,7 @@ const Restaurant = () => {
               </div>
             </button>
           )}
-  
+
           <button
             type="button"
             disabled={isRefetching}
@@ -297,7 +296,7 @@ const Restaurant = () => {
               />
             </span>
           </button>
-  
+
           <Link to="/restaurants/add">
             <button
               type="button"
@@ -313,7 +312,7 @@ const Restaurant = () => {
               </span>
             </button>
           </Link>
-  
+
           <Link to="/restaurants/trash">
             <button
               type="button"
@@ -326,11 +325,12 @@ const Restaurant = () => {
               </span>
             </button>
           </Link>
-  
+
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/restaurants/import"
           ></DropdownMenuDemo>
+          
         </div>
       </div>
       {filteredData?.length === 0 ? (
@@ -411,7 +411,7 @@ const Restaurant = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -424,7 +424,7 @@ const Restaurant = () => {
           )}
         </>
       )}
-  
+
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -456,7 +456,7 @@ const Restaurant = () => {
       )}
     </div>
   );
-  
+
 };
 
 export default Restaurant;
