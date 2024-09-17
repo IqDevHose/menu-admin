@@ -5,149 +5,137 @@ import {
   LayoutDashboard,
   MessageCircleCode,
   ShoppingBasket,
-  Star,
-  SunMoon,
+  X,
 } from "lucide-react";
-
 import { NavLink } from "react-router-dom";
 import Logout from "@/pages/Login/Logout";
+import { useGlobalSidebar } from "@/store";
+
 const Sidebar = () => {
+  const { isSidebarOpen, toggleSidebar } = useGlobalSidebar();
+
   return (
-    <>
-      <aside
-        id="separator-sidebar"
-        className="w-80 h-screen hidden md:block"
-        aria-label="Sidebar"
-      >
-        <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-[#F3F8FF]">
-          <div className="flex flex-col ">
-            <ul className="space-y-2 font-medium">
-              <li className="mb-3">
-                <NavLink
-                  to={"/"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg bg-indigo-800 "
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 shadow"
-                  }
-                >
-                  <LayoutDashboard />
-                  <span className="ms-3">Admin panal</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/restaurants"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <ChefHat />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Restaurant
-                  </span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/categories"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <ChartBarStacked />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Category
-                  </span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/items"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <ShoppingBasket />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Items
-                  </span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/customerReviews"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <MessageCircleCode />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Customer Review
-                  </span>
-                </NavLink>
-              </li>
-              {/* <li>
-                <NavLink
-                  to={"/ratings"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <Star />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Rating
-                  </span>
-                </NavLink>
-              </li> */}
-              <li>
-                <NavLink
-                  to={"/questions"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <FileQuestion />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Questions
-                  </span>
-                </NavLink>
-              </li>
-              {/* <li>
-                <NavLink
-                  to={"/themes"}
-                  className={(navData) =>
-                    navData.isActive
-                      ? "flex items-center p-2 text-white rounded-lg  bg-indigo-500 group"
-                      : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group "
-                  }
-                >
-                  <SunMoon />
-                  <span className="text-start flex-1 ms-3 whitespace-nowrap">
-                    Theme
-                  </span>
-                </NavLink>
-              </li> */}
-            </ul>
+    <aside
+      id="separator-sidebar"
+      className={`${
+        isSidebarOpen ? "block" : "hidden"
+      } lg:block fixed top-0 left-0 md:relative z-50 w-80 h-screen bg-[#F3F8FF]`}
+      aria-label="Sidebar"
+    >
+      <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto">
+        <div className="flex flex-col">
+          {/* Close button visible on mobile */}
+          <div className="flex justify-end mb-4 lg:hidden">
+            <button onClick={()=>toggleSidebar(!isSidebarOpen)}>
+              <X className="text-gray-800 cursor-pointer" size={24} />
+            </button>
           </div>
-          <div className="flex flex-col">
-            <Logout />
-          </div>
+
+          <ul className="space-y-2 font-medium">
+            {/* Admin Panel */}
+            <li className="mb-3">
+              <NavLink
+                to="/"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-800"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200 shadow"
+                }
+              >
+                <LayoutDashboard />
+                <span className="ml-3">Admin Panel</span>
+              </NavLink>
+            </li>
+
+            {/* Restaurants */}
+            <li>
+              <NavLink
+                to="/restaurants"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <ChefHat />
+                <span className="ml-3">Restaurants</span>
+              </NavLink>
+            </li>
+
+            {/* Categories */}
+            <li>
+              <NavLink
+                to="/categories"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <ChartBarStacked />
+                <span className="ml-3">Categories</span>
+              </NavLink>
+            </li>
+
+            {/* Items */}
+            <li>
+              <NavLink
+                to="/items"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <ShoppingBasket />
+                <span className="ml-3">Items</span>
+              </NavLink>
+            </li>
+
+            {/* Customer Reviews */}
+            <li>
+              <NavLink
+                to="/customerReviews"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <MessageCircleCode />
+                <span className="ml-3">Customer Reviews</span>
+              </NavLink>
+            </li>
+
+            {/* Questions */}
+            <li>
+              <NavLink
+                to="/questions"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <FileQuestion />
+                <span className="ml-3">Questions</span>
+              </NavLink>
+            </li>
+          </ul>
         </div>
-      </aside>
-    </>
+
+        {/* Logout button */}
+        <div className="flex flex-col">
+          <Logout />
+        </div>
+      </div>
+    </aside>
   );
 };
 

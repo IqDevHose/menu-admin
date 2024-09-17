@@ -109,8 +109,8 @@ const ImportTheme = (props: Props) => {
   };
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
-      <div className="flex justify-between">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+      <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           <label
             htmlFor="file"

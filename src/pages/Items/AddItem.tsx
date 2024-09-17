@@ -217,7 +217,7 @@ function AddItem() {
 
         {/* Upload Image */}
         <div className="mb-4">
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 flex-wrap items-center">
             <label
               htmlFor="upload-image"
               className="block text-sm font-medium text-gray-700"

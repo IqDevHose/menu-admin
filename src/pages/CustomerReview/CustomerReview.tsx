@@ -25,7 +25,7 @@ type customerReviewType = {
   comment: string;
   email: string;
   blue: string;
-  
+
 };
 
 interface DataItem {
@@ -100,8 +100,8 @@ const CustomerReview = () => {
     await queryClient.invalidateQueries({ queryKey: ["customerReview", currentPage, selectedRestaurant] });
     refetch(); // Optionally trigger refetch after invalidation
   };
-  
-  
+
+
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
@@ -139,16 +139,16 @@ const CustomerReview = () => {
     exportCSVFile(dataToConvert);
   };
 
- 
+
   function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
     let count = 0;
-  
+
     // Handle case where no ratings are provided
     if (!ratings || ratings.length === 0) {
       return <FaRegStar size={16} color="gray" title="No ratings" />;
     }
-  
+
     // Sum up all the valid ratings
     for (let index = 0; index < ratings.length; index++) {
       const score = ratings[index]?.score;
@@ -157,24 +157,24 @@ const CustomerReview = () => {
         count += 1;
       }
     }
-  
+
     // Handle case where there are no valid ratings
     if (count === 0) {
       return <FaRegStar size={16} color="gray" title="No valid ratings" />;
     }
-  
+
     // Calculate the average score out of 5
     const average = sum / count;
     const fullStars = Math.floor(average); // Full stars based on the integer part
     const halfStar = average % 1 >= 0.5; // Check if there should be a half star
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Calculate empty stars
-  
+
     // Function to handle star click
     const handleStarClick = () => {
       setSelectedChildData(ratings); // Pass the entire rating array to the popup
       setShowChildPopup(true);
     };
-  
+
     // Display multiple stars based on the average rating
     return (
       <>
@@ -190,10 +190,10 @@ const CustomerReview = () => {
             .map((_, index) => (
               <FaStar key={`full-${index}`} size={16} className="text-yellow-300" />
             ))}
-          
+
           {/* Render half star */}
           {halfStar && <FaStarHalfAlt size={16} className="text-yellow-300" />}
-  
+
           {/* Render empty stars */}
           {Array(emptyStars)
             .fill(0)
@@ -201,13 +201,13 @@ const CustomerReview = () => {
               <FaRegStar key={`empty-${index}`} size={16} className="text-gray-300" />
             ))}
         </div>
-        
+
         {/* Initialize the tooltip */}
         <ReactTooltip id="rating-tooltip" place="top" />
       </>
     );
   }
-  
+
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
@@ -297,20 +297,20 @@ const CustomerReview = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
       {/* Tooltip initialization */}
-      <ReactTooltip id="delete-many-tooltip" place="top"  />
-      <ReactTooltip id="reload-tooltip" place="top"  />
-      <ReactTooltip id="add-review-tooltip" place="top"  />
-      <ReactTooltip id="trash-tooltip" place="top"  />
-      <ReactTooltip id="edit-review-tooltip" place="top"  />
-      <ReactTooltip id="delete-review-tooltip" place="top"  />
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="reload-tooltip" place="top" />
+      <ReactTooltip id="add-review-tooltip" place="top" />
+      <ReactTooltip id="trash-tooltip" place="top" />
+      <ReactTooltip id="edit-review-tooltip" place="top" />
+      <ReactTooltip id="delete-review-tooltip" place="top" />
 
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
         </label>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 flex-wrap items-center">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
               <svg
@@ -365,21 +365,21 @@ const CustomerReview = () => {
               </div>
             </button>
           )}
-         <button
-        type="button"
-        disabled={isRefetching}
-        className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
-        onClick={handleReload} // Updated to handleReload
-        data-tooltip-id="reload-tooltip"
-        data-tooltip-content="Reload reviews"
-      >
-        <span className="hidden xl:flex items-center gap-1">
-          <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
-        </span>
-        <span className="inline xl:hidden">
-          <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
-        </span>
-      </button>
+          <button
+            type="button"
+            disabled={isRefetching}
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
+            onClick={handleReload} // Updated to handleReload
+            data-tooltip-id="reload-tooltip"
+            data-tooltip-content="Reload reviews"
+          >
+            <span className="hidden xl:flex items-center gap-1">
+              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
+            </span>
+            <span className="inline xl:hidden">
+              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
+            </span>
+          </button>
           <Link to="/customerReviews/add">
             <button
               type="button"
@@ -420,88 +420,76 @@ const CustomerReview = () => {
         </div>
       ) : (
         <>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 ">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === filteredData?.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3 ">
-                  Date
-                </th>
-                <th scope="col" className="px-6 py-3 ">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Comment
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Avg Rating
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Phone
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Email
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Birthday
-                </th>
-
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 ">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.length === filteredData?.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">
-                    {new Date(item.createdAt).toLocaleDateString()} -{" "}
-                    {new Date(item.createdAt).toLocaleTimeString()}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {highlightText(item.name || "", searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{item.comment}</td>
-                  <td className="px-6 py-4">{summation(item.rating)}</td>
-                  <td className="px-6 py-4">{item.phone}</td>
-                  <td className="px-6 py-4">{item.email}</td>
-                  <td className="px-6 py-4">
-                    {new Date(item.birthday).toLocaleDateString("en-CA")}
-                  </td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    <Link
-                      to={`/customerReviews/edit/${item.id}`}
-                      className="font-medium text-blue-600"
-                      state={item}
-                      data-tooltip-id="edit-review-tooltip"
-                      data-tooltip-content="Edit review"
-                    >
-                      <SquarePen />
-                    </Link>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(item)}
-                      data-tooltip-id="delete-review-tooltip"
-                      data-tooltip-content="Delete review"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
+                  </th>
+                  <th scope="col" className="px-6 py-3 ">Date</th>
+                  <th scope="col" className="px-6 py-3 ">Name</th>
+                  <th scope="col" className="px-6 py-3">Comment</th>
+                  <th scope="col" className="px-6 py-3">Avg Rating</th>
+                  <th scope="col" className="px-6 py-3">Phone</th>
+                  <th scope="col" className="px-6 py-3">Email</th>
+                  <th scope="col" className="px-6 py-3">Birthday</th>
+                  <th scope="col" className="px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredData?.map((item: any, index: number) => (
+                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      {new Date(item.createdAt).toLocaleDateString()} -{" "}
+                      {new Date(item.createdAt).toLocaleTimeString()}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {highlightText(item.name || "", searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{item.comment}</td>
+                    <td className="px-6 py-4">{summation(item.rating)}</td>
+                    <td className="px-6 py-4">{item.phone}</td>
+                    <td className="px-6 py-4">{item.email}</td>
+                    <td className="px-6 py-4">
+                      {new Date(item.birthday).toLocaleDateString("en-CA")}
+                    </td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      <Link
+                        to={`/customerReviews/edit/${item.id}`}
+                        className="font-medium text-blue-600"
+                        state={item}
+                        data-tooltip-id="edit-review-tooltip"
+                        data-tooltip-content="Edit review"
+                      >
+                        <SquarePen />
+                      </Link>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(item)}
+                        data-tooltip-id="delete-review-tooltip"
+                        data-tooltip-content="Delete review"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
 
           <div className="flex justify-center items-center mt-10">
             <Pagination

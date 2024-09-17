@@ -87,7 +87,7 @@ const Questions = () => {
     refetchOnWindowFocus: true
   });
 
-  const handleReload = async () => { 
+  const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["questions"] });
     refetch(); // Optionally trigger refetch after invalidation
   }
@@ -214,15 +214,15 @@ const Questions = () => {
     return <div>Error</div>;
   }
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
       {/* Tooltip initialization */}
-      <ReactTooltip id="delete-many-tooltip" place="top"  />
-      <ReactTooltip id="reload-tooltip" place="top"  />
-      <ReactTooltip id="add-question-tooltip" place="top"  />
-      <ReactTooltip id="trash-tooltip" place="top"  />
-      <ReactTooltip id="edit-question-tooltip" place="top"  />
-      <ReactTooltip id="delete-question-tooltip" place="top"  />
-  
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="reload-tooltip" place="top" />
+      <ReactTooltip id="add-question-tooltip" place="top" />
+      <ReactTooltip id="trash-tooltip" place="top" />
+      <ReactTooltip id="edit-question-tooltip" place="top" />
+      <ReactTooltip id="delete-question-tooltip" place="top" />
+
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search
@@ -252,7 +252,7 @@ const Questions = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-  
+
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
@@ -269,7 +269,7 @@ const Questions = () => {
               </div>
             </button>
           )}
-  
+
           <button
             type="button"
             disabled={isRefetching}
@@ -292,7 +292,7 @@ const Questions = () => {
               />
             </span>
           </button>
-  
+
           <Link to={"/questions/add"}>
             <button
               type="button"
@@ -308,7 +308,7 @@ const Questions = () => {
               </span>
             </button>
           </Link>
-  
+
           <Link to={"/questions/trash"}>
             <button
               type="button"
@@ -321,14 +321,14 @@ const Questions = () => {
               </span>
             </button>
           </Link>
-  
+
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/questions/import"
           ></DropdownMenuDemo>
         </div>
       </div>
-  
+
       {/* Conditional rendering when no items are found */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
@@ -337,84 +337,87 @@ const Questions = () => {
       ) : (
         <>
           {/* Items Table */}
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
-              <tr>
-                <th scope="col" className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === filteredData?.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3 w-4 ">
-                  #
-                </th>
-                <th scope="col" className="px-6 py-3 w-4 ">
-                  Restaurant Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Title
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  en Title
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Answer
-                </th>
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData?.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
+                <tr>
+                  <th scope="col" className="px-6 py-3 w-4">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.length === filteredData?.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                  >
-                    {highlightText(item.resturant?.name || "", searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{item.title}</td>
-                  <td className="px-6 py-4">{item.enTitle}</td>
-                  <td className="px-6 py-4">{item.description}</td>
-                  <td className="px-6 py-4">{item?.answer}</td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    <button
-                      className="font-medium text-blue-600"
-                      data-tooltip-id="edit-question-tooltip"
-                      data-tooltip-content="Edit question"
-                    >
-                      <Link to={`/questions/edit/${item.id}`} state={item}>
-                        <SquarePen />
-                      </Link>
-                    </button>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(item)}
-                      data-tooltip-id="delete-question-tooltip"
-                      data-tooltip-content="Delete question"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">
+                    Restaurant Name
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Title
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    en Title
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Answer
+                  </th>
+                  <th scope="col" className="px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-  
+              </thead>
+              <tbody>
+                {currentData?.map((item: any, index: number) => (
+                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    >
+                      {highlightText(item.resturant?.name || "", searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{item.title}</td>
+                    <td className="px-6 py-4">{item.enTitle}</td>
+                    <td className="px-6 py-4">{item.description}</td>
+                    <td className="px-6 py-4">{item?.answer}</td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      <button
+                        className="font-medium text-blue-600"
+                        data-tooltip-id="edit-question-tooltip"
+                        data-tooltip-content="Edit question"
+                      >
+                        <Link to={`/questions/edit/${item.id}`} state={item}>
+                          <SquarePen />
+                        </Link>
+                      </button>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(item)}
+                        data-tooltip-id="delete-question-tooltip"
+                        data-tooltip-content="Delete question"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -427,7 +430,7 @@ const Questions = () => {
           )}
         </>
       )}
-  
+
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -444,7 +447,7 @@ const Questions = () => {
           </p>
         </Popup>
       )}
-  
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
@@ -460,7 +463,7 @@ const Questions = () => {
       )}
     </div>
   );
-  
+
 };
 
 export default Questions;
