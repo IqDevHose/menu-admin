@@ -209,7 +209,7 @@ const DeletedCategories = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full m-14 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="restore-many-tooltip" place="top-end" />
       <ReactTooltip id="restore-tooltip" place="top" />
