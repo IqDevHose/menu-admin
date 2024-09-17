@@ -19,7 +19,7 @@ const Sidebar = () => {
       id="separator-sidebar"
       className={`${
         isSidebarOpen ? "block" : "hidden"
-      } lg:block fixed top-0 left-0 md:relative z-50 w-80 h-screen bg-[#F3F8FF]`}
+      } lg:block fixed top-0 left-0 lg:relative z-50 w-80 h-screen bg-[#F3F8FF]`}
       aria-label="Sidebar"
     >
       <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto">
