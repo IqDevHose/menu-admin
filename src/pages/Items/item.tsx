@@ -81,8 +81,8 @@ const Item = () => {
     queryKey: ["items"],
     queryFn: async () => {
       const item = await axiosInstance.get(`/item?page=all`);
-      const dataExcludedCategory = item.data.items.map((item:any) => {
-        const {category,...rest} = item
+      const dataExcludedCategory = item.data.items.map((item: any) => {
+        const { category, ...rest } = item
         return rest
       })
       const heads: any[] = extractHeaders(dataExcludedCategory);
@@ -95,11 +95,11 @@ const Item = () => {
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)
     );
-console.log(flattenedData,exportData)
-const dataExcludedCategory = exportData.items.map((items:any)=>{
-  const {category, ...rest} = items
-  return rest
-})
+    console.log(flattenedData, exportData)
+    const dataExcludedCategory = exportData.items.map((items: any) => {
+      const { category, ...rest } = items
+      return rest
+    })
     const dataToConvert = {
       data: dataExcludedCategory,
       filename: "items",
@@ -132,7 +132,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
 
   });
 
-  const handleReload = async () => { 
+  const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["items", selectedCategory, selectedRestaurant] });
     refetch(); // Optionally trigger refetch after invalidation
   }
@@ -260,13 +260,13 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
       {/* Tooltip initialization */}
-      <ReactTooltip id="delete-many-tooltip" place="top"  />
-      <ReactTooltip id="reload-tooltip" place="top"  />
-      <ReactTooltip id="add-item-tooltip" place="top"  />
-      <ReactTooltip id="trash-tooltip" place="top"  />
-      <ReactTooltip id="edit-item-tooltip" place="top"  />
-      <ReactTooltip id="delete-item-tooltip" place="top"  />
-  
+      <ReactTooltip id="delete-many-tooltip" place="top" />
+      <ReactTooltip id="reload-tooltip" place="top" />
+      <ReactTooltip id="add-item-tooltip" place="top" />
+      <ReactTooltip id="trash-tooltip" place="top" />
+      <ReactTooltip id="edit-item-tooltip" place="top" />
+      <ReactTooltip id="delete-item-tooltip" place="top" />
+
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -295,7 +295,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-  
+
           {/* Category Filter */}
           <select
             value={selectedCategory}
@@ -310,7 +310,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               </option>
             ))}
           </select>
-  
+
           {/* Restaurant Filter */}
           <select
             value={selectedRestaurant}
@@ -328,7 +328,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
             ))}
           </select>
         </div>
-  
+
         <div className="gap-2 flex items-start justify-center">
           {selectedItems.length > 0 && (
             <button
@@ -345,7 +345,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               </div>
             </button>
           )}
-  
+
           <button
             type="button"
             disabled={isRefetching}
@@ -368,7 +368,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               />
             </span>
           </button>
-  
+
           <Link to="/items/add">
             <button
               type="button"
@@ -384,7 +384,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               </span>
             </button>
           </Link>
-  
+
           <Link to="/items/trash">
             <button
               type="button"
@@ -397,11 +397,11 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
               </span>
             </button>
           </Link>
-  
+
           <DropdownMenuDemo handleExport={handleExport} link="/items/import" />
         </div>
       </div>
-  
+
       {/* Conditional rendering when there are no items */}
       {currentData && currentData.length === 0 ? (
         <div className="w-full text-center py-10">
@@ -410,74 +410,67 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
       ) : (
         <>
           {/* Items Table */}
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === currentData?.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  #
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Price
-                </th>
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData?.map((item: any, index: number) => (
-                <>
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 w-4">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.length === currentData?.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {highlightText(item?.name, searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{item?.description}</td>
-                  <td className="px-6 py-4">{item?.price}</td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    <Link
-                      to={`/items/edit/${item.id}`}
-                      state={item}
-                      data-tooltip-id="edit-item-tooltip"
-                      data-tooltip-content="Edit item"
-                    >
-                      <SquarePen className="text-blue-600" />
-                    </Link>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(item)}
-                      data-tooltip-id="delete-item-tooltip"
-                      data-tooltip-content="Delete item"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
+                  </th>
+                  <th scope="col" className="px-6 py-3">#</th>
+                  <th scope="col" className="px-6 py-3">Name</th>
+                  <th scope="col" className="px-6 py-3">Description</th>
+                  <th scope="col" className="px-6 py-3">Price</th>
+                  <th scope="col" className="px-6 py-3"></th>
                 </tr>
-                </>
-              ))}
-            </tbody>
-          </table>
-  
+              </thead>
+              <tbody>
+                {currentData?.map((item: any, index: number) => (
+                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {highlightText(item?.name, searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{item?.description}</td>
+                    <td className="px-6 py-4">{item?.price}</td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      <Link
+                        to={`/items/edit/${item.id}`}
+                        state={item}
+                        data-tooltip-id="edit-item-tooltip"
+                        data-tooltip-content="Edit item"
+                      >
+                        <SquarePen className="text-blue-600" />
+                      </Link>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(item)}
+                        data-tooltip-id="delete-item-tooltip"
+                        data-tooltip-content="Delete item"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -490,7 +483,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
           )}
         </>
       )}
-  
+
       {/* Delete Confirmation Popup for Multiple Items */}
       {showDeleteManyPopup && (
         <Popup
@@ -508,7 +501,7 @@ const dataExcludedCategory = exportData.items.map((items:any)=>{
           </p>
         </Popup>
       )}
-  
+
       {/* Delete Confirmation Popup for Single Item */}
       {showPopup && (
         <Popup

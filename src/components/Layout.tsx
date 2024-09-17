@@ -20,7 +20,7 @@ const Layout = () => {
       )}
 
       {/* Main content area */}
-      <div className="flex flex-col overflow-auto h-screen w-full bg-white ">
+      <div className="flex flex-col overflow-hidden h-screen w-full bg-white ">
         {/* Top bar with burger icon to toggle sidebar on mobile */}
         <div className="p-4 flex items-center md:hidden">
           <div className="block md:hidden">

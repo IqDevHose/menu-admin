@@ -232,7 +232,7 @@ const Category = () => {
       <ReactTooltip id="trash-tooltip" place="top" />
       <ReactTooltip id="edit-category-tooltip" place="top" />
       <ReactTooltip id="delete-category-tooltip" place="top" />
-  
+
       <div className="flex justify-between">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -275,7 +275,7 @@ const Category = () => {
             ))}
           </select>
         </div>
-  
+
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
@@ -313,7 +313,7 @@ const Category = () => {
               />
             </span>
           </button>
-  
+
           <Link to={"/categories/add"}>
             <button
               type="button"
@@ -329,7 +329,7 @@ const Category = () => {
               </span>
             </button>
           </Link>
-  
+
           <Link to={"/categories/trash"}>
             <button
               type="button"
@@ -342,89 +342,82 @@ const Category = () => {
               </span>
             </button>
           </Link>
-  
+
           <DropdownMenuDemo
             handleExport={handleExport}
             link="/categories/import"
           ></DropdownMenuDemo>
         </div>
       </div>
-  
+
       {currentData.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No categories found.</p>
         </div>
       ) : (
         <>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === currentData.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3 w-4">
-                  #
-                </th>
-                <th scope="col" className="px-6 py-3 w-4">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Items No.
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Restaurant
-                </th>
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.map((item: any, index: number) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 w-4">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.length === currentData.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {highlightText(item?.name || "", searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{item?.items?.length || 0}</td>
-                  <td className="px-6 py-4">
-                    {item?.name || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    <Link
-                      to={`/categories/edit/${item.id}`}
-                      state={item}
-                      className="font-medium text-blue-600"
-                      data-tooltip-id="edit-category-tooltip"
-                      data-tooltip-content="Edit category"
-                    >
-                      <SquarePen />
-                    </Link>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(item)}
-                      data-tooltip-id="delete-category-tooltip"
-                      data-tooltip-content="Delete category"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">#</th>
+                  <th scope="col" className="px-6 py-3 w-4">Name</th>
+                  <th scope="col" className="px-6 py-3">Items No.</th>
+                  <th scope="col" className="px-6 py-3">Restaurant</th>
+                  <th scope="col" className="px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-  
+              </thead>
+              <tbody>
+                {currentData.map((item: any, index: number) => (
+                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {highlightText(item?.name || "", searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{item?.items?.length || 0}</td>
+                    <td className="px-6 py-4">{item?.name || "N/A"}</td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      <Link
+                        to={`/categories/edit/${item.id}`}
+                        state={item}
+                        className="font-medium text-blue-600"
+                        data-tooltip-id="edit-category-tooltip"
+                        data-tooltip-content="Edit category"
+                      >
+                        <SquarePen />
+                      </Link>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(item)}
+                        data-tooltip-id="delete-category-tooltip"
+                        data-tooltip-content="Delete category"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
               <Pagination
@@ -436,7 +429,7 @@ const Category = () => {
           )}
         </>
       )}
-  
+
       {showDeleteManyPopup && (
         <Popup
           onClose={() => setShowDeleteManyPopup(false)}
@@ -453,7 +446,7 @@ const Category = () => {
           </p>
         </Popup>
       )}
-  
+
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
