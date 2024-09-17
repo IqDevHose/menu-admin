@@ -128,7 +128,7 @@ const Home: React.FC = () => {
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
-    <div className="p-8 w-full overflow-hidden bg-white min-h-screen flex">
+    <div className="p-8 w-full bg-white min-h-screen flex">
       <div className="flex-1">
         <div className="flex items-center space-x-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
