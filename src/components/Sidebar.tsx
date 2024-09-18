@@ -129,7 +129,7 @@ const Sidebar = () => {
             </li>
             <li>
               <NavLink
-                to="/offer"
+                to="/offers"
                 onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive

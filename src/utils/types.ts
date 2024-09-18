@@ -24,6 +24,27 @@ export interface AvgRatingPerRestaurant {
   averageRating: number; // Assuming there is an averageRating field
 }
 
+// Define the offer interface for both active and deleted offers
+export interface Offer {
+  id: number;
+  title: string;
+  image: string;
+  description: string;
+}
+
+// Define the PopupProps interface for the Popup component
+export interface PopupProps {
+  children: React.ReactNode;
+  onClose: () => void;
+  onConfirm: () => void;
+  loading?: boolean;
+  loadingText?: string;
+  confirmText?: string;
+  cancelText?: string;
+  showOneBtn?: boolean;
+  confirmButtonVariant?: "primary" | "red" | "default";
+}
+
 
 export interface StatsData {
   totalCustomerReview: number;

@@ -1,9 +1,8 @@
 import React, { useRef, useEffect } from "react";
-
 interface PopupProps {
   children: React.ReactNode;
   onClose: () => void;
-  loading: boolean;
+  loading?: boolean;  // Make loading optional
   loadingText?: string;
   onConfirm: () => void;
   confirmText?: string;
@@ -15,7 +14,7 @@ interface PopupProps {
 const Popup: React.FC<PopupProps> = ({
   children,
   onClose,
-  loading,
+  loading = false,  // Default value for loading is false
   loadingText,
   onConfirm,
   confirmText,
@@ -24,10 +23,9 @@ const Popup: React.FC<PopupProps> = ({
   confirmButtonVariant = "primary",
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
-  
 
   const handleConfirm = () => {
-    if (!loading) {
+    if (!loading && onConfirm) {  // Only call onConfirm if it exists
       onConfirm();
     }
   };
@@ -65,15 +63,15 @@ const Popup: React.FC<PopupProps> = ({
               onClick={onClose}
               className="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
             >
-              {cancelText || ("cancel")}
+              {cancelText || "Cancel"}
             </button>
           )}
           <button
-            onClick={handleConfirm}
+            onClick={showOneBtn ? onClose : handleConfirm}
             disabled={loading}
             className={`py-2.5 px-5 text-sm font-medium text-white rounded focus:outline-none focus:ring-4 focus:ring-blue-300 ${confirmButtonClass}`}
           >
-            {loading ? loadingText || ("Loading...") : confirmText || ("Confirm")}
+            {loading ? loadingText || "Loading..." : confirmText || "Confirm"}
           </button>
         </div>
       </div>

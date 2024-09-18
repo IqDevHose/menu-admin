@@ -1,26 +1,30 @@
 import { useState } from 'react';
-import { Plus, Eye, RotateCw, Trash2, SquarePen } from 'lucide-react';
+import { Plus, RotateCw, Trash2, SquarePen } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
+import { Offer } from '../../utils/types'; // Import the Offer interface
 import Popup from '@/components/Popup';
 import Spinner from '@/components/Spinner';
 import Pagination from '@/components/Pagination';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 
-const Offer = () => {
-  const [selectedOffer, setSelectedOffer] = useState(null);
+const Offers = () => {
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);  // Use the Offer interface here
   const [showPopup, setShowPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Set the number of items per page
+  const itemsPerPage = 10;
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Dummy data for offers
-  const offers = [
+  const offers: Offer[] = [  // Explicitly typing the offers array as Offer[]
     {
       id: 1,
       title: '50% Off Summer Sale',
@@ -41,7 +45,6 @@ const Offer = () => {
     },
   ];
 
-  // Simulate fetching offers with search and pagination
   const filteredOffers = offers.filter(offer =>
     offer.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -51,30 +54,45 @@ const Offer = () => {
     currentPage * itemsPerPage
   );
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   const handleReload = async () => {
-    // Trigger a reload of the data
     await queryClient.invalidateQueries({ queryKey: ['offers'] });
   };
 
-  const handleViewOffer = (offer) => {
+  const handleViewOffer = (offer: Offer) => {
     setSelectedOffer(offer);
     setShowPopup(true);
   };
 
-  const handleDeleteClick = (offer) => {
+  const handleDeleteClick = (offer: Offer) => {
     setSelectedOffer(offer);
-    setShowPopup(true); // Show confirmation popup
+    setShowDeletePopup(true);
   };
 
+  const deleteOfferMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await fetch(`/api/offers/${id}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['offers']);
+      setShowDeletePopup(false);
+      setSelectedOffer(null);
+    },
+  });
+
   const confirmDelete = () => {
-    // Logic for deleting the selected offer
-    console.log(`Deleted offer: ${selectedOffer.title}`);
-    setSelectedOffer(null);
-    setShowPopup(false);
+    if (selectedOffer) {
+      deleteOfferMutation.mutate(selectedOffer.id);
+    }
+  };
+
+  const handleEditOffer = (offerId: number) => {
+    navigate(`/offers/edit/${offerId}`);
   };
 
   return (
@@ -129,29 +147,34 @@ const Offer = () => {
             </span>
           </button>
 
-          <Button
-            variant="default"
-            className="flex items-center"
-            data-tooltip-id="add-offer-tooltip"
-            data-tooltip-content="Add new offer"
-          >
-            <Plus className="mr-2" />
-            Add New Offer
-          </Button>
+          <Link to={"/offers/add"}>
+            <button
+              type="button"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="add-question-tooltip"
+              data-tooltip-content="Add new question"
+            >
+              <span className="hidden xl:flex items-center gap-1">
+                <Plus size={16} /> Add Offers
+              </span>
+              <span className="inline xl:hidden">
+                <Plus size={16} />
+              </span>
+            </button>
+          </Link>
 
-          <Button
-            variant="default"
-            className="flex items-center bg-gray-800 hover:bg-gray-900 text-white"
-            data-tooltip-id="trash-tooltip"
-            data-tooltip-content="View trashed offers"
-            onClick={() => {
-              // Navigate or trigger logic to show trashed offers
-              console.log("Navigate to trash view");
-            }}
-          >
-            <Trash2 className="mr-2" />
-            Trash
-          </Button>
+          <Link to={"/offers/trash"}>
+            <button
+              type="button"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="trash-tooltip"
+              data-tooltip-content="View trashed questions"
+            >
+              <span className="flex gap-1 items-center">
+                <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
+              </span>
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -161,6 +184,7 @@ const Offer = () => {
           <Card
             key={offer.id}
             className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleViewOffer(offer)}
           >
             <AspectRatio ratio={16 / 9}>
               <img
@@ -177,9 +201,14 @@ const Offer = () => {
             <CardFooter className="flex justify-between p-3 items-center">
               <span className="text-xs text-gray-500">Offer ID: {offer.id}</span>
               <div className="flex gap-4">
-                <Eye className="text-gray-500 cursor-pointer" onClick={() => handleViewOffer(offer)} />
-                <SquarePen className="text-blue-500 cursor-pointer" />
-                <Trash2 className="text-red-500 cursor-pointer" onClick={() => handleDeleteClick(offer)} />
+                <SquarePen className="text-blue-500 cursor-pointer" onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering card click
+                  handleEditOffer(offer.id);
+                }} />
+                <Trash2 className="text-red-500 cursor-pointer" onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering card click
+                  handleDeleteClick(offer);
+                }} />
               </div>
             </CardFooter>
           </Card>
@@ -198,13 +227,35 @@ const Offer = () => {
       )}
 
       {/* Popup for viewing offer details */}
-      {showPopup && (
+      {showPopup && selectedOffer && (
         <Popup
           onClose={() => setShowPopup(false)}
-          onConfirm={confirmDelete}
+          onConfirm={() => {}}  // Dummy function since we don't need this action
+          confirmText="Close"
+          showOneBtn={true}
+        >
+          <div className="p-4">
+            <h2 className="text-xl font-bold">{selectedOffer.title}</h2>
+            <img
+              src={selectedOffer.image}
+              alt={selectedOffer.title}
+              className="w-full h-60 object-cover my-4"
+            />
+            <p>{selectedOffer.description}</p>
+            <p className="text-gray-500 text-sm mt-4">Offer ID: {selectedOffer.id}</p>
+          </div>
+        </Popup>
+      )}
+
+      {/* Popup for delete confirmation */}
+      {showDeletePopup && selectedOffer && (
+        <Popup
+          onClose={() => setShowDeletePopup(false)}  // Pass the onClose function
+          onConfirm={confirmDelete}                  // Pass the onConfirm function
+          loading={false}                            // Set loading state as needed
           confirmText="Delete"
           cancelText="Cancel"
-          confirmButtonVariant="red"
+          confirmButtonVariant="red"                 // Set button variant
         >
           <div className="p-4">
             <h2 className="text-xl font-bold">Are you sure you want to delete this offer?</h2>
@@ -217,4 +268,4 @@ const Offer = () => {
   );
 };
 
-export default Offer;
+export default Offers;

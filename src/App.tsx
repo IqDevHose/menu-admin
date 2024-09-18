@@ -39,7 +39,8 @@ import ImportRestaurant from "./pages/Restaurant/ImportRestauarnt";
 // import ImportRating from "./pages/Rating/ImportRating";
 import ImportQuestion from "./pages/Questions/ImportQuestion";
 import ImportCustomerReview from "./pages/CustomerReview/ImportCustomerReview";
-import Offer from "./pages/Offers/Offer";
+import Offer from "./pages/Offers/Offers";
+import DeletedOffers from "./pages/Offers/DeletedOffers";
 
 function App() {
   return (
@@ -127,8 +128,9 @@ function App() {
           
           {/* end questions */}
             {/* questions */}
-            <Route path="/offer/*">
+            <Route path="/offers/*">
             <Route index element={<Offer />} />
+            <Route path="trash" element={<DeletedOffers />} />
            
           </Route>
 
