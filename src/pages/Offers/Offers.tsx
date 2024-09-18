@@ -1,17 +1,24 @@
-import { useState } from 'react';
-import { Plus, Eye, RotateCw, Trash2, SquarePen } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import Popup from '@/components/Popup';
-import Spinner from '@/components/Spinner';
-import Pagination from '@/components/Pagination';
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
+import { useState } from "react";
+import { Plus, Eye, RotateCw, Trash2, SquarePen } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Popup from "@/components/Popup";
+import Spinner from "@/components/Spinner";
+import Pagination from "@/components/Pagination";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+import { Link } from "react-router-dom";
 
-const Offer = () => {
+const Offers = () => {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,26 +30,29 @@ const Offer = () => {
   const offers = [
     {
       id: 1,
-      title: '50% Off Summer Sale',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Get 50% off on all summer items. Limited time offer!',
+      title: "50% Off Summer Sale",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Get 50% off on all summer items. Limited time offer!",
     },
     {
       id: 2,
-      title: 'Buy One Get One Free',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Buy one item and get another one for free. Don\'t miss out!',
+      title: "Buy One Get One Free",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Buy one item and get another one for free. Don't miss out!",
     },
     {
       id: 3,
-      title: 'Free Shipping on Orders Over $100',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Enjoy free shipping when your order exceeds $100.',
+      title: "Free Shipping on Orders Over $100",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Enjoy free shipping when your order exceeds $100.",
     },
   ];
 
   // Simulate fetching offers with search and pagination
-  const filteredOffers = offers.filter(offer =>
+  const filteredOffers = offers.filter((offer) =>
     offer.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const totalPages = Math.ceil(filteredOffers.length / itemsPerPage);
@@ -57,7 +67,7 @@ const Offer = () => {
 
   const handleReload = async () => {
     // Trigger a reload of the data
-    await queryClient.invalidateQueries({ queryKey: ['offers'] });
+    await queryClient.invalidateQueries({ queryKey: ["offers"] });
   };
 
   const handleViewOffer = (offer) => {
@@ -129,16 +139,21 @@ const Offer = () => {
             </span>
           </button>
 
-          <Button
-            variant="default"
-            className="flex items-center"
-            data-tooltip-id="add-offer-tooltip"
-            data-tooltip-content="Add new offer"
-          >
-            <Plus className="mr-2" />
-            Add New Offer
-          </Button>
-
+          <Link to="/offer/add">
+            <button
+              type="button"
+              className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
+              data-tooltip-id="add-offer-tooltip"
+              data-tooltip-content="Add new offer"
+            >
+              <span className="hidden xl:flex items-center gap-1">
+                <Plus size={16} /> Add offer
+              </span>
+              <span className="inline xl:hidden">
+                <Plus size={16} />
+              </span>
+            </button>
+          </Link>
           <Button
             variant="default"
             className="flex items-center bg-gray-800 hover:bg-gray-900 text-white"
@@ -171,15 +186,32 @@ const Offer = () => {
             </AspectRatio>
             <CardHeader className="p-4">
               <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
-              <CardDescription className="truncate">{offer.description}</CardDescription>
+              <CardDescription className="truncate">
+                {offer.description}
+              </CardDescription>
             </CardHeader>
             <Separator />
             <CardFooter className="flex justify-between p-3 items-center">
-              <span className="text-xs text-gray-500">Offer ID: {offer.id}</span>
+              <span className="text-xs text-gray-500">
+                Offer ID: {offer.id}
+              </span>
               <div className="flex gap-4">
-                <Eye className="text-gray-500 cursor-pointer" onClick={() => handleViewOffer(offer)} />
-                <SquarePen className="text-blue-500 cursor-pointer" />
-                <Trash2 className="text-red-500 cursor-pointer" onClick={() => handleDeleteClick(offer)} />
+                <Eye
+                  className="text-gray-500 cursor-pointer"
+                  onClick={() => handleViewOffer(offer)}
+                />
+                <Link
+                  to={`/offer/edit/${offer.id}`}
+                  state={offer}
+                  data-tooltip-id="edit-item-tooltip"
+                  data-tooltip-content="Edit item"
+                >
+                  <SquarePen className="text-blue-600" />
+                </Link>
+                <Trash2
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => handleDeleteClick(offer)}
+                />
               </div>
             </CardFooter>
           </Card>
@@ -207,9 +239,15 @@ const Offer = () => {
           confirmButtonVariant="red"
         >
           <div className="p-4">
-            <h2 className="text-xl font-bold">Are you sure you want to delete this offer?</h2>
-            <p className="text-gray-500 text-sm mt-4">Offer: {selectedOffer?.title}</p>
-            <p className="text-gray-500 text-sm">Offer ID: {selectedOffer?.id}</p>
+            <h2 className="text-xl font-bold">
+              Are you sure you want to delete this offer?
+            </h2>
+            <p className="text-gray-500 text-sm mt-4">
+              Offer: {selectedOffer?.title}
+            </p>
+            <p className="text-gray-500 text-sm">
+              Offer ID: {selectedOffer?.id}
+            </p>
           </div>
         </Popup>
       )}
@@ -217,4 +255,4 @@ const Offer = () => {
   );
 };
 
-export default Offer;
+export default Offers;

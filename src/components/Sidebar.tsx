@@ -129,7 +129,7 @@ const Sidebar = () => {
             </li>
             <li>
               <NavLink
-                to="/offer"
+                to="/offers"
                 onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
@@ -138,7 +138,7 @@ const Sidebar = () => {
                 }
               >
                 <MessageCircleCode />
-                <span className="ml-3">Offer</span>
+                <span className="ml-3">Offers</span>
               </NavLink>
             </li>
           </ul>
