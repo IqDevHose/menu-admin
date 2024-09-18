@@ -11,6 +11,8 @@ type categoryType = {
   icon?: string | null; // Use a base64 encoded string instead of a File
 };
 
+
+
 function EditCategory() {
   const location = useLocation();
   const record = location.state;
@@ -132,7 +134,11 @@ function EditCategory() {
           >
             Select Icon
           </label>
-          <IconSelector onIconSelect={handleIconSelect} />
+          <IconSelector
+            onIconSelect={handleIconSelect}
+            initialIcon={icon ?? undefined} // Convert null to undefined
+          />
+
         </div>
 
         {/* Submit Button */}

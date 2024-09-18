@@ -32,6 +32,15 @@ export interface Offer {
   description: string;
 }
 
+export type selectedIconT = {
+  title: string;
+  value: React.ReactNode;
+};
+
+export type iconSelectorPropsT = {
+  onIconSelect: (icon: string) => void;
+  initialIcon?: string; // Optional initial icon prop for editing use case
+};
 // Define the PopupProps interface for the Popup component
 export interface PopupProps {
   children: React.ReactNode;

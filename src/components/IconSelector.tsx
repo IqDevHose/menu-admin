@@ -1,9 +1,4 @@
-import { 
-  FaUtensils, FaPizzaSlice, FaHamburger, FaIceCream, FaCoffee, FaCocktail, FaFish, FaLeaf, FaWineBottle, 
-  FaConciergeBell, FaAppleAlt, FaBreadSlice, FaDrumstickBite, FaPepperHot, FaBeer, FaCheese, FaCarrot, 
-  FaShoppingCart, FaGift, FaCashRegister 
-} from "react-icons/fa";
-
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,35 +6,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { iconSelectorPropsT } from "@/utils/types";
+import { iconSelectorPropsT, selectedIconT } from "@/utils/types";
 import { iconOptions } from "@/utils/data";
-import React, { useState } from "react";
 
+export function IconSelector({ onIconSelect, initialIcon }: iconSelectorPropsT) {
+  const [selectedIcon, setSelectedIcon] = useState<selectedIconT | null>(null);
 
-type selectedIconT = {
-  title:string
-  value: React.ReactNode
+  // Set the initial selected icon if it exists (useful for editing cases)
+  useEffect(() => {
+    if (initialIcon) {
+      const icon = iconOptions.find((option) => option.title === initialIcon);
+      if (icon) setSelectedIcon(icon);
+    }
+  }, [initialIcon]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">
+          {selectedIcon ? selectedIcon.value : "Choose Icon ✨"}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80 grid grid-cols-4 gap-2 p-4">
+        {iconOptions.map((icon) => (
+          <DropdownMenuItem
+            key={icon.title}
+            onSelect={() => {
+              onIconSelect(icon.title); // Pass the selected icon's title or value to the parent
+              setSelectedIcon(icon); // Set the selected icon for the current state
+            }}
+            className="flex flex-col items-center justify-center"
+          >
+            {icon.value}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
-  export function IconSelector({onIconSelect}: iconSelectorPropsT) {
-    const [selectedIcon, setSelectedIcon] = useState<selectedIconT | null>(null)
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">{selectedIcon ? selectedIcon.value : 'Chose Icon ✨' }</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-80 grid grid-cols-4 gap-2 p-4">
-          {iconOptions.map((icon) => (
-            <DropdownMenuItem  onSelect={() => {
-              onIconSelect(icon.title)
-              setSelectedIcon(icon)
-              }} key={icon.title} className="flex  flex-col items-center justify-center">
-              {icon.value}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
-
-  export default IconSelector
+export default IconSelector;
