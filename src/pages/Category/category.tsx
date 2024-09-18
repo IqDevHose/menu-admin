@@ -12,6 +12,7 @@ import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
+import { getIconByTitle } from "@/utils/data";
 
 type categoryReviewType = {
   id: string;
@@ -369,6 +370,7 @@ const Category = () => {
                   </th>
                   <th scope="col" className="px-6 py-3 w-4">#</th>
                   <th scope="col" className="px-6 py-3 w-4">Name</th>
+                  <th scope="col" className="px-6 py-3 w-4">Icon</th>
                   <th scope="col" className="px-6 py-3">Items No.</th>
                   <th scope="col" className="px-6 py-3">Restaurant</th>
                   <th scope="col" className="px-6 py-3"></th>
@@ -389,6 +391,9 @@ const Category = () => {
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                       {highlightText(item?.name || "", searchQuery)}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item?.icon }
                     </td>
                     <td className="px-6 py-4">{item?.items?.length || 0}</td>
                     <td className="px-6 py-4">{item?.name || "N/A"}</td>

@@ -7,14 +7,14 @@ import { useNavigate } from "react-router-dom";
 
 type CreateCategoryDto = {
   name: string;
-  icon?: File | null;
+  icon?: string | null;
   restaurantId: string;
 };
 
 function AddCategory() {
   const [name, setName] = useState<string>("");
   const [restaurantId, setRestaurantId] = useState<string>("");
-  const [uploadImage, _] = useState<File | null>(null);
+  const [icon, setIcon] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
@@ -45,15 +45,13 @@ function AddCategory() {
     const newCategory: CreateCategoryDto = {
       name,
       restaurantId,
-      icon: uploadImage || null,
+      icon: icon || null,
     };
 
     mutation.mutate(newCategory);
   };
   const handleIconSelect = (title: string) => {
-    // setSelectedIconTitle(title);
-    // Here you can store the title in the database via an API call
-    console.log("Selected Icon Title:", title);
+    setIcon(title)
   };
   if (isLoading) {
     return (
