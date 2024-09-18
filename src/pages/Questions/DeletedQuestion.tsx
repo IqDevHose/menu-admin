@@ -46,7 +46,7 @@ const DeletedQuestions = () => {
       params.append("page", String(currentPage));
 
       // Fetching deleted questions from the server
-      const question = await axiosInstance.get(`/question/findAll-deleted`, {
+      const question = await axiosInstance.get(`/question/deleted`, {
         params,
       });
       return question.data;
