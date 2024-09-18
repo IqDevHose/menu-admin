@@ -127,6 +127,20 @@ const Sidebar = () => {
                 <span className="ml-3">Questions</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink
+                to="/offer"
+                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                className={(navData) =>
+                  navData.isActive
+                    ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
+                    : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
+                }
+              >
+                <MessageCircleCode />
+                <span className="ml-3">Offer</span>
+              </NavLink>
+            </li>
           </ul>
         </div>
 
