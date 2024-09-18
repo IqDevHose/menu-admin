@@ -1,20 +1,26 @@
-import { useState } from 'react';
-import { Plus, RotateCw, Trash2, SquarePen } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
-import { Offer } from '../../utils/types'; // Import the Offer interface
-import Popup from '@/components/Popup';
-import Spinner from '@/components/Spinner';
-import Pagination from '@/components/Pagination';
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { useState } from "react";
+import { Plus, Eye, RotateCw, Trash2, SquarePen } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Popup from "@/components/Popup";
+import Spinner from "@/components/Spinner";
+import Pagination from "@/components/Pagination";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+import { Link, useNavigate } from "react-router-dom";
+import { Offer } from "@/utils/types";
 
 const Offers = () => {
-  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);  // Use the Offer interface here
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,25 +33,29 @@ const Offers = () => {
   const offers: Offer[] = [  // Explicitly typing the offers array as Offer[]
     {
       id: 1,
-      title: '50% Off Summer Sale',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Get 50% off on all summer items. Limited time offer!',
+      title: "50% Off Summer Sale",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Get 50% off on all summer items. Limited time offer!",
     },
     {
       id: 2,
-      title: 'Buy One Get One Free',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Buy one item and get another one for free. Don\'t miss out!',
+      title: "Buy One Get One Free",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Buy one item and get another one for free. Don't miss out!",
     },
     {
       id: 3,
-      title: 'Free Shipping on Orders Over $100',
-      image: 'https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      description: 'Enjoy free shipping when your order exceeds $100.',
+      title: "Free Shipping on Orders Over $100",
+      image:
+        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Enjoy free shipping when your order exceeds $100.",
     },
   ];
 
-  const filteredOffers = offers.filter(offer =>
+  // Simulate fetching offers with search and pagination
+  const filteredOffers = offers.filter((offer) =>
     offer.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const totalPages = Math.ceil(filteredOffers.length / itemsPerPage);
@@ -59,7 +69,8 @@ const Offers = () => {
   };
 
   const handleReload = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['offers'] });
+    // Trigger a reload of the data
+    await queryClient.invalidateQueries({ queryKey: ["offers"] });
   };
 
   const handleViewOffer = (offer: Offer) => {
@@ -78,8 +89,8 @@ const Offers = () => {
         method: 'DELETE',
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['offers']);
+    onSuccess: async() => {
+      await queryClient.invalidateQueries({ queryKey: ["offers"] });
       setShowDeletePopup(false);
       setSelectedOffer(null);
     },
@@ -195,11 +206,15 @@ const Offers = () => {
             </AspectRatio>
             <CardHeader className="p-4">
               <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
-              <CardDescription className="truncate">{offer.description}</CardDescription>
+              <CardDescription className="truncate">
+                {offer.description}
+              </CardDescription>
             </CardHeader>
             <Separator />
             <CardFooter className="flex justify-between p-3 items-center">
-              <span className="text-xs text-gray-500">Offer ID: {offer.id}</span>
+              <span className="text-xs text-gray-500">
+                Offer ID: {offer.id}
+              </span>
               <div className="flex gap-4">
                 <SquarePen className="text-blue-500 cursor-pointer" onClick={(e) => {
                   e.stopPropagation(); // Prevent triggering card click
@@ -258,9 +273,15 @@ const Offers = () => {
           confirmButtonVariant="red"                 // Set button variant
         >
           <div className="p-4">
-            <h2 className="text-xl font-bold">Are you sure you want to delete this offer?</h2>
-            <p className="text-gray-500 text-sm mt-4">Offer: {selectedOffer?.title}</p>
-            <p className="text-gray-500 text-sm">Offer ID: {selectedOffer?.id}</p>
+            <h2 className="text-xl font-bold">
+              Are you sure you want to delete this offer?
+            </h2>
+            <p className="text-gray-500 text-sm mt-4">
+              Offer: {selectedOffer?.title}
+            </p>
+            <p className="text-gray-500 text-sm">
+              Offer ID: {selectedOffer?.id}
+            </p>
           </div>
         </Popup>
       )}

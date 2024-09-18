@@ -138,7 +138,7 @@ const Sidebar = () => {
                 }
               >
                 <MessageCircleCode />
-                <span className="ml-3">Offer</span>
+                <span className="ml-3">Offers</span>
               </NavLink>
             </li>
           </ul>
