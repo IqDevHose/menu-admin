@@ -1,9 +1,11 @@
-// src/pages/AddOffer.js
 
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import React, { FormEvent, useState } from "react";
+import {  useMutation } from "@tanstack/react-query";
 
 import { Progress } from "@/components/ui/progress";
+import axiosInstance from "@/axiosInstance";
+import { Navigate } from "react-router-dom";
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
@@ -12,7 +14,17 @@ const Addoffer = () => {
   const [progress, setProgress] = useState<number>(0);
   const [description, setDescription] = useState("");
 
- 
+
+  const mutation = useMutation({
+    mutationFn: (newoffer: FormData ) => {
+      return axiosInstance.post(`/offers`, newoffer);
+    },
+    onSuccess: () => {
+      Navigate("/offers"); // Navigate back to the item list after successful addition
+    },
+  });
+
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -24,9 +36,10 @@ const Addoffer = () => {
       formData.append("image", uploadImage);
     }
 
-    // mutation.mutate(formData);
+    mutation.mutate(formData);
   };
-  
+
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Add New Offer</h1>
@@ -90,9 +103,9 @@ const Addoffer = () => {
           <button
             type="submit"
             className="px-4 py-2 disabled:animate-pulse disabled:bg-indigo-300 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            // disabled={mutation.isPending}
+            disabled={mutation.isPending}
           >
-            {/* {mutation.isPending ? "Adding... " : "Add Item"} */}
+            {mutation.isPending ? "Adding... " : "Add Item"}
           </button>
         </div>
       </form>
