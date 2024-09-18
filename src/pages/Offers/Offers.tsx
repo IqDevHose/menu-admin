@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Eye, RotateCw, Trash2, SquarePen } from "lucide-react";
+import { Plus, RotateCw, Trash2, SquarePen } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/axiosInstance";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import Pagination from "@/components/Pagination";
@@ -17,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Offer } from "@/utils/types";
+import { Offer } from "@/utils/types";  // Assuming this type is defined in utils/types
 
 const Offers = () => {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -29,48 +30,46 @@ const Offers = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Dummy data for offers
-  const offers: Offer[] = [  // Explicitly typing the offers array as Offer[]
-    {
-      id: 1,
-      title: "50% Off Summer Sale",
-      image:
-        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      description: "Get 50% off on all summer items. Limited time offer!",
+  // Fetching offers from backend
+  const { data: offersData, isRefetching, isLoading, isError, refetch } = useQuery({
+    queryKey: ["offers", currentPage],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", currentPage.toString());
+      const response = await axiosInstance.get("/offers", { params });
+      console.log(response.data)
+      return response.data;
     },
-    {
-      id: 2,
-      title: "Buy One Get One Free",
-      image:
-        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      description: "Buy one item and get another one for free. Don't miss out!",
-    },
-    {
-      id: 3,
-      title: "Free Shipping on Orders Over $100",
-      image:
-        "https://plus.unsplash.com/premium_photo-1670509045675-af9f249b1bbe?q=80&w=2035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      description: "Enjoy free shipping when your order exceeds $100.",
-    },
-  ];
 
-  // Simulate fetching offers with search and pagination
-  const filteredOffers = offers.filter((offer) =>
-    offer.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const totalPages = Math.ceil(filteredOffers.length / itemsPerPage);
-  const currentData = filteredOffers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    refetchOnWindowFocus: false, // Prevent refetching when the window is focused
+
+  });
+
+  // Mutation for deleting an offer
+  const deleteOfferMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await axiosInstance.delete(`/offers/soft-delete/${id}`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(["offers", currentPage]);
+      setShowDeletePopup(false);
+      setSelectedOffer(null);
+    },
+  });
+
+  const confirmDelete = () => {
+    if (selectedOffer) {
+      deleteOfferMutation.mutate(selectedOffer.id);
+    }
+  };
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   const handleReload = async () => {
-    // Trigger a reload of the data
-    await queryClient.invalidateQueries({ queryKey: ["offers"] });
+    await queryClient.invalidateQueries({ queryKey: ["offers", currentPage] });
+    refetch();
   };
 
   const handleViewOffer = (offer: Offer) => {
@@ -83,28 +82,30 @@ const Offers = () => {
     setShowDeletePopup(true);
   };
 
-  const deleteOfferMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await fetch(`/api/offers/${id}`, {
-        method: 'DELETE',
-      });
-    },
-    onSuccess: async() => {
-      await queryClient.invalidateQueries({ queryKey: ["offers"] });
-      setShowDeletePopup(false);
-      setSelectedOffer(null);
-    },
-  });
-
-  const confirmDelete = () => {
-    if (selectedOffer) {
-      deleteOfferMutation.mutate(selectedOffer.id);
-    }
-  };
-
   const handleEditOffer = (offerId: number) => {
     navigate(`/offers/edit/${offerId}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return <div>Error loading offers</div>;
+  }
+
+  const filteredOffers = offersData?.items?.filter((offer: Offer) =>
+    offer.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const totalPages = Math.ceil((filteredOffers?.length || 0) / itemsPerPage);
+  const currentData = filteredOffers?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="relative w-full p-2">
@@ -145,25 +146,32 @@ const Offers = () => {
         <div className="flex items-center gap-x-2">
           <button
             type="button"
-            className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3"
+            className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
             onClick={handleReload}
             data-tooltip-id="reload-tooltip"
             data-tooltip-content="Reload offers"
           >
-            <span className="hidden xl:flex items-center gap-1">
-              <RotateCw size={16} /> Reload
+          <span className="hidden xl:flex items-center gap-1">
+              <RotateCw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCw size={16} />
+              <RotateCw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
             </span>
           </button>
 
-          <Link to={"/offers/add"}>
+          <Link to="/offers/add">
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
               data-tooltip-id="add-question-tooltip"
-              data-tooltip-content="Add new question"
+              data-tooltip-content="Add new offer"
             >
               <span className="hidden xl:flex items-center gap-1">
                 <Plus size={16} /> Add Offers
@@ -174,12 +182,12 @@ const Offers = () => {
             </button>
           </Link>
 
-          <Link to={"/offers/trash"}>
+          <Link to="/offers/trash">
             <button
               type="button"
               className="text-white w-10 h-10 xl:w-auto bg-gray-800 hover:bg-gray-900 font-medium rounded-lg py-2 xl:py-2.5 px-3 text-nowrap text-sm"
               data-tooltip-id="trash-tooltip"
-              data-tooltip-content="View trashed questions"
+              data-tooltip-content="View trashed offers"
             >
               <span className="flex gap-1 items-center">
                 <Trash2 size={20} /> <p className="hidden xl:inline">Trash</p>
@@ -191,13 +199,14 @@ const Offers = () => {
 
       {/* Offers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {currentData.map((offer) => (
+        {currentData?.map((offer: Offer) => (
           <Card
             key={offer.id}
             className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => handleViewOffer(offer)}
           >
             <AspectRatio ratio={16 / 9}>
+            <>{console.log(offer.image)}</>
               <img
                 src={offer.image}
                 alt={offer.title}
@@ -212,16 +221,14 @@ const Offers = () => {
             </CardHeader>
             <Separator />
             <CardFooter className="flex justify-between p-3 items-center">
-              <span className="text-xs text-gray-500">
-                Offer ID: {offer.id}
-              </span>
+              <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span>
               <div className="flex gap-4">
                 <SquarePen className="text-blue-500 cursor-pointer" onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering card click
+                  e.stopPropagation();
                   handleEditOffer(offer.id);
                 }} />
                 <Trash2 className="text-red-500 cursor-pointer" onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering card click
+                  e.stopPropagation();
                   handleDeleteClick(offer);
                 }} />
               </div>
@@ -265,23 +272,17 @@ const Offers = () => {
       {/* Popup for delete confirmation */}
       {showDeletePopup && selectedOffer && (
         <Popup
-          onClose={() => setShowDeletePopup(false)}  // Pass the onClose function
-          onConfirm={confirmDelete}                  // Pass the onConfirm function
-          loading={false}                            // Set loading state as needed
+          onClose={() => setShowDeletePopup(false)}
+          onConfirm={confirmDelete}
+          loading={deleteOfferMutation.isPending}
           confirmText="Delete"
           cancelText="Cancel"
-          confirmButtonVariant="red"                 // Set button variant
+          confirmButtonVariant="red"
         >
           <div className="p-4">
-            <h2 className="text-xl font-bold">
-              Are you sure you want to delete this offer?
-            </h2>
-            <p className="text-gray-500 text-sm mt-4">
-              Offer: {selectedOffer?.title}
-            </p>
-            <p className="text-gray-500 text-sm">
-              Offer ID: {selectedOffer?.id}
-            </p>
+            <h2 className="text-xl font-bold">Are you sure you want to delete this offer?</h2>
+            <p className="text-gray-500 text-sm mt-4">Offer: {selectedOffer?.title}</p>
+            <p className="text-gray-500 text-sm">Offer ID: {selectedOffer?.id}</p>
           </div>
         </Popup>
       )}
