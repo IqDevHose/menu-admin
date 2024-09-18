@@ -226,6 +226,7 @@ const Category = () => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
       {/* Tooltip initialization */}
+      
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="reload-tooltip" place="top" />
       <ReactTooltip id="add-category-tooltip" place="top" />
