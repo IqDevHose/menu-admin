@@ -1,9 +1,9 @@
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
+import IconSelector from "@/components/IconSelector"; // Import IconSelector
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 type categoryType = {
   name: string | null;
@@ -16,7 +16,7 @@ function EditCategory() {
   const record = location.state;
   const [name, setName] = useState<string | null>(record.name);
   const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
-  const [uploadImage, setUploadImage] = useState<string | null>(null); // Base64 encoded string
+  const [icon, setIcon] = useState<string | null>(record.icon || null); // Use icon state
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ function EditCategory() {
       return axiosInstance.put(`/category/${categoryId}`, newEdit);
     },
     onSuccess: () => {
-      navigate("/categories"); // Navigate back to the item list after successful addition
+      navigate("/categories"); // Navigate back to the category list after successful edit
     },
   });
 
@@ -48,10 +48,14 @@ function EditCategory() {
     const newEdit: categoryType = {
       name,
       restaurantId,
-      icon: uploadImage || null,
+      icon: icon || null,
     };
 
     mutation.mutate(newEdit);
+  };
+
+  const handleIconSelect = (selectedIcon: string) => {
+    setIcon(selectedIcon); // Set the selected icon
   };
 
   if (isLoading) {
@@ -61,6 +65,7 @@ function EditCategory() {
       </div>
     );
   }
+
   if (isError) return <div>Error loading restaurants</div>;
 
   return (
@@ -117,6 +122,17 @@ function EditCategory() {
               </option>
             )}
           </select>
+        </div>
+
+        {/* Icon Selector */}
+        <div className="mb-4">
+          <label
+            htmlFor="icon"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Select Icon
+          </label>
+          <IconSelector onIconSelect={handleIconSelect} />
         </div>
 
         {/* Submit Button */}
