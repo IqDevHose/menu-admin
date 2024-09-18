@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   MessageCircleCode,
   ShoppingBasket,
+  TicketPercent,
   X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -26,7 +27,7 @@ const Sidebar = () => {
         <div className="flex flex-col">
           {/* Close button visible on mobile */}
           <div className="flex justify-end mb-4 lg:hidden">
-            <button onClick={()=>toggleSidebar(!isSidebarOpen)}>
+            <button onClick={() => toggleSidebar(!isSidebarOpen)}>
               <X className="text-gray-800 cursor-pointer" size={24} />
             </button>
           </div>
@@ -36,7 +37,7 @@ const Sidebar = () => {
             <li className="mb-3">
               <NavLink
                 to="/"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-800"
@@ -52,7 +53,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/restaurants"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -68,7 +69,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/categories"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -84,7 +85,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/items"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -100,7 +101,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/customerReviews"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -116,7 +117,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/questions"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
@@ -130,14 +131,14 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to="/offers"
-                onClick={()=>toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
+                onClick={() => toggleSidebar(!isSidebarOpen)} // Close sidebar on item click
                 className={(navData) =>
                   navData.isActive
                     ? "flex items-center p-2 text-white rounded-lg bg-indigo-500"
                     : "flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200"
                 }
               >
-                <MessageCircleCode />
+                <TicketPercent />
                 <span className="ml-3">Offers</span>
               </NavLink>
             </li>

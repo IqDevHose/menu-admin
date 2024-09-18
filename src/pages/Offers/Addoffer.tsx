@@ -1,11 +1,9 @@
-
-
 import React, { FormEvent, useState } from "react";
-import {  useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { Progress } from "@/components/ui/progress";
 import axiosInstance from "@/axiosInstance";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
@@ -13,17 +11,16 @@ const Addoffer = () => {
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [description, setDescription] = useState("");
-
+  const Navigate = useNavigate();
 
   const mutation = useMutation({
-    mutationFn: (newoffer: FormData ) => {
+    mutationFn: (newoffer: FormData) => {
       return axiosInstance.post(`/offers`, newoffer);
     },
     onSuccess: () => {
       Navigate("/offers"); // Navigate back to the item list after successful addition
     },
   });
-
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -38,7 +35,6 @@ const Addoffer = () => {
 
     mutation.mutate(formData);
   };
-
 
   return (
     <div className="p-6">
