@@ -223,10 +223,13 @@ const Offers = () => {
             <CardFooter className="flex justify-between p-3 items-center">
               <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span>
               <div className="flex gap-4">
-                <SquarePen className="text-blue-500 cursor-pointer" onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditOffer(offer.id);
-                }} />
+              <Link
+                  to={`/offers/edit/${offer.id}`}
+                  className="font-medium text-blue-600"
+                  state={offer}
+                  >
+                  <SquarePen />
+                </Link>
                 <Trash2 className="text-red-500 cursor-pointer" onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteClick(offer);
