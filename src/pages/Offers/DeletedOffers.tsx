@@ -1,121 +1,204 @@
-import { useState } from 'react';
-import { RotateCw, RefreshCw, Trash2, Undo } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import Spinner from '@/components/Spinner';
-import Pagination from '@/components/Pagination';
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { RotateCw, Trash2 } from "lucide-react";
+import Popup from "@/components/Popup";
+import Spinner from "@/components/Spinner";
+import Pagination from "@/components/Pagination";
+import axiosInstance from "@/axiosInstance";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+
+type OfferType = {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+};
 
 const DeletedOffers = () => {
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [showRestorePopup, setShowRestorePopup] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<OfferType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Set the number of items per page
+  const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
-  // Fetch deleted offers (assuming backend provides a filter for deleted offers)
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['deletedOffers', currentPage],
+  // Fetch deleted offers based on current page
+  const {
+    data: offersData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["findAll-deleted-offers", currentPage],
     queryFn: async () => {
-      // Replace this with your actual API call to get deleted offers
-      const response = await fetch(`/api/offers/deleted?page=${currentPage}`);
-      return await response.json();
+      const params = new URLSearchParams();
+      params.append("page", String(currentPage));
+      const response = await axiosInstance.get(`/offers/findAll-deleted`, {
+        params,
+      });
+      return response.data;
     },
   });
 
-  const restoreOfferMutation = useMutation({
-    mutationFn: async (id) => {
-      // Replace with your API call to restore the offer
-      return await fetch(`/api/offers/restore/${id}`, { method: 'PUT' });
+  // Mutation to restore an offer
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axiosInstance.put(`/offers/restore/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['deletedOffers']);
+      // Corrected invalidateQueries and refetchQueries usage
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-offers"] });
+      setShowRestorePopup(false); // Close restore popup after success
     },
   });
 
-  const permanentlyDeleteOfferMutation = useMutation({
-    mutationFn: async (id) => {
-      // Replace with your API call to permanently delete the offer
-      return await fetch(`/api/offers/permanent-delete/${id}`, { method: 'DELETE' });
+  // Mutation to permanently delete an offer
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axiosInstance.delete(`/offers/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['deletedOffers']);
+      // Corrected invalidateQueries and refetchQueries usage
+      queryClient.invalidateQueries({ queryKey: ["findAll-deleted-offers"] });
+      setShowDeletePopup(false); // Close delete popup after success
     },
   });
 
-  const handlePageChange = (newPage) => {
+  // Handle restore and delete operations
+  const handleRestoreClick = (offer: OfferType) => {
+    setSelectedOffer(offer);
+    setShowRestorePopup(true); // Show restore popup
+  };
+
+  const handleDeleteClick = (offer: OfferType) => {
+    setSelectedOffer(offer);
+    setShowDeletePopup(true); // Show delete popup
+  };
+
+  const confirmRestore = () => {
+    if (selectedOffer) {
+      restoreMutation.mutate(selectedOffer.id);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (selectedOffer) {
+      deleteMutation.mutate(selectedOffer.id);
+    }
+  };
+
+  const totalPages = Math.ceil(offersData?.totalOffers / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (isError) {
     return <div>Error loading deleted offers.</div>;
   }
 
-  const offers = data.items; // Assuming the data structure contains `items` and pagination details
-  const totalPages = Math.ceil(data.totalItems / itemsPerPage);
-
   return (
-    <div className="relative w-full p-2">
-      <div className="flex items-center justify-between pb-8">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+      <ReactTooltip id="restore-tooltip" place="top" />
+      <ReactTooltip id="delete-tooltip" place="top" />
+
+      <div className="flex flex-wrap justify-between mb-4">
         <h1 className="text-xl font-bold">Deleted Offers</h1>
-        <Button
-          variant="default"
-          onClick={() => queryClient.invalidateQueries(['deletedOffers'])}
-        >
-          <RefreshCw className="mr-2" />
-          Reload
-        </Button>
       </div>
 
-      {/* Deleted Offers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {offers.map((offer) => (
-          <Card
-            key={offer.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-          >
-            <AspectRatio ratio={16 / 9}>
-              <img
-                src={offer.image}
-                alt={offer.title}
-                className="object-cover w-full h-full rounded-t-lg"
-              />
-            </AspectRatio>
-            <CardHeader className="p-4">
-              <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
-              <CardDescription className="truncate">{offer.description}</CardDescription>
-            </CardHeader>
-            <Separator />
-            <CardFooter className="flex justify-between p-3 items-center">
-              <span className="text-xs text-gray-500">Offer ID: {offer.id}</span>
-              <div className="flex gap-4">
-                <Undo
-                  className="text-green-500 cursor-pointer"
-                  onClick={() => restoreOfferMutation.mutate(offer.id)}
-                />
-                <Trash2
-                  className="text-red-500 cursor-pointer"
-                  onClick={() => permanentlyDeleteOfferMutation.mutate(offer.id)}
-                />
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {/* Deleted Offers Table */}
+      {offersData?.offers?.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500">No deleted offers found.</p>
+        </div>
+      ) : (
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Offer ID
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Title
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Description
+              </th>
+              <th scope="col" className="px-6 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {offersData?.offers?.map((offer: OfferType) => (
+              <tr key={offer.id} className="bg-white border-b hover:bg-gray-50">
+                <td className="px-6 py-4">{offer.id}</td>
+                <td className="px-6 py-4">{offer.title}</td>
+                <td className="px-6 py-4">{offer.description}</td>
+                <td className="px-6 py-4 flex gap-x-4">
+                  <button
+                    className="font-medium text-green-600"
+                    onClick={() => handleRestoreClick(offer)}
+                    data-tooltip-id="restore-tooltip"
+                    data-tooltip-content="Restore"
+                  >
+                    <RotateCw />
+                  </button>
+                  <button
+                    className="font-medium text-red-600"
+                    onClick={() => handleDeleteClick(offer)}
+                    data-tooltip-id="delete-tooltip"
+                    data-tooltip-content="Delete"
+                  >
+                    <Trash2 />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
+      )}
+
+      {/* Restore Confirmation Popup */}
+      {showRestorePopup && (
+        <Popup
+          onClose={() => setShowRestorePopup(false)}
+          onConfirm={confirmRestore}
+          loading={restoreMutation.isPending}
+          confirmText="Restore"
+          loadingText="Restoring..."
+          cancelText="Cancel"
+        >
+          <p>Are you sure you want to restore {selectedOffer?.title}?</p>
+        </Popup>
+      )}
+
+      {/* Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <Popup
+          onClose={() => setShowDeletePopup(false)}
+          onConfirm={confirmDelete}
+          loading={deleteMutation.isPending}
+          confirmText="Delete"
+          loadingText="Deleting..."
+          cancelText="Cancel"
+          confirmButtonVariant="red"
+        >
+          <p>Are you sure you want to delete {selectedOffer?.title}?</p>
+        </Popup>
       )}
     </div>
   );
