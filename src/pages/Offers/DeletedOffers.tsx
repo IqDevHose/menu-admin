@@ -106,7 +106,7 @@ const DeletedOffers = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <ReactTooltip id="restore-tooltip" place="top" />
       <ReactTooltip id="delete-tooltip" place="top" />
 
@@ -168,7 +168,11 @@ const DeletedOffers = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-10">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

@@ -10,8 +10,8 @@ import { highlightText } from "@/utils/utils";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 import { getIconByTitle } from "@/utils/data";
 
 type categoryReviewType = {
@@ -122,11 +122,12 @@ const Category = () => {
       return category.data;
     },
     refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
-
   });
 
   const handleReload = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["categories", selectedRestaurant] });
+    await queryClient.invalidateQueries({
+      queryKey: ["categories", selectedRestaurant],
+    });
     refetch(); // Optionally trigger refetch after invalidation
   };
 
@@ -225,7 +226,7 @@ const Category = () => {
     return <div>Error</div>;
   }
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       {/* Tooltip initialization */}
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="reload-tooltip" place="top" />
@@ -368,17 +369,30 @@ const Category = () => {
                       onChange={handleSelectAll}
                     />
                   </th>
-                  <th scope="col" className="px-6 py-3 w-4">#</th>
-                  <th scope="col" className="px-6 py-3 w-4">Name</th>
-                  <th scope="col" className="px-6 py-3 w-4">Icon</th>
-                  <th scope="col" className="px-6 py-3">Items No.</th>
-                  <th scope="col" className="px-6 py-3">Restaurant</th>
+                  <th scope="col" className="px-6 py-3 w-4">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 w-4">
+                    Icon
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Items No.
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Restaurant
+                  </th>
                   <th scope="col" className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {currentData.map((item: any, index: number) => (
-                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <tr
+                    key={item.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4">
                       <input
                         type="checkbox"
@@ -393,7 +407,7 @@ const Category = () => {
                       {highlightText(item?.name || "", searchQuery)}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {item?.icon }
+                      {item?.icon}
                     </td>
                     <td className="px-6 py-4">{item?.items?.length || 0}</td>
                     <td className="px-6 py-4">{item?.name || "N/A"}</td>
@@ -421,7 +435,6 @@ const Category = () => {
               </tbody>
             </table>
           </div>
-
 
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">

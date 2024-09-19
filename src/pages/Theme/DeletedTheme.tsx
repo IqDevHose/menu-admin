@@ -33,7 +33,7 @@ const DeletedThemes = () => {
     data: themesData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["findAll-deleted-themes", currentPage],
     queryFn: async () => {
@@ -54,7 +54,7 @@ const DeletedThemes = () => {
       await axiosInstance.put(`/theme/restore/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -68,7 +68,7 @@ const DeletedThemes = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["restore-themes"],
       });
@@ -82,7 +82,7 @@ const DeletedThemes = () => {
       await axiosInstance.delete(`/theme/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-themes"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
@@ -96,7 +96,7 @@ const DeletedThemes = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -190,7 +190,7 @@ const DeletedThemes = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}

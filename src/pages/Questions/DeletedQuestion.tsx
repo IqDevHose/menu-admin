@@ -9,7 +9,6 @@ import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
-
 type QuestionType = {
   id: string;
   title: string;
@@ -38,7 +37,7 @@ const DeletedQuestions = () => {
     data: questionsData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["findAll-deleted-questions", currentPage],
     queryFn: async () => {
@@ -200,12 +199,12 @@ const DeletedQuestions = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="restore-many-tooltip" place="top-end" />
       <ReactTooltip id="restore-tooltip" place="top" />
       <ReactTooltip id="delete-tooltip" place="top" />
-  
+
       <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -260,7 +259,7 @@ const DeletedQuestions = () => {
           )}
         </div>
       </div>
-  
+
       {/* Conditional rendering for no questions */}
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
@@ -333,7 +332,7 @@ const DeletedQuestions = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           <div className="flex justify-center items-center mt-10">
             <Pagination
@@ -344,7 +343,7 @@ const DeletedQuestions = () => {
           </div>
         </>
       )}
-  
+
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
         <Popup
@@ -358,7 +357,7 @@ const DeletedQuestions = () => {
           <p>Are you sure you want to restore this question?</p>
         </Popup>
       )}
-  
+
       {/* Restore Many Confirmation Popup */}
       {showRestoreManyPopup && (
         <Popup
@@ -372,7 +371,7 @@ const DeletedQuestions = () => {
           <p>Are you sure you want to restore {selectedItems.length} items?</p>
         </Popup>
       )}
-  
+
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
         <Popup
@@ -387,7 +386,7 @@ const DeletedQuestions = () => {
           <p>Are you sure you want to delete this question?</p>
         </Popup>
       )}
-  
+
       {/* Delete Many Popup */}
       {showDeleteManyPopup && (
         <Popup
