@@ -4,15 +4,50 @@ import axiosInstance from "@/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
+import marked from 'marked';
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(""); // Description for both generated and manual
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [loading, setLoading] = useState(false); // Loading state for description generation
   const navigate = useNavigate();
+  function removeMarkdownPreserveEmojis(input:string) {
+    // Remove headers
+    let result = input.replace(/^(#{1,6})\s+/gm, '');
+    
+    // Remove bold and italic formatting but preserve emojis
+    result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); // Bold
+    result = result.replace(/\*([^*]+)\*/g, '$1'); // Italic
+    
+    // Remove links but preserve emojis
+    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // Links
+    
+    // Remove images but preserve emojis
+    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); // Images
+    
+    // Remove code blocks and inline code but preserve emojis
+    result = result.replace(/```[\s\S]*?```/g, ''); // Code blocks
+    result = result.replace(/`([^`]+)`/g, '$1'); // Inline code
+    
+    // Remove lists but preserve emojis
+    result = result.replace(/^\s*[-*+]\s+/gm, ''); // Unordered list
+    result = result.replace(/^\s*\d+\.\s+/gm, ''); // Ordered list
+    
+    // Remove blockquotes but preserve emojis
+    result = result.replace(/^>\s+/gm, '');
+    
+    // Remove horizontal rules but preserve emojis
+    result = result.replace(/^\s*[-*]{3,}\s*$/gm, '');
+    
+    // Ensure any remaining Markdown links and images are also handled
+    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // Links
+    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); // Images
+    
+    return result.trim();
+}
 
   // Function to generate description using Google Gemini API
   const generateDescription = async (title: string) => {
@@ -25,7 +60,7 @@ const Addoffer = () => {
             {
               parts: [
                 {
-                  text: `create, complete and enhance this offer: ${title}, and format the response in markdown`,
+                  text: `create, complete and enhance this offer: ${title}`,
                 },
               ],
             },
@@ -37,11 +72,11 @@ const Addoffer = () => {
           },
         }
       );
-      
+
       const generatedContent = response.data.candidates[0].content.parts[0].text;
       if (generatedContent) {
         setLoading(false); // Stop loading
-        return generatedContent;
+        return removeMarkdownPreserveEmojis(generatedContent);
       } else {
         throw new Error("Unexpected response structure");
       }
@@ -66,6 +101,8 @@ const Addoffer = () => {
 
     const formData = new FormData();
     formData.append("title", title);
+
+    // Combine manual and generated descriptions for final description
     formData.append("description", description);
 
     if (uploadImage) {
@@ -78,7 +115,7 @@ const Addoffer = () => {
   const handleGenerateDescription = async () => {
     if (title) {
       const generatedDescription = await generateDescription(title);
-      setDescription(generatedDescription);
+      setDescription(generatedDescription); // Set generated description
     } else {
       alert("Please enter a title to generate a description.");
     }
@@ -113,6 +150,18 @@ const Addoffer = () => {
           </button>
         </div>
 
+        {/* Manual Description Input */}
+        <div>
+          <label className="block font-bold mb-2">Add Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={7}
+            className="w-full p-2 border border-gray-300 rounded"
+            placeholder="You can add or edit the description here..."
+          />
+        </div>
+
         {/* Upload Image */}
         <div className="mb-4">
           {uploadImageUrl && (
@@ -131,14 +180,6 @@ const Addoffer = () => {
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-        </div>
-
-        <div>
-          <label className="block font-bold mb-2">Description</label>
-          {/* Render description as markdown */}
-          <div className="border border-gray-300 p-2 rounded">
-            <ReactMarkdown>{description}</ReactMarkdown>
-          </div>
         </div>
 
         <div className="flex justify-end">
