@@ -239,7 +239,7 @@ const Offers = () => {
                   className="font-medium text-blue-600"
                   state={offer}
                 >
-                  <Button variant={"outline"}>Send</Button>
+                  <Button variant={"outline"}>Send offer 🎁</Button>
                 </Link>
               </div>
             </CardFooter>
