@@ -18,7 +18,7 @@ const SendOffer = (props: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [From, setFrom] = useState<string | null>(null);
   const [To, setTo] = useState<string | null>(null);
-  const navigate = useNavigate();
+
   const location = useLocation();
   const offer = location.state;
 
@@ -59,7 +59,7 @@ console.log(To);
   return (
     <div>
       {/* Restaurant Filter */}
-      <div>
+      <div className="mb-10">
         <select
           value={selectedDate}
           onChange={(e) => {
@@ -68,11 +68,9 @@ console.log(To);
           className="p-2 border border-gray-300 rounded-lg"
         >
           <option value="">This month</option>
-          {query?.data?.map((query: any) => (
-            <option key={query.id} value={query.id}>
-              {query.name}
-            </option>
-          ))}
+          <option value="">This week</option>
+          <option value="">This day</option>
+          
         </select>
       </div>
 
