@@ -9,9 +9,8 @@ import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import exportCSVFile from "json-to-csv-export";
 import axiosInstance from "@/axiosInstance";
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
-
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 
@@ -82,9 +81,9 @@ const Item = () => {
     queryFn: async () => {
       const item = await axiosInstance.get(`/item?page=all`);
       const dataExcludedCategory = item.data.items.map((item: any) => {
-        const { category, ...rest } = item
-        return rest
-      })
+        const { category, ...rest } = item;
+        return rest;
+      });
       const heads: any[] = extractHeaders(dataExcludedCategory);
       setHeaders(heads);
       return item.data;
@@ -95,11 +94,11 @@ const Item = () => {
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)
     );
-    console.log(flattenedData, exportData)
+    console.log(flattenedData, exportData);
     const dataExcludedCategory = exportData.items.map((items: any) => {
-      const { category, ...rest } = items
-      return rest
-    })
+      const { category, ...rest } = items;
+      return rest;
+    });
     const dataToConvert = {
       data: dataExcludedCategory,
       filename: "items",
@@ -129,13 +128,14 @@ const Item = () => {
       return item.data;
     },
     refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
-
   });
 
   const handleReload = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["items", selectedCategory, selectedRestaurant] });
+    await queryClient.invalidateQueries({
+      queryKey: ["items", selectedCategory, selectedRestaurant],
+    });
     refetch(); // Optionally trigger refetch after invalidation
-  }
+  };
   // Fetch categories based on the selected restaurant
   const { data: categories } = useQuery({
     queryKey: ["categories", selectedRestaurant],
@@ -258,7 +258,7 @@ const Item = () => {
   }
   // console.log(currentData)
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       {/* Tooltip initialization */}
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="reload-tooltip" place="top" />
@@ -421,16 +421,27 @@ const Item = () => {
                       onChange={handleSelectAll}
                     />
                   </th>
-                  <th scope="col" className="px-6 py-3">#</th>
-                  <th scope="col" className="px-6 py-3">Name</th>
-                  <th scope="col" className="px-6 py-3">Description</th>
-                  <th scope="col" className="px-6 py-3">Price</th>
+                  <th scope="col" className="px-6 py-3">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Price
+                  </th>
                   <th scope="col" className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {currentData?.map((item: any, index: number) => (
-                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <tr
+                    key={item.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4">
                       <input
                         type="checkbox"
@@ -469,7 +480,6 @@ const Item = () => {
               </tbody>
             </table>
           </div>
-
 
           {/* Pagination Component */}
           {totalPages > 1 && (

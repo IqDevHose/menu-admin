@@ -9,8 +9,8 @@ import { Link } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
 type questionsReviewType = {
   id: string;
@@ -84,13 +84,13 @@ const Questions = () => {
       );
       return questions.data;
     },
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
   });
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["questions"] });
     refetch(); // Optionally trigger refetch after invalidation
-  }
+  };
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
@@ -214,7 +214,7 @@ const Questions = () => {
     return <div>Error</div>;
   }
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       {/* Tooltip initialization */}
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="reload-tooltip" place="top" />
@@ -371,7 +371,10 @@ const Questions = () => {
               </thead>
               <tbody>
                 {currentData?.map((item: any, index: number) => (
-                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <tr
+                    key={item.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4">
                       <input
                         type="checkbox"
@@ -416,7 +419,6 @@ const Questions = () => {
               </tbody>
             </table>
           </div>
-
 
           {/* Pagination Component */}
           {totalPages > 1 && (
@@ -463,7 +465,6 @@ const Questions = () => {
       )}
     </div>
   );
-
 };
 
 export default Questions;

@@ -14,9 +14,14 @@ import RatingPopup from "@/components/RatingPopup";
 import axiosInstance from "@/axiosInstance";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; // Importing the styles
-import { FaFaceAngry, FaFaceFrown, FaFaceLaughBeam, FaFaceSmile } from "react-icons/fa6";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
+import {
+  FaFaceAngry,
+  FaFaceFrown,
+  FaFaceLaughBeam,
+  FaFaceSmile,
+} from "react-icons/fa6";
 import { FaRegStar, FaSmile, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 type customerReviewType = {
@@ -25,7 +30,6 @@ type customerReviewType = {
   comment: string;
   email: string;
   blue: string;
-
 };
 
 interface DataItem {
@@ -97,10 +101,11 @@ const CustomerReview = () => {
   });
 
   const handleReload = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["customerReview", currentPage, selectedRestaurant] });
+    await queryClient.invalidateQueries({
+      queryKey: ["customerReview", currentPage, selectedRestaurant],
+    });
     refetch(); // Optionally trigger refetch after invalidation
   };
-
 
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
@@ -138,7 +143,6 @@ const CustomerReview = () => {
 
     exportCSVFile(dataToConvert);
   };
-
 
   function summation(ratings: { score: number; question: any }[]) {
     let sum = 0;
@@ -188,7 +192,11 @@ const CustomerReview = () => {
           {Array(fullStars)
             .fill(0)
             .map((_, index) => (
-              <FaStar key={`full-${index}`} size={16} className="text-yellow-300" />
+              <FaStar
+                key={`full-${index}`}
+                size={16}
+                className="text-yellow-300"
+              />
             ))}
 
           {/* Render half star */}
@@ -198,7 +206,11 @@ const CustomerReview = () => {
           {Array(emptyStars)
             .fill(0)
             .map((_, index) => (
-              <FaRegStar key={`empty-${index}`} size={16} className="text-gray-300" />
+              <FaRegStar
+                key={`empty-${index}`}
+                size={16}
+                className="text-gray-300"
+              />
             ))}
         </div>
 
@@ -297,7 +309,7 @@ const CustomerReview = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       {/* Tooltip initialization */}
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="reload-tooltip" place="top" />
@@ -374,10 +386,17 @@ const CustomerReview = () => {
             data-tooltip-content="Reload reviews"
           >
             <span className="hidden xl:flex items-center gap-1">
-              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} /> Reload
+              <RotateCw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />{" "}
+              Reload
             </span>
             <span className="inline xl:hidden">
-              <RotateCw size={16} className={isRefetching ? `animate-spin` : ""} />
+              <RotateCw
+                size={16}
+                className={isRefetching ? `animate-spin` : ""}
+              />
             </span>
           </button>
           <Link to="/customerReviews/add">
@@ -431,19 +450,36 @@ const CustomerReview = () => {
                       onChange={handleSelectAll}
                     />
                   </th>
-                  <th scope="col" className="px-6 py-3 ">Date</th>
-                  <th scope="col" className="px-6 py-3 ">Name</th>
-                  <th scope="col" className="px-6 py-3">Comment</th>
-                  <th scope="col" className="px-6 py-3">Avg Rating</th>
-                  <th scope="col" className="px-6 py-3">Phone</th>
-                  <th scope="col" className="px-6 py-3">Email</th>
-                  <th scope="col" className="px-6 py-3">Birthday</th>
+                  <th scope="col" className="px-6 py-3 ">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 ">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Comment
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Avg Rating
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Phone
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Email
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Birthday
+                  </th>
                   <th scope="col" className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredData?.map((item: any, index: number) => (
-                  <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                  <tr
+                    key={item.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4">
                       <input
                         type="checkbox"
@@ -489,7 +525,6 @@ const CustomerReview = () => {
               </tbody>
             </table>
           </div>
-
 
           <div className="flex justify-center items-center mt-10">
             <Pagination

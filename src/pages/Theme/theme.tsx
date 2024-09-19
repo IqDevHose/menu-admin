@@ -68,12 +68,12 @@ const Theme = () => {
       const theme = await axiosInstance.get(`/theme?page=${currentPage}`);
       return theme.data;
     },
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
   });
-  
-  const handleReload = async() => {
-    await queryClient.invalidateQueries({queryKey: ["theme"]})
-  }
+
+  const handleReload = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["theme"] });
+  };
 
   const { data: exportData, refetch } = useQuery({
     queryKey: ["theme all"],
@@ -84,10 +84,8 @@ const Theme = () => {
       setHeaders(heads);
       return item.data;
     },
-    
   });
 
-  
   const handleExport = () => {
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)
@@ -190,7 +188,7 @@ const Theme = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <label htmlFor="table-search" className="sr-only">
           Search

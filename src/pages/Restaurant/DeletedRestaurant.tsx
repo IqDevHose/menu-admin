@@ -8,8 +8,8 @@ import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import axiosInstance from "@/axiosInstance";
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css'; 
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 type RestaurantType = {
   id: string;
@@ -199,12 +199,12 @@ const DeletedRestaurants = () => {
     return <div>Error</div>;
   }
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <ReactTooltip id="delete-many-tooltip" place="top" />
       <ReactTooltip id="restore-many-tooltip" place="top-end" />
       <ReactTooltip id="restore-tooltip" place="top" />
       <ReactTooltip id="delete-tooltip" place="top" />
-  
+
       <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
@@ -259,7 +259,7 @@ const DeletedRestaurants = () => {
           )}
         </div>
       </div>
-  
+
       {filteredData?.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No deleted restaurants found.</p>
@@ -330,7 +330,7 @@ const DeletedRestaurants = () => {
               ))}
             </tbody>
           </table>
-  
+
           {/* Pagination Component */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-10">
@@ -343,7 +343,7 @@ const DeletedRestaurants = () => {
           )}
         </>
       )}
-  
+
       {/* Restore Confirmation Popup */}
       {showRestorePopup && (
         <Popup
@@ -357,7 +357,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to restore {selectedRestaurant?.name}?</p>
         </Popup>
       )}
-  
+
       {/* Restore Many Confirmation Popup */}
       {showRestoreManyPopup && (
         <Popup
@@ -371,7 +371,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to restore {selectedItems.length} items?</p>
         </Popup>
       )}
-  
+
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
         <Popup
@@ -386,7 +386,7 @@ const DeletedRestaurants = () => {
           <p>Are you sure you want to delete {selectedRestaurant?.name}?</p>
         </Popup>
       )}
-  
+
       {/* Delete Many Popup */}
       {showDeleteManyPopup && (
         <Popup
@@ -406,7 +406,6 @@ const DeletedRestaurants = () => {
       )}
     </div>
   );
-  
 };
 
 export default DeletedRestaurants;

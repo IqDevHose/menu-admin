@@ -32,7 +32,7 @@ const Layout = () => {
         </div>
 
         {/* Main content rendered by the router */}
-        <div className="flex-1 p-1 md:p-6 ">
+        <div className="flex-1 p-1 md:p-6 overflow-scroll ">
           <Outlet />
         </div>
       </div>

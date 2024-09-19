@@ -34,7 +34,7 @@ const DeletedRatings = () => {
     data: ratingsData,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["findAll-deleted-ratings", currentPage],
     queryFn: async () => {
@@ -55,7 +55,7 @@ const DeletedRatings = () => {
       await axiosInstance.put(`/rating/restore/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
       setShowRestorePopup(false); // Close the restore popup after success
     },
@@ -69,7 +69,7 @@ const DeletedRatings = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({
         queryKey: ["restore-ratings"],
       });
@@ -83,7 +83,7 @@ const DeletedRatings = () => {
       await axiosInstance.delete(`/rating/${id}`);
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       queryClient.invalidateQueries({ queryKey: ["findAll-deleted-ratings"] });
       setShowDeletePopup(false); // Close the delete popup after success
     },
@@ -97,7 +97,7 @@ const DeletedRatings = () => {
       });
     },
     onSuccess: () => {
-      refetch()
+      refetch();
       setShowDeleteManyPopup(false);
       setSelectedItems([]); // Clear selected items after successful deletion
       queryClient.invalidateQueries({
@@ -192,7 +192,7 @@ const DeletedRatings = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 scrollbar-hide">
+    <div className="relative overflow-x-auto sm:rounded-lg w-full mx-6 md:mx-0 scrollbar-hide">
       <div className="flex flex-wrap justify-between mb-4">
         <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center gap-4 pb-4">
           {/* Search Bar */}
