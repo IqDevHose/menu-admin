@@ -151,7 +151,7 @@ const Offers = () => {
             data-tooltip-id="reload-tooltip"
             data-tooltip-content="Reload offers"
           >
-          <span className="hidden xl:flex items-center gap-1">
+            <span className="hidden xl:flex items-center gap-1">
               <RotateCw
                 size={16}
                 className={isRefetching ? `animate-spin` : ""}
@@ -206,7 +206,7 @@ const Offers = () => {
             onClick={() => handleViewOffer(offer)}
           >
             <AspectRatio ratio={16 / 9}>
-            <>{console.log(offer.image)}</>
+              <>{console.log(offer.image)}</>
               <img
                 src={offer.image}
                 alt={offer.title}
@@ -220,20 +220,27 @@ const Offers = () => {
               </CardDescription>
             </CardHeader>
             <Separator />
-            <CardFooter className="flex justify-between p-3 items-center">
-              <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span>
-              <div className="flex gap-4">
-              <Link
+            <CardFooter className="flex justify-end p-3 items-center">
+              {/* <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span> */}
+              <div className="flex items-center gap-4">
+                <Link
                   to={`/offers/edit/${offer.id}`}
                   className="font-medium text-blue-600"
                   state={offer}
-                  >
+                >
                   <SquarePen />
                 </Link>
                 <Trash2 className="text-red-500 cursor-pointer" onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteClick(offer);
                 }} />
+                <Link
+                  to={`/offers/send/${offer.id}`}
+                  className="font-medium text-blue-600"
+                  state={offer}
+                >
+                  <Button variant={"outline"}>Send</Button>
+                </Link>
               </div>
             </CardFooter>
           </Card>
@@ -255,7 +262,7 @@ const Offers = () => {
       {showPopup && selectedOffer && (
         <Popup
           onClose={() => setShowPopup(false)}
-          onConfirm={() => {}}  // Dummy function since we don't need this action
+          onConfirm={() => { }}  // Dummy function since we don't need this action
           confirmText="Close"
           showOneBtn={true}
         >

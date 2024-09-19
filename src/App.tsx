@@ -43,6 +43,7 @@ import Addoffer from "./pages/Offers/Addoffer";
 import Editoffer from "./pages/Offers/Editoffer";
 import Offers from "./pages/Offers/Offers";
 import DeletedOffers from "./pages/Offers/DeletedOffers";
+import SendOffer from "./pages/Offers/SendOffer";
 
 function App() {
   return (
@@ -135,6 +136,8 @@ function App() {
             <Route path="trash" element={<DeletedOffers />} />
             <Route path="add" element={<Addoffer />} />
             <Route path="edit/:offerId" element={<Editoffer />} />
+            <Route path="send/:offerId" element={<SendOffer />} />
+          
           </Route>
 
           {/* themes */}
