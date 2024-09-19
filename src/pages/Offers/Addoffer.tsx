@@ -1,28 +1,67 @@
 import React, { FormEvent, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-
-import { Progress } from "@/components/ui/progress";
 import axiosInstance from "@/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [description, setDescription] = useState("");
-  const Navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // Loading state for description generation
+  const navigate = useNavigate();
+
+  // Function to generate description using Google Gemini API
+  const generateDescription = async (title: string) => {
+    try {
+      setLoading(true); // Start loading
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyABPSSgejEC2icELd6_5fK5rLEKqbu5S88`,
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: `create, complete and enhance this offer: ${title}, and format the response in markdown`,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      const generatedContent = response.data.candidates[0].content.parts[0].text;
+      if (generatedContent) {
+        setLoading(false); // Stop loading
+        return generatedContent;
+      } else {
+        throw new Error("Unexpected response structure");
+      }
+    } catch (error) {
+      console.error("Error generating description: ", error);
+      setLoading(false); // Stop loading in case of error
+      return "";
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: (newoffer: FormData) => {
       return axiosInstance.post(`/offers`, newoffer);
     },
     onSuccess: () => {
-      Navigate("/offers"); // Navigate back to the item list after successful addition
+      navigate("/offers"); // Navigate back to the item list after successful addition
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData();
@@ -34,6 +73,15 @@ const Addoffer = () => {
     }
 
     mutation.mutate(formData);
+  };
+
+  const handleGenerateDescription = async () => {
+    if (title) {
+      const generatedDescription = await generateDescription(title);
+      setDescription(generatedDescription);
+    } else {
+      alert("Please enter a title to generate a description.");
+    }
   };
 
   return (
@@ -50,27 +98,28 @@ const Addoffer = () => {
             required
           />
         </div>
+
+        {/* Generate Description Button */}
+        <div>
+          <button
+            type="button"
+            onClick={handleGenerateDescription}
+            className={`px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Generating Description..." : "Generate Description"}
+          </button>
+        </div>
+
         {/* Upload Image */}
         <div className="mb-4">
-          <div className="flex gap-4 flex-wrap items-center">
-            <label
-              htmlFor="upload-image"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Upload image
-            </label>
-            {progress > 0 && title && uploadImage && (
-              <div className="flex items-center gap-1">
-                <h1 className="text-gray-400 ">{progress}</h1>
-                <Progress value={progress} max={100} className="h-2 w-24 " />
-              </div>
-            )}
-          </div>
-          {uploadImageUrl ? (
+          {uploadImageUrl && (
             <div className="p-4">
               <img width={100} src={uploadImageUrl} alt="" />
             </div>
-          ) : null}
+          )}
           <input
             type="file"
             id="upload-image"
@@ -86,22 +135,19 @@ const Addoffer = () => {
 
         <div>
           <label className="block font-bold mb-2">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-            required
-          ></textarea>
+          {/* Render description as markdown */}
+          <div className="border border-gray-300 p-2 rounded">
+            <ReactMarkdown>{description}</ReactMarkdown>
+          </div>
         </div>
 
-        {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
             className="px-4 py-2 disabled:animate-pulse disabled:bg-indigo-300 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Adding... " : "Add Item"}
+            {mutation.isPending ? "Adding... " : "Add Offer"}
           </button>
         </div>
       </form>
