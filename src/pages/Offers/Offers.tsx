@@ -197,55 +197,64 @@ const Offers = () => {
         </div>
       </div>
 
-      {/* Offers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {currentData?.map((offer: Offer) => (
-          <Card
-            key={offer.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => handleViewOffer(offer)}
-          >
-            <AspectRatio ratio={16 / 9}>
-              <>{console.log(offer.image)}</>
-              <img
-                src={offer.image}
-                alt={offer.title}
-                className="object-cover w-full h-full rounded-t-lg"
-              />
-            </AspectRatio>
-            <CardHeader className="p-4">
-              <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
-              <CardDescription className="truncate">
-                {offer.description}
-              </CardDescription>
-            </CardHeader>
-            <Separator />
-            <CardFooter className="flex justify-end p-3 items-center">
-              {/* <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span> */}
-              <div className="flex items-center gap-4">
-                <Link
-                  to={`/offers/edit/${offer.id}`}
-                  className="font-medium text-blue-600"
-                  state={offer}
-                >
-                  <SquarePen />
-                </Link>
-                <Trash2 className="text-red-500 cursor-pointer" onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteClick(offer);
-                }} />
-                <Link
-                  to={`/offers/send/${offer.id}`}
-                  className="font-medium text-blue-600"
-                  state={offer}
-                >
-                  <Button variant={"outline"}>Send offer 🎁</Button>
-                </Link>
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+     {/* Offers Grid */}
+{currentData?.length ? (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {currentData?.map((offer: Offer) => (
+      <Card
+        key={offer.id}
+        className="cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={() => handleViewOffer(offer)}
+      >
+        <AspectRatio ratio={16 / 9}>
+          <>{console.log(offer.image)}</>
+          <img
+            src={offer.image}
+            alt={offer.title}
+            className="object-cover w-full h-full rounded-t-lg"
+          />
+        </AspectRatio>
+        <CardHeader className="p-4">
+          <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
+          <CardDescription className="truncate">
+            {offer.description}
+          </CardDescription>
+        </CardHeader>
+        <Separator />
+        <CardFooter className="flex justify-end p-3 items-center">
+          {/* <span className="text-xs text-gray-500 truncate">Offer ID: {offer.id}</span> */}
+          <div className="flex items-center gap-4">
+            <Link
+              to={`/offers/edit/${offer.id}`}
+              className="font-medium text-blue-600"
+              state={offer}
+            >
+              <SquarePen />
+            </Link>
+            <Trash2
+              className="text-red-500 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(offer);
+              }}
+            />
+            <Link
+              to={`/offers/send/${offer.id}`}
+              className="font-medium text-blue-600"
+              state={offer}
+            >
+              <Button variant={"outline"}>Send offer 🎁</Button>
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    ))}
+  </div>
+) : (
+  <div className="text-center p-6">
+    <p className="text-gray-500">No offers available</p>
+  </div>
+)}
 
       {/* Pagination */}
       {totalPages > 1 && (

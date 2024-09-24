@@ -3,56 +3,38 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
+import ReactMarkdown from "react-markdown"; 
 import marked from 'marked';
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState(""); // Description for both generated and manual
+  const [description, setDescription] = useState(""); 
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [loading, setLoading] = useState(false); // Loading state for description generation
+  const [loading, setLoading] = useState(false); 
+  const [autoTitle, setAutoTitle] = useState(false); // State for auto title checkbox
   const navigate = useNavigate();
+
   function removeMarkdownPreserveEmojis(input:string) {
-    // Remove headers
     let result = input.replace(/^(#{1,6})\s+/gm, '');
-    
-    // Remove bold and italic formatting but preserve emojis
-    result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); // Bold
-    result = result.replace(/\*([^*]+)\*/g, '$1'); // Italic
-    
-    // Remove links but preserve emojis
-    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // Links
-    
-    // Remove images but preserve emojis
-    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); // Images
-    
-    // Remove code blocks and inline code but preserve emojis
-    result = result.replace(/```[\s\S]*?```/g, ''); // Code blocks
-    result = result.replace(/`([^`]+)`/g, '$1'); // Inline code
-    
-    // Remove lists but preserve emojis
-    result = result.replace(/^\s*[-*+]\s+/gm, ''); // Unordered list
-    result = result.replace(/^\s*\d+\.\s+/gm, ''); // Ordered list
-    
-    // Remove blockquotes but preserve emojis
+    result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); 
+    result = result.replace(/\*([^*]+)\*/g, '$1'); 
+    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); 
+    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); 
+    result = result.replace(/```[\s\S]*?```/g, ''); 
+    result = result.replace(/`([^`]+)`/g, '$1'); 
+    result = result.replace(/^\s*[-*+]\s+/gm, ''); 
+    result = result.replace(/^\s*\d+\.\s+/gm, ''); 
     result = result.replace(/^>\s+/gm, '');
-    
-    // Remove horizontal rules but preserve emojis
     result = result.replace(/^\s*[-*]{3,}\s*$/gm, '');
-    
-    // Ensure any remaining Markdown links and images are also handled
-    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // Links
-    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); // Images
-    
     return result.trim();
-}
+  }
 
   // Function to generate description using Google Gemini API
   const generateDescription = async (title: string) => {
     try {
-      setLoading(true); // Start loading
+      setLoading(true); 
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyABPSSgejEC2icELd6_5fK5rLEKqbu5S88`,
         {
@@ -74,15 +56,11 @@ const Addoffer = () => {
       );
 
       const generatedContent = response.data.candidates[0].content.parts[0].text;
-      if (generatedContent) {
-        setLoading(false); // Stop loading
-        return removeMarkdownPreserveEmojis(generatedContent);
-      } else {
-        throw new Error("Unexpected response structure");
-      }
+      setLoading(false);
+      return removeMarkdownPreserveEmojis(generatedContent);
     } catch (error) {
       console.error("Error generating description: ", error);
-      setLoading(false); // Stop loading in case of error
+      setLoading(false);
       return "";
     }
   };
@@ -92,17 +70,14 @@ const Addoffer = () => {
       return axiosInstance.post(`/offers`, newoffer);
     },
     onSuccess: () => {
-      navigate("/offers"); // Navigate back to the item list after successful addition
+      navigate("/offers");
     },
   });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append("title", title);
-
-    // Combine manual and generated descriptions for final description
     formData.append("description", description);
 
     if (uploadImage) {
@@ -115,9 +90,20 @@ const Addoffer = () => {
   const handleGenerateDescription = async () => {
     if (title) {
       const generatedDescription = await generateDescription(title);
-      setDescription(generatedDescription); // Set generated description
+      setDescription(generatedDescription); 
     } else {
       alert("Please enter a title to generate a description.");
+    }
+  };
+
+   
+         const handleAutoTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    setAutoTitle(isChecked);
+
+    if (isChecked) {
+      // Append emojis to the current title if the checkbox is checked
+      setTitle((prevTitle) => `${prevTitle} with emojis`);
     }
   };
 
@@ -133,7 +119,18 @@ const Addoffer = () => {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
             required
+           
           />
+          <div className="mt-2">
+            <label>
+              <input
+                type="checkbox"
+                checked={autoTitle}
+                onChange={handleAutoTitleChange}
+              />{" "}
+              Add emojis 
+            </label>
+          </div>
         </div>
 
         {/* Generate Description Button */}
