@@ -1,12 +1,17 @@
 import axiosInstance from "@/axiosInstance";
-import { CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "antd";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 type Props = {};
 
@@ -14,7 +19,7 @@ const SendOffer = (props: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [From, setFrom] = useState<string | null>(null);
   const [To, setTo] = useState<string | null>(null);
-  const [phoneNumbers, setPhoneNumbers] = useState<string[]>(["9647760692282"]); // Add more numbers as needed
+  const [phoneNumbers, setPhoneNumbers] = useState<Number[]>([]);
   const location = useLocation();
   const offer = location.state;
 
@@ -65,20 +70,22 @@ const SendOffer = (props: Props) => {
     const nextWeek = new Date(today.setDate(today.getDate() + 7));
     return nextWeek.toISOString().split("T")[0];
   };
-  const sendMessage = async (phoneNumbers:string[], message:string) => {
-    const url = "https://7103.api.greenapi.com/waInstance7103113800/sendMessage/b531fcd0b034440eb56e280f712c3a869bbec62f62014c5790";
+
+  const sendMessage = async (phoneNumbers: string[], message: string) => {
+    const url =
+      "https://7103.api.greenapi.com/waInstance7103113800/sendMessage/b531fcd0b034440eb56e280f712c3a869bbec62f62014c5790";
     const headers = {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     };
-  
+
     try {
       // Loop through phone numbers and send the message
       for (const phoneNumber of phoneNumbers) {
         const payload = {
           chatId: `${phoneNumber}@c.us`,
-          message: message
+          message: message,
         };
-  
+
         await axios.post(url, payload, { headers });
         console.log(`Message sent to ${phoneNumber}`);
       }
@@ -86,10 +93,45 @@ const SendOffer = (props: Props) => {
       console.error("Error sending message:", error);
     }
   };
+
   const handleSendMessages = async () => {
     const message = offer.description; // Set your message content here
-    await sendMessage(['9647760692282'], message);
+    await sendMessage(["9647760692282"], message);
   };
+
+  const formatPhoneNumber = (phone: string) => {
+    // Replace Arabic numerals with English numerals
+    if (phone) {
+      const arabicToEnglishMap: { [key: string]: string } = {
+        "٠": "0",
+        "١": "1",
+        "٢": "2",
+        "٣": "3",
+        "٤": "4",
+        "٥": "5",
+        "٦": "6",
+        "٧": "7",
+        "٨": "8",
+        "٩": "9",
+      };
+
+      return phone.replace(/[٠-٩]/g, (char) => arabicToEnglishMap[char]);
+    }
+    return phone;
+  };
+
+  const sortedItems = query.data?.items
+    ? query.data.items
+        .map((item: any) => ({
+          ...item,
+          birthday: new Date(item.birthday), 
+        }))
+
+        .sort(
+          (a: { birthday: Date }, b: { birthday: Date }) =>
+            a.birthday.getTime() - b.birthday.getTime()
+        ) 
+    : [];
 
   return (
     <>
@@ -101,20 +143,29 @@ const SendOffer = (props: Props) => {
             className="p-2 border border-gray-300 rounded-lg"
             defaultValue={"select"}
           >
-            <option value="select">select time</option>
+            <option value="select">Select time</option>
             <option value="day">Today</option>
             <option value="week">This week</option>
             <option value="month">This month</option>
           </select>
         </div>
 
-        <Card key={offer.id} className="cursor-pointer hover:shadow-lg transition-shadow w-96">
+        <Card
+          key={offer.id}
+          className="cursor-pointer hover:shadow-lg transition-shadow w-96"
+        >
           <AspectRatio ratio={16 / 9}>
-            <img src={offer.image} alt={offer.title} className="object-cover w-full h-full rounded-t-lg" />
+            <img
+              src={offer.image}
+              alt={offer.title}
+              className="object-cover w-full h-full rounded-t-lg"
+            />
           </AspectRatio>
           <CardHeader className="p-4">
             <CardTitle className="text-lg truncate">{offer.title}</CardTitle>
-            <CardDescription className="truncate">{offer.description}</CardDescription>
+            <CardDescription className="truncate">
+              {offer.description}
+            </CardDescription>
           </CardHeader>
           <Separator />
         </Card>
@@ -137,25 +188,40 @@ const SendOffer = (props: Props) => {
               <th scope="col" className="px-6 py-3">
                 <input type="checkbox" />
               </th>
-              <th scope="col" className="px-6 py-3">Name</th>
-              <th scope="col" className="px-6 py-3">Phone</th>
-              <th scope="col" className="px-6 py-3">Birthday</th>
+              <th scope="col" className="px-6 py-3">
+                Name
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Phone
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Birthday
+              </th>
               <th scope="col" className="px-6 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {query.data?.items.length > 0 ? (
-              query.data.items.map((item: any) => (
-                <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4"><input type="checkbox" /></td>
+            {sortedItems.length > 0 ? (
+              sortedItems.map((item: any) => (
+                <tr
+                  key={item.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4">
+                    <input type="checkbox" />
+                  </td>
                   <td className="px-6 py-4">{item.name}</td>
-                  <td className="px-6 py-4">{item.phone}</td>
-                  <td className="px-6 py-4">{new Date(item.birthday).toLocaleDateString("en-CA")}</td>
+                  <td className="px-6 py-4">{formatPhoneNumber(item.phone)}</td>
+                  <td className="px-6 py-4">
+                    {item.birthday.toLocaleDateString("en-CA")}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-4">No data available.</td>
+                <td colSpan={5} className="text-center py-4">
+                  No data available.
+                </td>
               </tr>
             )}
           </tbody>
