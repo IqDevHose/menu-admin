@@ -8,6 +8,7 @@ import marked from 'marked';
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
+  const [withEmoji, setWithEmoji] = useState("");
   const [description, setDescription] = useState(""); 
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [uploadImage, setUploadImage] = useState<File | null>(null);
@@ -42,7 +43,7 @@ const Addoffer = () => {
             {
               parts: [
                 {
-                  text: `create, complete and enhance this offer: ${title}`,
+                  text: `create, complete and enhance this offer: ${title} ${withEmoji}`,
                 },
               ],
             },
@@ -103,7 +104,7 @@ const Addoffer = () => {
 
     if (isChecked) {
       // Append emojis to the current title if the checkbox is checked
-      setTitle((prevTitle) => `${prevTitle} with emojis`);
+      setWithEmoji('with emojis');
     }
   };
 
