@@ -11,6 +11,8 @@ import {
   ResponsiveContainer,
   XAxis,
   YAxis,
+  LineChart,
+  Line,
 } from 'recharts';
 import { Card, Row, Col, Statistic, Divider, List, Avatar, Select } from 'antd';
 import Spinner from '@/components/Spinner';
@@ -45,6 +47,8 @@ const Home: React.FC = () => {
     },
   });
 
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>('all');
+
   const customerReviewQuery = useQuery({
     queryKey: ['customerReview'],
     queryFn: async () => {
@@ -52,8 +56,6 @@ const Home: React.FC = () => {
       return response.data as ItemsCustomerReviewType;
     },
   });
-
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string | undefined>('all');
 
   const restaurantStatsQuery = useQuery({
     queryKey: ['restaurantStats', selectedRestaurant],
@@ -93,7 +95,6 @@ const Home: React.FC = () => {
 
   const avgRatingPerRestaurant: AvgRatingPerRestaurant[] = avgRatingsQuery.data || [];
   const specificRestaurantData = restaurantStatsQuery.data || {};
-  const topReviewedItems = specificRestaurantData.topReviewedItems || [];
 
   const restaurantList = avgRatingPerRestaurant.map((avgRating: AvgRatingPerRestaurant) => ({
     id: avgRating.id,
@@ -125,10 +126,20 @@ const Home: React.FC = () => {
       ? totalItems
       : specificRestaurantData.itemsCount || 0;
 
+  // Example data for the line chart (replace with real data)
+  const lineChartData = [
+    { date: '2023-01', averageRating: 3.5 },
+    { date: '2023-02', averageRating: 8.0 },
+    { date: '2023-03', averageRating: 4.2 },
+    { date: '2023-04', averageRating: 3.9 },
+    { date: '2023-05', averageRating: 4.5 },
+    { date: '2023-06', averageRating: 4.3 },
+  ];
+
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
-    <div className="p-8 w-full bg-white min-h-screen flex">
+    <div className="p-4 sm:p-8 w-full bg-white min-h-screen flex flex-col md:flex-row">
       <div className="flex-1">
         <div className="flex items-center space-x-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
@@ -149,7 +160,7 @@ const Home: React.FC = () => {
           </Select>
         </div>
 
-        <Row gutter={24}>
+        <Row gutter={[16, 24]}>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
@@ -188,7 +199,7 @@ const Home: React.FC = () => {
           </Col>
         </Row>
 
-        <Row gutter={24} className="mt-6">
+        <Row gutter={[16, 24]} className="mt-6">
           <Col xs={24} lg={12}>
             <Card hoverable>
               <h2 className="text-lg font-medium mb-4 text-gray-800">
@@ -207,7 +218,24 @@ const Home: React.FC = () => {
             </Card>
           </Col>
 
-          {/* Conditionally render nothing when a specific restaurant is selected */}
+          <Col xs={24} lg={12}>
+            <Card hoverable>
+              <h2 className="text-lg font-medium mb-4 text-gray-800">
+                Average Ratings Over Time
+              </h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={lineChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="averageRating" stroke="#82ca9d" />
+                </LineChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+
           {selectedRestaurant === 'all' && (
             <Col xs={24} lg={12}>
               <Card hoverable>
@@ -244,7 +272,7 @@ const Home: React.FC = () => {
           <h2 className="text-lg font-medium mb-4 text-gray-800">
             Total Restaurants
           </h2>
-          <Row gutter={24}>
+          <Row gutter={[16, 24]}>
             <Col xs={24} sm={12} lg={6}>
               <Card hoverable>
                 <Statistic
@@ -258,7 +286,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-80 pl-4">
+      <div className="w-full md:w-80 md:pl-4 mt-6 md:mt-0">
         <Card title="Recent Activity" className="mb-6">
           <List
             itemLayout="horizontal"
