@@ -101,6 +101,7 @@ const SendOffer = (props: Props) => {
 
   const formatPhoneNumber = (phone: string) => {
     // Replace Arabic numerals with English numerals
+    
     if (phone) {
       const arabicToEnglishMap: { [key: string]: string } = {
         "٠": "0",
