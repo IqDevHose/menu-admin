@@ -13,7 +13,7 @@ function Logout() {
   return (
     <button
       onClick={handleSignOut}
-      className="flex items-center p-2 text-indigo-900 rounded-lg hover:bg-indigo-200  group"
+      className="flex items-center p-2 text-indigo-100 rounded-lg hover:bg-red-800 group transition-colors duration-300"
     >
       <SquareArrowLeft className="mr-2 mb-[2px]"/>
       LOG OUT

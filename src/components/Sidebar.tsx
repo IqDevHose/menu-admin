@@ -30,7 +30,7 @@ const Sidebar = () => {
           fixed top-0 left-0 z-50 w-64 h-screen transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:w-80
-          bg-gradient-to-b from-indigo-600 to-indigo-800 text-white
+          bg-gray-800 text-white
         `}
         aria-label="Sidebar"
       >
