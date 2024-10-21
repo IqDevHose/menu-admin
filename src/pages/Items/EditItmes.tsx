@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, FormEvent, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner";
+import { toBase64 } from "@/utils/imageUtils";
 
 type itemType = {
   name: string | null;
@@ -63,34 +64,32 @@ function EditItem() {
   });
 
   const mutation = useMutation({
-    mutationFn: (formData: FormData) => {
-      return axiosInstance.put(`/item/${itemId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    mutationFn: (data: any) => {
+      return axiosInstance.put(`/item/${itemId}`, data);
     },
     onSuccess: () => {
       navigate("/items");
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name || "");
-    formData.append("description", description || "");
-    formData.append("price", price?.toString() || "");
-    formData.append("categoryId", categoryId || "");
+    let imageBase64 = uploadImageUrl;
+
     if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
-    else{
-      formData.append("image", uploadImageUrl || '')
+      imageBase64 = await toBase64(uploadImage);
     }
 
-    mutation.mutate(formData);
+    const data = {
+      name: name || "",
+      description: description || "",
+      price: price || 0,
+      categoryId: categoryId || "",
+      image: imageBase64,
+    };
+
+    mutation.mutate(data);
   };
 
   if (isLoadingRestaurants) return;

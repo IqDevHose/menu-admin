@@ -1,5 +1,5 @@
 // AddItem.tsx
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
@@ -15,6 +15,7 @@ function AddItem() {
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
@@ -45,17 +46,8 @@ function AddItem() {
 
   // Mutation for submitting the form
   const mutation = useMutation({
-    mutationFn: (newItem: FormData) => {
-      return axiosInstance.post(`/item`, newItem, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (event) => {
-          setProgress(
-            event.total ? Math.round((100 * event.loaded) / event.total) : 0
-          );
-        },
-      });
+    mutationFn: (newItem: any) => {
+      return axiosInstance.post(`/item`, newItem);
     },
     onError: (e) => {
       console.log(e);
@@ -66,19 +58,31 @@ function AddItem() {
   });
 
   // Consolidated handleSubmit function using FormData
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("price", `${price}`);
-    formData.append("categoryId", categoryId);
-    if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
+    const itemData = {
+      name,
+      description,
+      price: `${price}`,
+      categoryId,
+      image: base64Image,
+    };
 
-    mutation.mutate(formData);
+    mutation.mutate(itemData);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadImage(file);
+      setUploadImageUrl(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBase64Image(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (isLoadingRestaurants) {
@@ -239,12 +243,7 @@ function AddItem() {
           <input
             type="file"
             id="upload-image"
-            onChange={(e) => {
-              if (e.target.files) {
-                setUploadImage(e.target.files[0]);
-                setUploadImageUrl(URL.createObjectURL(e.target.files[0]));
-              }
-            }}
+            onChange={handleFileChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>

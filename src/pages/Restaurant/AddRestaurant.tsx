@@ -1,6 +1,7 @@
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
 import { Progress } from "@/components/ui/progress";
+import { toBase64 } from "@/utils/imageUtils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +41,7 @@ function AddRestaurant() {
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [bg, setBg] = useState<string | null>("");
+  const [base64Image, setBase64Image] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const { data: categories, isLoading } = useQuery({
@@ -51,17 +53,8 @@ function AddRestaurant() {
   });
 
   const mutation = useMutation({
-    mutationFn: (newRest: FormData) => {
-      return axiosInstance.post(`/restaurant`, newRest, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (event) => {
-          setProgress(
-            event.total ? Math.round((100 * event.loaded) / event.total!) : 0
-          );
-        },
-      });
+    mutationFn: (newRest: any) => {
+      return axiosInstance.post(`/restaurant`, newRest);
     },
     onError: (e) => {
       console.log(e);
@@ -98,22 +91,30 @@ function AddRestaurant() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name || "");
-    formData.append("description", description || "");
-    formData.append("accessCode", accessCode || "");
-    formData.append("primary", primary || "");
-    formData.append("secondary", secondary || "");
-    formData.append("bg", bg || "");
-    if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
+    const restaurantData = {
+      name,
+      description,
+      accessCode,
+      primary,
+      secondary,
+      bg,
+      image: base64Image,
+      categories: JSON.stringify(categoriesData),
+    };
 
-    // Append categories as JSON string
-    formData.append("categories", JSON.stringify(categoriesData));
-
-    mutation.mutate(formData);
+    mutation.mutate(restaurantData);
   };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUploadImage(file);
+      setUploadImageUrl(URL.createObjectURL(file));
+      const base64 = await toBase64(file);
+      setBase64Image(base64 as string);
+    }
+  };
+
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md overflow-auto">
       <h2 className="text-2xl font-bold mb-6">Add Restaurant</h2>
@@ -302,12 +303,7 @@ function AddRestaurant() {
           <input
             type="file"
             id="upload-image"
-            onChange={(e) => {
-              if (e.target.files) {
-                setUploadImage(e.target.files[0]);
-                setUploadImageUrl(URL.createObjectURL(e.target.files[0]));
-              }
-            }}
+            onChange={handleFileChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>

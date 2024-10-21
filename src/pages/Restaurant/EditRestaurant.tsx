@@ -6,6 +6,7 @@ import CreatableSelect from "react-select/creatable";
 import { ActionMeta, MultiValue } from "react-select";
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
+import { toBase64 } from "@/utils/imageUtils";
 
 type categoryType = {
   name: string;
@@ -68,12 +69,8 @@ function EditRestaurant() {
 
   // Mutation for updating restaurant
   const mutation = useMutation({
-    mutationFn: (formData: FormData) => {
-      return axiosInstance.put(`/restaurant/${restaurantId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    mutationFn: (data: any) => {
+      return axiosInstance.put(`/restaurant/${restaurantId}`, data);
     },
     onSuccess: () => {
       navigate("/restaurants");
@@ -105,27 +102,27 @@ function EditRestaurant() {
     );
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name || "");
-    formData.append("description", description || "");
-    formData.append("accessCode", accessCode || "");
-    formData.append("primary", primary || "");
-    formData.append("secondary", secondary || "");
-    formData.append("bg", bg || "");
+    let imageBase64 = uploadImageUrl;
+
     if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
-    else{
-      formData.append("image", uploadImageUrl || '')
+      imageBase64 = await toBase64(uploadImage);
     }
 
-    // Append categories as JSON string
-    formData.append("categories", JSON.stringify(categoriesData));
+    const data = {
+      name: name || "",
+      description: description || "",
+      accessCode: accessCode || "",
+      primary: primary || "",
+      secondary: secondary || "",
+      bg: bg || "",
+      image: imageBase64,
+      categories: categoriesData,
+    };
 
-    mutation.mutate(formData);
+    mutation.mutate(data);
   };
 
   return (
