@@ -45,16 +45,6 @@ const ImportTheme = (props: Props) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [isHeaderMatch, setIsHeaderMatch] = useState(false);
 
-  // Fetch headers from the API using react-query
-  const { data } = useQuery({
-    queryKey: ["theme"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/theme?page=all`);
-      const heads: any[] = extractHeaders(response.data.items);
-      setHeaders(heads);
-      return response.data;
-    },
-  });
 
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

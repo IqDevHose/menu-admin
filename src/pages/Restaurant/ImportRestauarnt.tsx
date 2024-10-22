@@ -84,20 +84,6 @@ const ImportRestaurant = (props: Props) => {
     "theme",
   ];
 
-  // Fetch headers from the API using react-query
-  const { data } = useQuery({
-    queryKey: ["restaurant"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/restaurant?page=all`);
-
-      const heads: string[] = extractHeaders(response.data.items);
-
-      setHeaders(heads);
-      console.log("heads in the query", heads === expectedHeaders);
-      return response.data;
-    },
-  });
-
   const arraysEqual = (a: string[], b: string[]) => {
     if (a.length !== b.length) return false;
     a.sort();

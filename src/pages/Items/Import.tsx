@@ -49,16 +49,6 @@ const ImportItem = (props: Props) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [isHeaderMatch, setIsHeaderMatch] = useState(false);
 
-  // Fetch headers from the API using react-query
-  const { data } = useQuery({
-    queryKey: ["items-all"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/item?page=all`);
-      const heads: any[] = extractHeaders(response.data.items);
-      setHeaders(heads);
-      return response.data;
-    },
-  });
 
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

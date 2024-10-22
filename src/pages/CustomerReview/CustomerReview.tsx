@@ -114,20 +114,6 @@ const CustomerReview = () => {
       return res.data;
     },
   });
-  const {
-    data: exportData,
-    refetch,
-    isRefetching,
-  } = useQuery({
-    queryKey: ["customer-review-all"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/customer-review?page=all`);
-
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
 
   const handleExport = () => {
     const flattenedData = query.data.items.map((item: any) =>

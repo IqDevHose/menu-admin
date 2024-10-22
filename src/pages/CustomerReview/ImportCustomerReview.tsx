@@ -48,17 +48,6 @@ const ImportCustomerReview = (props: Props) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [isHeaderMatch, setIsHeaderMatch] = useState(false);
 
-  // Fetch headers from the API using react-query
-  const { data } = useQuery({
-    queryKey: ["customer-review"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/customer-review?page=all`);
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
-
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {

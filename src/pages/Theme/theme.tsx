@@ -75,16 +75,6 @@ const Theme = () => {
     await queryClient.invalidateQueries({ queryKey: ["theme"] });
   };
 
-  const { data: exportData, refetch } = useQuery({
-    queryKey: ["theme all"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/theme?page=all`);
-
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
 
   const handleExport = () => {
     const flattenedData = query.data.items.map((item: any) =>

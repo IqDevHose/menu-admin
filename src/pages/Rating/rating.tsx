@@ -77,17 +77,6 @@ const Rating = () => {
     },
   });
 
-  const { data: exportData, refetch } = useQuery({
-    queryKey: ["ratings-all"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/rating?page=all`);
-
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
-
   const handleExport = () => {
     const flattenedData = query.data.items.map((item: any) =>
       flattenObject(item)

@@ -75,23 +75,6 @@ const Item = () => {
 
   const queryClient = useQueryClient();
 
-  // Fetch all items for export and to extract headers
-  const { data: exportData } = useQuery({
-    queryKey: ["items"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/item?page=all`);
-      const dataExcludedCategory = item.data.items.map((item: any) => {
-        const { category, ...rest } = item;
-        return rest;
-      });
-      const heads: any[] = extractHeaders(dataExcludedCategory);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
-
-
-
   // Fetch items based on current page, category, and restaurant filters
   const {
     data: itemsData,
@@ -117,8 +100,7 @@ const Item = () => {
     const flattenedData = itemsData.items.map((item: any) =>
       flattenObject(item)
     );
-    console.log(flattenedData, exportData);
-    const dataExcludedCategory = exportData.items.map((items: any) => {
+    const dataExcludedCategory = itemsData.items.map((items: any) => {
       const { category, ...rest } = items;
       return rest;
     });

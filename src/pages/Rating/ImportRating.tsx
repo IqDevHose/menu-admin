@@ -47,16 +47,6 @@ const ImportRating = (props: Props) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [isHeaderMatch, setIsHeaderMatch] = useState(false);
 
-  // Fetch headers from the API using react-query
-  const { data } = useQuery({
-    queryKey: ["rating"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/rating?page=all`);
-      const heads: any[] = extractHeaders(response.data.items);
-      setHeaders(heads);
-      return response.data;
-    },
-  });
 
   // Handle file change and parse CSV
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -114,16 +114,6 @@ const Questions = () => {
     },
   });
 
-  const { data: exportData } = useQuery({
-    queryKey: ["questions-all"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/question?page=all`);
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
-
   const handleExport = () => {
     const flattenedData = queryData.items.map((item: any) =>
       flattenObject(item)
