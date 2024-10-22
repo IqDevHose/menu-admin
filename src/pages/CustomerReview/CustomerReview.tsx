@@ -130,7 +130,7 @@ const CustomerReview = () => {
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) =>
+    const flattenedData = query.data.items.map((item: any) =>
       flattenObject(item)
     );
 

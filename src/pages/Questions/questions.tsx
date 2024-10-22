@@ -125,7 +125,7 @@ const Questions = () => {
   });
 
   const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) =>
+    const flattenedData = queryData.items.map((item: any) =>
       flattenObject(item)
     );
 

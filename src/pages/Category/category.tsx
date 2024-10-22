@@ -88,20 +88,7 @@ const Category = () => {
     },
   });
 
-  const handleExport = () => {
-    const flattenedData = exportData.items.map((item: any) =>
-      flattenObject(item)
-    );
-
-    const dataToConvert = {
-      data: flattenedData,
-      filename: "categories",
-      delimiter: ",",
-      headers,
-    };
-
-    exportCSVFile(dataToConvert);
-  };
+  
 
   // Fetch categories based on selected restaurant
   const {
@@ -123,6 +110,21 @@ const Category = () => {
     },
     refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
   });
+
+const handleExport = () => {
+    const flattenedData = categoryData.items.map((item: any) =>
+      flattenObject(item)
+    );
+
+    const dataToConvert = {
+      data: flattenedData,
+      filename: "categories",
+      delimiter: ",",
+      headers,
+    };
+
+    exportCSVFile(dataToConvert);
+  };
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({

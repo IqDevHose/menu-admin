@@ -102,19 +102,8 @@ const Restaurant = () => {
  
 
   const handleExport = () => {
-    const {
-      data: exportData,
-    } = useQuery({
-      queryKey: ["restaurants-all"],
-      queryFn: async () => {
-        const item = await axiosInstance.get(`/restaurant?page=all`);
-  
-        const heads: any[] = extractHeaders(item.data.items);
-        setHeaders(heads);
-        return item.data;
-      },
-    });
-    const flattenedData = exportData.items.map((item: any) =>
+    
+    const flattenedData = data.items.map((item: any) =>
       flattenObject(item)
     );
 
