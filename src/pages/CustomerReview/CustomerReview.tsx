@@ -1,12 +1,8 @@
 import { useState } from "react";
 import Popup from "@/components/Popup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import happy from "../../assets/smile.png";
-import satisfied from "../../assets/neutral.png";
-import sad from "../../assets/sad.png";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
@@ -16,13 +12,8 @@ import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
-import {
-  FaFaceAngry,
-  FaFaceFrown,
-  FaFaceLaughBeam,
-  FaFaceSmile,
-} from "react-icons/fa6";
-import { FaRegStar, FaSmile, FaStar, FaStarHalfAlt } from "react-icons/fa";
+
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 type customerReviewType = {
   id: string;
@@ -104,7 +95,7 @@ const CustomerReview = () => {
     await queryClient.invalidateQueries({
       queryKey: ["customerReview", currentPage, selectedRestaurant],
     });
-    refetch(); // Optionally trigger refetch after invalidation
+    query.refetch(); // Optionally trigger refetch after invalidation
   };
 
   const { data: restaurants } = useQuery({
@@ -211,7 +202,7 @@ const CustomerReview = () => {
       await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch();
+      query.refetch();
       queryClient.invalidateQueries({ queryKey: ["customerReview"] });
       setShowPopup(false);
     },
@@ -223,7 +214,7 @@ const CustomerReview = () => {
       });
     },
     onSuccess: () => {
-      refetch();
+      query.refetch();
       queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
       setShowDeleteManyPopup(false); // Close the delete popup
       setSelectedItems([]); // Reset the selected items state after deletion
@@ -365,7 +356,7 @@ const CustomerReview = () => {
           )}
           <button
             type="button"
-            disabled={isRefetching}
+            disabled={query.isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
             onClick={handleReload} // Updated to handleReload
             data-tooltip-id="reload-tooltip"
@@ -374,14 +365,14 @@ const CustomerReview = () => {
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
                 size={16}
-                className={isRefetching ? `animate-spin` : ""}
+                className={query.isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
               <RotateCw
                 size={16}
-                className={isRefetching ? `animate-spin` : ""}
+                className={query.isRefetching ? `animate-spin` : ""}
               />
             </span>
           </button>
@@ -461,7 +452,7 @@ const CustomerReview = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData?.map((item: any, index: number) => (
+                {filteredData?.map((item: any) => (
                   <tr
                     key={item.id}
                     className="bg-white border-b hover:bg-gray-50"
