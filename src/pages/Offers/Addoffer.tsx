@@ -3,39 +3,36 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ReactMarkdown from "react-markdown"; 
-import marked from 'marked';
+
 
 const Addoffer = () => {
   const [title, setTitle] = useState("");
   const [withEmoji, setWithEmoji] = useState("");
   const [description, setDescription] = useState(""); 
-  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
-  const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const [uploadImageBase64, setUploadImageBase64] = useState<string | null>(null); // Store base64 image
   const [progress, setProgress] = useState<number>(0);
   const [loading, setLoading] = useState(false); 
   const [autoTitle, setAutoTitle] = useState(false); // State for auto title checkbox
   const navigate = useNavigate();
 
-  function removeMarkdownPreserveEmojis(input:string) {
-    let result = input.replace(/^(#{1,6})\s+/gm, '');
-    result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); 
-    result = result.replace(/\*([^*]+)\*/g, '$1'); 
-    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); 
-    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1'); 
-    result = result.replace(/```[\s\S]*?```/g, ''); 
-    result = result.replace(/`([^`]+)`/g, '$1'); 
-    result = result.replace(/^\s*[-*+]\s+/gm, ''); 
-    result = result.replace(/^\s*\d+\.\s+/gm, ''); 
-    result = result.replace(/^>\s+/gm, '');
-    result = result.replace(/^\s*[-*]{3,}\s*$/gm, '');
+  function removeMarkdownPreserveEmojis(input: string) {
+    let result = input.replace(/^(#{1,6})\s+/gm, "");
+    result = result.replace(/\*\*([^*]+)\*\*/g, "$1"); 
+    result = result.replace(/\*([^*]+)\*/g, "$1"); 
+    result = result.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1"); 
+    result = result.replace(/!\[([^\]]*)\]\([^\)]+\)/g, "$1"); 
+    result = result.replace(/```[\s\S]*?```/g, ""); 
+    result = result.replace(/`([^`]+)`/g, "$1"); 
+    result = result.replace(/^\s*[-*+]\s+/gm, ""); 
+    result = result.replace(/^\s*\d+\.\s+/gm, ""); 
+    result = result.replace(/^>\s+/gm, "");
+    result = result.replace(/^\s*[-*]{3,}\s*$/gm, "");
     return result.trim();
   }
 
-  // Function to generate description using Google Gemini API
   const generateDescription = async (title: string) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyABPSSgejEC2icELd6_5fK5rLEKqbu5S88`,
         {
@@ -56,7 +53,8 @@ const Addoffer = () => {
         }
       );
 
-      const generatedContent = response.data.candidates[0].content.parts[0].text;
+      const generatedContent =
+        response.data.candidates[0].content.parts[0].text;
       setLoading(false);
       return removeMarkdownPreserveEmojis(generatedContent);
     } catch (error) {
@@ -67,7 +65,7 @@ const Addoffer = () => {
   };
 
   const mutation = useMutation({
-    mutationFn: (newoffer: FormData) => {
+    mutationFn: (newoffer: any) => {
       return axiosInstance.post(`/offers`, newoffer);
     },
     onSuccess: () => {
@@ -77,15 +75,13 @@ const Addoffer = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
+    const newOffer = {
+      title,
+      description,
+      image: uploadImageBase64, // Send Base64 encoded image as string
+    };
 
-    if (uploadImage) {
-      formData.append("image", uploadImage);
-    }
-
-    mutation.mutate(formData);
+    mutation.mutate(newOffer);
   };
 
   const handleGenerateDescription = async () => {
@@ -97,15 +93,21 @@ const Addoffer = () => {
     }
   };
 
-   
-         const handleAutoTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAutoTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
     setAutoTitle(isChecked);
 
     if (isChecked) {
-      // Append emojis to the current title if the checkbox is checked
-      setWithEmoji('with emojis');
+      setWithEmoji("with emojis");
     }
+  };
+
+  const handleImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadImageBase64(reader.result as string); // Convert image to base64
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -120,7 +122,6 @@ const Addoffer = () => {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
             required
-           
           />
           <div className="mt-2">
             <label>
@@ -129,12 +130,11 @@ const Addoffer = () => {
                 checked={autoTitle}
                 onChange={handleAutoTitleChange}
               />{" "}
-              Add emojis 
+              Add emojis
             </label>
           </div>
         </div>
 
-        {/* Generate Description Button */}
         <div>
           <button
             type="button"
@@ -148,7 +148,6 @@ const Addoffer = () => {
           </button>
         </div>
 
-        {/* Manual Description Input */}
         <div>
           <label className="block font-bold mb-2">Add Description</label>
           <textarea
@@ -160,11 +159,10 @@ const Addoffer = () => {
           />
         </div>
 
-        {/* Upload Image */}
         <div className="mb-4">
-          {uploadImageUrl && (
+          {uploadImageBase64 && (
             <div className="p-4">
-              <img width={100} src={uploadImageUrl} alt="" />
+              <img width={100} src={uploadImageBase64} alt="" />
             </div>
           )}
           <input
@@ -172,8 +170,7 @@ const Addoffer = () => {
             id="upload-image"
             onChange={(e) => {
               if (e.target.files) {
-                setUploadImage(e.target.files[0]);
-                setUploadImageUrl(URL.createObjectURL(e.target.files[0]));
+                handleImageUpload(e.target.files[0]); // Handle image upload as base64
               }
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

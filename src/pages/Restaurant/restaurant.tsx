@@ -87,7 +87,7 @@ const Restaurant = () => {
     queryKey: ["restaurant", currentPage],
     queryFn: async () => {
       const res = await axiosInstance.get(`/restaurant?page=${currentPage}`);
-
+      console.log(res.data)
       return res.data;
     },
     refetchOnWindowFocus: true

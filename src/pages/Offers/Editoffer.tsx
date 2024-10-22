@@ -1,8 +1,7 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, FormEvent } from "react";
-import { Button } from "@/components/ui/button";
 import axiosInstance from "@/axiosInstance";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 const EditOffer = () => {
   const navigate = useNavigate();
@@ -18,12 +17,22 @@ const EditOffer = () => {
 
   const { offerId } = useParams();
 
+  // Helper function to convert image file to base64 string
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   // Update mutation for saving offer
   const mutation = useMutation({
-    mutationFn: (formData: FormData) => {
-      return axiosInstance.put(`/offers/${offerId}`, formData, {
+    mutationFn: async (updatedOffer: any) => {
+      return axiosInstance.put(`/offers/${offerId}`, updatedOffer, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       });
     },
@@ -32,20 +41,23 @@ const EditOffer = () => {
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", title || "");
-    formData.append("description", description || "");
-
+    let base64Image = uploadImageUrl;
+    
+    // Convert uploaded image to base64 if a new image is selected
     if (uploadImage) {
-      formData.append("image", uploadImage);
-    } else if (uploadImageUrl) {
-      formData.append("image", uploadImageUrl);
+      base64Image = await convertImageToBase64(uploadImage);
     }
 
-    mutation.mutate(formData);
+    const updatedOffer = {
+      title: title || "",
+      description: description || "",
+      image: base64Image || null, // Include base64 image string if available
+    };
+
+    mutation.mutate(updatedOffer);
   };
 
   return (

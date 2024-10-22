@@ -64,7 +64,7 @@ function AddItem() {
     const itemData = {
       name,
       description,
-      price: `${price}`,
+      price: price,
       categoryId,
       image: base64Image,
     };

@@ -199,7 +199,7 @@ const Offers = () => {
 
      {/* Offers Grid */}
 {currentData?.length ? (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
     {currentData?.map((offer: Offer) => (
       <Card
         key={offer.id}
