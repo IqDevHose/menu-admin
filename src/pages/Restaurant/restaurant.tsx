@@ -83,7 +83,7 @@ const Restaurant = () => {
 
   const queryClient = useQueryClient();
 
-  const query = useQuery({
+  const {data,refetch,isRefetching,isPending,isError} = useQuery({
     queryKey: ["restaurant", currentPage],
     queryFn: async () => {
       const res = await axiosInstance.get(`/restaurant?page=${currentPage}`);
@@ -96,26 +96,24 @@ const Restaurant = () => {
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["restaurant"] });
-    refetch()
   }
 
   // Assuming `headers` is being set in the component state
-  const {
-    data: exportData,
-    refetch,
-    isRefetching,
-  } = useQuery({
-    queryKey: ["restaurants-all"],
-    queryFn: async () => {
-      const item = await axiosInstance.get(`/restaurant?page=all`);
-
-      const heads: any[] = extractHeaders(item.data.items);
-      setHeaders(heads);
-      return item.data;
-    },
-  });
+ 
 
   const handleExport = () => {
+    const {
+      data: exportData,
+    } = useQuery({
+      queryKey: ["restaurants-all"],
+      queryFn: async () => {
+        const item = await axiosInstance.get(`/restaurant?page=all`);
+  
+        const heads: any[] = extractHeaders(item.data.items);
+        setHeaders(heads);
+        return item.data;
+      },
+    });
     const flattenedData = exportData.items.map((item: any) =>
       flattenObject(item)
     );
@@ -136,7 +134,6 @@ const Restaurant = () => {
       await axiosInstance.delete(`/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
-      refetch();
       queryClient.invalidateQueries({ queryKey: ["restaurant"] });
       setShowPopup(false); // Close the popup after successful deletion
     },
@@ -149,7 +146,6 @@ const Restaurant = () => {
       });
     },
     onSuccess: () => {
-      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },
@@ -172,12 +168,12 @@ const Restaurant = () => {
   };
 
   // Filter the data based on the search query
-  const filteredData = query.data?.items.filter((item: any) =>
+  const filteredData = data?.items.filter((item: any) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(query.data?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(data?.totalItems / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -207,7 +203,7 @@ const Restaurant = () => {
     setShowDeleteManyPopup(true);
   };
 
-  if (query.isPending) {
+  if (isPending) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -215,7 +211,7 @@ const Restaurant = () => {
     );
   }
 
-  if (query.isError) {
+  if (isError) {
     return <div>Error</div>;
   }
   return (
