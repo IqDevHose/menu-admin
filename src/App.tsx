@@ -44,6 +44,10 @@ import Editoffer from "./pages/Offers/Editoffer";
 import Offers from "./pages/Offers/Offers";
 import DeletedOffers from "./pages/Offers/DeletedOffers";
 import SendOffer from "./pages/Offers/SendOffer";
+import Deals from "./pages/Deals/Deals";
+import AddDeal from "./pages/Deals/AddDeal";
+import EditDeal from "./pages/Deals/EditDeal";
+import DeletedDeals from "./pages/Deals/DeletedDeals";
 
 function App() {
   return (
@@ -149,6 +153,15 @@ function App() {
             <Route path="import" element={<ImportTheme />} />
           </Route> */}
           {/*end theme */}
+
+          {/* Deals routes */}
+          <Route path="/deals/*">
+            <Route index element={<Deals />} />
+            <Route path="add" element={<AddDeal />} />
+            <Route path="edit/:dealId" element={<EditDeal />} />
+            <Route path="trash" element={<DeletedDeals />} />
+          </Route>
+
           {/* end sidebar */}
         </Route>
       </>

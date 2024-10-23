@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   MessageCircleCode,
   ShoppingBasket,
+  Tag,
   TicketPercent,
   X,
 } from "lucide-react";
@@ -57,6 +58,7 @@ const Sidebar = () => {
                 { to: "/customerReviews", icon: <MessageCircleCode />, label: "Customer Reviews" },
                 { to: "/questions", icon: <FileQuestion />, label: "Questions" },
                 { to: "/offers", icon: <TicketPercent />, label: "Offers" },
+                { to: "/deals", icon: <Tag />, label: "Deals" },
               ].map((item) => (
                 <li key={item.to}>
                   <NavLink

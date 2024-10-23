@@ -205,7 +205,7 @@ function AddItem() {
                 ? "Loading categories..."
                 : "Select a category"}
             </option>
-            {categories && categories.items.length > 0 ? (
+            {categories && categories.items?.length > 0 ? (
               categories.items.map((category: any) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
