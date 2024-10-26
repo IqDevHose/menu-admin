@@ -89,7 +89,6 @@ const Category = () => {
     queryKey: ["categories", selectedRestaurant],
     queryFn: async () => {
       const params = new URLSearchParams();
-      params.append("page", "all"); // Fetch all items to handle filtering manually
       if (selectedRestaurant) {
         params.append("restaurantId", selectedRestaurant);
       }
