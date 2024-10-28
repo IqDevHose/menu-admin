@@ -1,6 +1,6 @@
 // AddItem.tsx
 import { useState, FormEvent, ChangeEvent } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
@@ -30,18 +30,24 @@ function AddItem() {
   // Fetch categories based on selected restaurant
   const {
     data: categories,
-    isLoading: isLoadingCategories,
-    refetch: refetchCategories,
-  } = useQuery({
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching:isLoadingCategories,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
     queryKey: ["categories", restaurantId],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       if (!restaurantId) return [];
       const response = await axiosInstance.get(
-        `/category?restaurantId=${restaurantId}`
+        `/category?restaurantId=${restaurantId}&page=${pageParam}` // Ensure to include pagination
       );
       return response.data;
     },
     enabled: !!restaurantId,
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+    initialPageParam: 1, // Add this line
   });
 
   // Mutation for submitting the form
@@ -92,6 +98,7 @@ function AddItem() {
       </div>
     );
   }
+  console.log("cat", categories)
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -168,7 +175,6 @@ function AddItem() {
             onChange={(e) => {
               setRestaurantId(e.target.value);
               setCategoryId("");
-              refetchCategories();
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             required
@@ -205,8 +211,8 @@ function AddItem() {
                 ? "Loading categories..."
                 : "Select a category"}
             </option>
-            {categories && categories.items?.length > 0 ? (
-              categories.items.map((category: any) => (
+            {categories && categories.pages.length > 0 ? (
+              categories.pages.flatMap((page: any) => page.items).map((category: any) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
