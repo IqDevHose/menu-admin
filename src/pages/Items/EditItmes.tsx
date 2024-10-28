@@ -17,17 +17,43 @@ function EditItem() {
   const location = useLocation();
   const record = location.state;
   console.log(record);
-  const [name, setName] = useState<string | null>(record.name);
-  const [description, setDescription] = useState<string | null>(record.description);
-  const [price, setPrice] = useState<number | null>(record.price);
-  const [restaurantId, setRestaurantId] = useState<string | null>(record.category.restaurantId);
-  const [uploadImage, setUploadImage] = useState<File | null>(null); // Handle file uploads
-  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(record.image);
-  const [categoryId, setCategoryId] = useState<string | null>(record.category.id);
-
   const { itemId } = useParams();
-  const navigate = useNavigate();
 
+  // Fetch item data based on itemId
+  const {
+    data: itemData,
+    isLoading: isLoadingItem,
+    isError: isErrorItem,
+  } = useQuery({
+    queryKey: ["item", itemId],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/item/${itemId}`);
+      return response.data;
+    },
+  });
+
+  // Initialize state with fetched item data
+  const [name, setName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [price, setPrice] = useState<number | null>(null);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [uploadImage, setUploadImage] = useState<File | null>(null);
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+
+  // Effect to set state when itemData is fetched
+  useEffect(() => {
+    if (itemData) {
+      setName(itemData.name);
+      setDescription(itemData.description);
+      setPrice(itemData.price);
+      setUploadImageUrl(itemData.image);
+      setCategoryId(itemData.categoryId);
+      setRestaurantId(itemData.category.restaurantId);
+    }
+  }, [itemData]);
+
+  const navigate = useNavigate();
 
   // Fetch restaurants from the server
   const {
@@ -99,6 +125,9 @@ function EditItem() {
   </div>;
 
   if (isErrorRestaurants) return <div>Error loading restaurants</div>;
+
+  if (isLoadingItem) return <div>Loading item data...</div>;
+  if (isErrorItem) return <div>Error loading item data</div>;
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
