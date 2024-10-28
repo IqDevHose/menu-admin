@@ -1,5 +1,5 @@
 // AddItem.tsx
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent, ChangeEvent, useRef } from "react";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
@@ -16,6 +16,8 @@ function AddItem() {
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [base64Image, setBase64Image] = useState<string | null>(null);
+  const selectRef = useRef<HTMLSelectElement>(null);
+
   const navigate = useNavigate();
 
   // Fetch restaurants from the server
@@ -90,7 +92,16 @@ function AddItem() {
       reader.readAsDataURL(file);
     }
   };
-
+  const handleScroll = () => {
+    const select = selectRef.current;
+    if (select) {
+      const atBottom = select.scrollTop + select.clientHeight >= select.scrollHeight;
+      if (atBottom) {
+        console.log("next")
+        fetchNextPage();
+      }
+    }
+  };
   if (isLoadingRestaurants) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -199,6 +210,7 @@ function AddItem() {
             Category
           </label>
           <select
+          ref={selectRef}
             id="categoryId"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
