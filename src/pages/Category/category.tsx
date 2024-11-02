@@ -424,9 +424,6 @@ const handleExport = () => {
                   <th scope="col" className="px-6 py-3">
                     Items No.
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    Restaurant
-                  </th>
                   <th scope="col" className="px-6 py-3"></th>
                 </tr>
               </thead>
@@ -452,7 +449,7 @@ const handleExport = () => {
                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                       {item?.icon}
                     </td>
-                    <td className="px-6 py-4">{item?.items?.length || 0}</td>
+                    <td className="px-6 py-4">{item?._count?.items || 0}</td>
                     <td className="px-6 py-4">{item?.name || "N/A"}</td>
                     <td className="px-6 py-4 flex gap-x-4">
                       <Link
