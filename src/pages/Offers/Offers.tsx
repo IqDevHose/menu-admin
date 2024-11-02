@@ -235,7 +235,6 @@ const Offers = () => {
         onClick={() => handleViewOffer(offer)}
       >
         <AspectRatio ratio={16 / 9}>
-          <>{console.log(offer.image)}</>
           <img
             src={offer.image}
             alt={offer.title}
