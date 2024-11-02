@@ -450,7 +450,6 @@ const handleExport = () => {
                       {item?.icon}
                     </td>
                     <td className="px-6 py-4">{item?._count?.items || 0}</td>
-                    <td className="px-6 py-4">{item?.name || "N/A"}</td>
                     <td className="px-6 py-4 flex gap-x-4">
                       <Link
                         to={`/categories/edit/${item.id}`}
