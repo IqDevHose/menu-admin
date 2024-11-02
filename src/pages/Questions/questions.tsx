@@ -2,7 +2,7 @@ import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
 import { highlightText } from "@/utils/utils";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,6 +11,8 @@ import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
+import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type questionsReviewType = {
   id: string;
@@ -68,55 +70,64 @@ const Questions = () => {
   const itemsPerPage = 10; // Set the number of items per page
   const queryClient = useQueryClient();
   const [headers, setHeaders] = useState<string[]>([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState("");
 
-  // Modify useQuery to destructure refetch
+  // Add restaurants query
   const {
-    data: queryData,
+    data: restaurants,
+    fetchNextPage: fetchNextPageRestaurants,
+    hasNextPage: hasNextPageRestaurants,
+    isFetchingNextPage: isFetchingNextPageRestaurants,
+  } = useInfiniteQuery({
+    queryKey: ["restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
+  });
+
+  // Update questions query to include restaurant filter
+  const {
+    data: questionData,
     isLoading,
     isError,
-    refetch, // Destructure refetch to use later
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
     isRefetching,
-  } = useQuery({
-    queryKey: ["questions", currentPage],
-    queryFn: async () => {
-      const questions = await axiosInstance.get(
-        `/question?page=${currentPage}`
-      );
-      return questions.data;
+  } = useInfiniteQuery({
+    queryKey: ["questions", selectedRestaurant],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams();
+      if (selectedRestaurant && selectedRestaurant !== 'all') {
+        params.append("restaurantId", selectedRestaurant);
+      }
+      params.append("page", pageParam.toString());
+      const response = await axiosInstance.get(`/question`, { params });
+      return response.data;
     },
-    refetchOnWindowFocus: true,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["questions"] });
-    refetch(); // Optionally trigger refetch after invalidation
+    refetch();
   };
 
-  const mutation = useMutation({
-    mutationFn: async (id: string) => {
-      await axiosInstance.delete(`/question/soft-delete/${id}`);
-    },
-    onSuccess: () => {
-      refetch(); // Refetch data after successful deletion
-      setShowPopup(false); // Close the popup after successful deletion
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (selectedItemsIds: string[]) => {
-      return axiosInstance.put(`/question/soft-delete-many`, {
-        data: selectedItemsIds,
-      });
-    },
-    onSuccess: () => {
-      refetch(); // Refetch data after successful deletion
-      setShowDeleteManyPopup(false); // Close the popup after successful deletion
-    },
-  });
-
   const handleExport = () => {
-    const flattenedData = queryData.items.map((item: any) =>
-      flattenObject(item)
+    if (!questionData) return;
+    const flattenedData = questionData.pages.flatMap(page => 
+      page.items.map((item: any) => flattenObject(item))
     );
 
     const dataToConvert = {
@@ -128,6 +139,28 @@ const Questions = () => {
 
     exportCSVFile(dataToConvert);
   };
+
+  const mutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axiosInstance.delete(`/question/soft-delete/${id}`);
+    },
+    onSuccess: () => {
+      refetch();
+      setShowPopup(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (selectedItemsIds: string[]) => {
+      return axiosInstance.put(`/question/soft-delete-many`, {
+        data: selectedItemsIds,
+      });
+    },
+    onSuccess: () => {
+      refetch();
+      setShowDeleteManyPopup(false);
+    },
+  });
 
   const handleDeleteClick = (item: any) => {
     setSelectedItem(item);
@@ -146,19 +179,40 @@ const Questions = () => {
     }
   };
 
-  const filteredData = queryData?.items?.filter((item: any) =>
-    item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Update filtered data to work with infinite query
+  const filteredData = questionData?.pages.flatMap(page => 
+    page.items.filter((item: any) =>
+      item.resturant?.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  ) || [];
 
-  // Pagination based on filtered data
-  const currentData = filteredData?.slice(
+  // Update pagination logic
+  const currentData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Reset the current page to 1 when filters change
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedItems([]);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = questionData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  // Add useEffect to reset page when search changes
   useEffect(() => {
     setCurrentPage(1);
+    setSelectedItems([]);
   }, [searchQuery]);
 
   // Handle select all checkbox
@@ -180,17 +234,15 @@ const Questions = () => {
     );
   };
 
-  // Calculate the total number of pages
-  const totalPages = Math.ceil(queryData?.totalItems / itemsPerPage);
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    setSelectedItems([]);
-  };
-
   const handleDeleteMany = () => {
     setShowDeleteManyPopup(true);
   };
+
+  // Add useEffect to reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedItems([]);
+  }, [selectedRestaurant, searchQuery]);
 
   if (isLoading) {
     return (
@@ -217,6 +269,7 @@ const Questions = () => {
         <label htmlFor="table-search" className="sr-only">
           Search
         </label>
+        
         <div className="relative">
           <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
             <svg
@@ -242,7 +295,42 @@ const Questions = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-
+        <div className="flex gap-4 flex-wrap items-center">
+        <Select
+          value={selectedRestaurant}
+          onValueChange={(value) => {
+            setSelectedRestaurant(value);
+            setCurrentPage(1);
+            setSelectedItems([]);
+          }}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="All Restaurants" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Restaurants</SelectItem>
+            {restaurants?.pages.map((page) =>
+              page.items.map((restaurant: any) => (
+                <SelectItem key={restaurant.id} value={restaurant.id}>
+                  {restaurant.name}
+                </SelectItem>
+              ))
+            )}
+            {hasNextPageRestaurants && (
+              <Button
+                className="w-full text-center text-gray-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchNextPageRestaurants();
+                }}
+                disabled={isFetchingNextPageRestaurants}
+              >
+                {isFetchingNextPageRestaurants ? "Loading..." : "Load More"}
+              </Button>
+            )}
+          </SelectContent>
+        </Select>
+      </div>
         <div className="gap-2 flex justify-center items-start">
           {selectedItems.length > 0 && (
             <button
@@ -410,9 +498,22 @@ const Questions = () => {
             </table>
           </div>
 
+          {/* Add Load More button */}
+          {hasNextPage && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
+
           {/* Pagination Component */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-10">
+            <div className="flex justify-center items-center mt-4">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -453,6 +554,7 @@ const Questions = () => {
           <p>Are you sure you want to delete {selectedItem?.name}?</p>
         </Popup>
       )}
+
     </div>
   );
 };

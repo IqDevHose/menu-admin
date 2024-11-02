@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, RotateCw, Trash2, SquarePen } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/axiosInstance";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
-import Pagination from "@/components/Pagination";
 import {
   Card,
   CardHeader,
@@ -31,18 +30,26 @@ const Offers = () => {
   const navigate = useNavigate();
 
   // Fetching offers from backend
-  const { data: offersData, isRefetching, isLoading, isError, refetch } = useQuery({
-    queryKey: ["offers", currentPage],
-    queryFn: async () => {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    isRefetching,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ["offers"],
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams();
-      params.append("page", currentPage.toString());
+      params.append("page", pageParam.toString());
       const response = await axiosInstance.get("/offers", { params });
-      console.log(response.data)
       return response.data;
     },
-
-    refetchOnWindowFocus: false, // Prevent refetching when the window is focused
-
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    refetchOnWindowFocus: false,
   });
 
   // Mutation for deleting an offer
@@ -50,8 +57,8 @@ const Offers = () => {
     mutationFn: async (id: number) => {
       return await axiosInstance.delete(`/offers/soft-delete/${id}`);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries(["offers", currentPage]);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["offers"] });
       setShowDeletePopup(false);
       setSelectedOffer(null);
     },
@@ -68,7 +75,7 @@ const Offers = () => {
   };
 
   const handleReload = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["offers", currentPage] });
+    await queryClient.invalidateQueries({ queryKey: ["offers"] });
     refetch();
   };
 
@@ -86,6 +93,27 @@ const Offers = () => {
     navigate(`/offers/edit/${offerId}`);
   };
 
+  // Add an intersection observer for infinite loading
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -98,7 +126,7 @@ const Offers = () => {
     return <div>Error loading offers</div>;
   }
 
-  const filteredOffers = offersData?.items?.filter((offer: Offer) =>
+  const filteredOffers = data?.pages?.flatMap(page => page.items)?.filter((offer: Offer) =>
     offer.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const totalPages = Math.ceil((filteredOffers?.length || 0) / itemsPerPage);
@@ -256,16 +284,16 @@ const Offers = () => {
   </div>
 )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
+      {/* Add infinite scroll loader */}
+      <div ref={loadMoreRef} className="w-full py-4 text-center">
+        {isFetchingNextPage ? (
+          <Spinner />
+        ) : hasNextPage ? (
+          <p className="text-gray-500">Load more...</p>
+        ) : (
+          <p className="text-gray-500">No more offers</p>
+        )}
+      </div>
 
       {/* Popup for viewing offer details */}
       {showPopup && selectedOffer && (

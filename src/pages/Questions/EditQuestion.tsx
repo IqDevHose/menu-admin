@@ -1,9 +1,10 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner"; // Assuming you have a Spinner component for loading states
 import axiosInstance from "@/axiosInstance";
+import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type questionType = {
   title: string | null;
@@ -33,12 +34,20 @@ function EditQuestion() {
     data: restaurants,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["restaurant"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/restaurant");
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const mutation = useMutation({
@@ -152,28 +161,35 @@ function EditQuestion() {
           >
             Restaurant
           </label>
-          <select
-            id="restaurantId"
-            value={restaurantId || ""}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          >
-            <option value="" disabled>
-              Select a restaurant
-            </option>
-            {restaurants && restaurants.items.length > 0 ? (
-              restaurants.items.map((restaurant: any) => (
-                <option key={restaurant.id} value={restaurant.id}>
-                  {restaurant.name}
-                </option>
-              ))
-            ) : (
-              <option value="" disabled>
-                No restaurants available
-              </option>
-            )}
-          </select>
+          <Select value={restaurantId || "default"} onValueChange={setRestaurantId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a restaurant" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default" disabled>
+                Select a restaurant
+              </SelectItem>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPage && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPage();
+                  }}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Submit Button */}

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Popup from "@/components/Popup";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
@@ -14,6 +14,8 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type customerReviewType = {
   id: string;
@@ -72,7 +74,7 @@ const CustomerReview = () => {
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
-  const [selectedRestaurant, setSelectedRestaurant] = useState(""); // State to manage selected restaurant
+  const [selectedRestaurant, setSelectedRestaurant] = useState("all"); // State to manage selected restaurant
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const itemsPerPage = 10; // Set the number of items per page
@@ -80,35 +82,62 @@ const CustomerReview = () => {
 
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["customerReview", currentPage, selectedRestaurant],
-    queryFn: async () => {
-      const customerReview = await axiosInstance.get(
-        `/customer-review?page=${currentPage}&restaurantId=${selectedRestaurant}`
-      );
-      return customerReview.data;
+  const {
+    data: restaurants,
+    fetchNextPage: fetchNextPageRestaurants,
+    hasNextPage: hasNextPageRestaurants,
+    isFetchingNextPage: isFetchingNextPageRestaurants,
+  } = useInfiniteQuery({
+    queryKey: ["restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
+      return response.data;
     },
-    refetchOnWindowFocus: false, // Prevent automatic refetching on window focus if not needed
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
+  });
+
+  const {
+    data: customerReviewData,
+    isLoading,
+    isError,
+    fetchNextPage: fetchNextPageReviews,
+    hasNextPage: hasNextPageReviews,
+    isFetchingNextPage: isFetchingNextPageReviews,
+    refetch,
+    isRefetching,
+  } = useInfiniteQuery({
+    queryKey: ["customerReview", selectedRestaurant],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams();
+      if (selectedRestaurant && selectedRestaurant !== 'all') {
+        params.append("restaurantId", selectedRestaurant);
+      }
+      params.append("page", pageParam.toString());
+      const response = await axiosInstance.get(`/customer-review`, { params });
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({
-      queryKey: ["customerReview", currentPage, selectedRestaurant],
+      queryKey: ["customerReview", selectedRestaurant],
     });
-    query.refetch(); // Optionally trigger refetch after invalidation
+    refetch();
   };
 
-  const { data: restaurants } = useQuery({
-    queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
-      return res.data;
-    },
-  });
-
   const handleExport = () => {
-    const flattenedData = query.data.items.map((item: any) =>
-      flattenObject(item)
+    if (!customerReviewData) return;
+    const flattenedData = customerReviewData.pages.flatMap(page => 
+      page.items.map((item: any) => flattenObject(item))
     );
 
     const dataToConvert = {
@@ -202,22 +231,21 @@ const CustomerReview = () => {
       await axiosInstance.delete(`/customer-review/soft-delete/${id}`);
     },
     onSuccess: () => {
-      query.refetch();
-      queryClient.invalidateQueries({ queryKey: ["customerReview"] });
+      refetch();
       setShowPopup(false);
     },
   });
+
   const deleteMutation = useMutation({
-    mutationFn: async (selectedItemsIds: string[]) => {
+    mutationFn: (selectedItemsIds: string[]) => {
       return axiosInstance.put(`/customer-review/soft-delete-many`, {
-        data: selectedItemsIds, // Ensure only selected items are sent
+        data: selectedItemsIds,
       });
     },
     onSuccess: () => {
-      query.refetch();
-      queryClient.invalidateQueries({ queryKey: ["customerReview"] }); // Refresh the data
-      setShowDeleteManyPopup(false); // Close the delete popup
-      setSelectedItems([]); // Reset the selected items state after deletion
+      refetch();
+      setShowDeleteManyPopup(false);
+      return "Items deleted successfully";
     },
   });
 
@@ -239,16 +267,29 @@ const CustomerReview = () => {
   };
 
   // Filter the data based on the search query
-  const filteredData = query?.data?.items.filter((item: any) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = customerReviewData?.pages.flatMap(page => 
+    page.items.filter((item: any) =>
+      item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  ) || [];
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(query?.data?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = customerReviewData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPageReviews) {
+      fetchNextPageReviews();
+    }
   };
 
   const handleSelectAll = () => {
@@ -273,7 +314,13 @@ const CustomerReview = () => {
     setShowDeleteManyPopup(true);
   };
 
-  if (query.isPending) {
+  // Add useEffect to reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedItems([]);
+  }, [selectedRestaurant, searchQuery]);
+
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -281,7 +328,7 @@ const CustomerReview = () => {
     );
   }
 
-  if (query.isError) {
+  if (isError) {
     return <div>Error</div>;
   }
 
@@ -325,18 +372,40 @@ const CustomerReview = () => {
               placeholder="Search for items"
             />
           </div>
-          <select
+          <Select
             value={selectedRestaurant}
-            onChange={(e) => setSelectedRestaurant(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
+            onValueChange={(value) => {
+              setSelectedRestaurant(value);
+              setCurrentPage(1);
+              setSelectedItems([]);
+            }}
           >
-            <option value="">All Restaurants</option>
-            {restaurants?.items.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Restaurants" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Restaurants</SelectItem>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPageRestaurants && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPageRestaurants();
+                  }}
+                  disabled={isFetchingNextPageRestaurants}
+                >
+                  {isFetchingNextPageRestaurants ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
         <div className="gap-2 flex justify-center items-center">
           {selectedItems.length > 0 && (
@@ -356,7 +425,7 @@ const CustomerReview = () => {
           )}
           <button
             type="button"
-            disabled={query.isRefetching}
+            disabled={isRefetching}
             className="text-white w-10 h-10 xl:w-auto bg-gray-800 text-sm hover:bg-gray-900 font-medium rounded-lg py-2.5 px-3 disabled:animate-pulse disabled:bg-gray-600"
             onClick={handleReload} // Updated to handleReload
             data-tooltip-id="reload-tooltip"
@@ -365,14 +434,14 @@ const CustomerReview = () => {
             <span className="hidden xl:flex items-center gap-1">
               <RotateCw
                 size={16}
-                className={query.isRefetching ? `animate-spin` : ""}
+                className={isRefetching ? `animate-spin` : ""}
               />{" "}
               Reload
             </span>
             <span className="inline xl:hidden">
               <RotateCw
                 size={16}
-                className={query.isRefetching ? `animate-spin` : ""}
+                className={isRefetching ? `animate-spin` : ""}
               />
             </span>
           </button>
@@ -503,13 +572,27 @@ const CustomerReview = () => {
             </table>
           </div>
 
-          <div className="flex justify-center items-center mt-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+          {hasNextPageReviews && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPageReviews()}
+                disabled={isFetchingNextPageReviews}
+                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+              >
+                {isFetchingNextPageReviews ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </>
       )}
 

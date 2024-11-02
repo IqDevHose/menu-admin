@@ -1,9 +1,11 @@
 import axiosInstance from "@/axiosInstance";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useState, FormEvent, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { toBase64 } from "@/utils/imageUtils";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type itemType = {
   name: string | null;
@@ -16,7 +18,6 @@ type itemType = {
 function EditItem() {
   const location = useLocation();
   const record = location.state;
-  console.log(record);
   const { itemId } = useParams();
 
   // Fetch item data based on itemId
@@ -55,37 +56,41 @@ function EditItem() {
 
   const navigate = useNavigate();
 
-  // Fetch restaurants from the server
+  // Fetch restaurants with infinite query
   const {
     data: restaurants,
-    isLoading: isLoadingRestaurants,
-    isError: isErrorRestaurants,
-  } = useQuery({
+    fetchNextPage: fetchNextPageRestaurants,
+    hasNextPage: hasNextPageRestaurants,
+    isFetching: isLoadingRestaurants,
+    isFetchingNextPage: isFetchingNextPageRestaurants,
+  } = useInfiniteQuery({
     queryKey: ["restaurant"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/restaurant?page=all");
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return response.data;
     },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
   });
 
-  // Fetch categories based on selected restaurant
+  // Fetch categories with infinite query
   const {
     data: categories,
-    isLoading: isLoadingCategories,
-    refetch: refetchCategories,
-  } = useQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetching: isLoadingCategories,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["categories", restaurantId],
-    queryFn: async () => {
-      if (restaurantId) {
-        const response = await axiosInstance.get(
-          `/category?restaurantId=${restaurantId}&page=all`
-        );
-        return response.data;
-      } else {
-        const response = await axiosInstance.get(`/category?page=all`);
-        return response.data;
-      }
+    queryFn: async ({ pageParam = 1 }) => {
+      if (!restaurantId) return { items: [], hasNextPage: false };
+      const response = await axiosInstance.get(
+        `/category?restaurantId=${restaurantId}&page=${pageParam}`
+      );
+      return response.data;
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: !!restaurantId,
   });
 
@@ -118,15 +123,14 @@ function EditItem() {
     mutation.mutate(data);
   };
 
-  if (isLoadingRestaurants) return;
+  if (isLoadingRestaurants || isLoadingItem) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
-  <div className="w-full h-screen flex items-center justify-center">
-    <Spinner />
-  </div>;
-
-  if (isErrorRestaurants) return <div>Error loading restaurants</div>;
-
-  if (isLoadingItem) return <div>Loading item data...</div>;
   if (isErrorItem) return <div>Error loading item data</div>;
 
   return (
@@ -199,26 +203,46 @@ function EditItem() {
           >
             Restaurant
           </label>
-          <select
-            id="restaurantId"
-            value={restaurantId || ""}
-            onChange={(e) => {
-              setRestaurantId(e.target.value);
-              setCategoryId(""); // Clear category when changing restaurant
-              refetchCategories();
-            }}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
+          <Select 
+            value={restaurantId || ""} 
+            onValueChange={(value) => {
+              setRestaurantId(value);
+              setCategoryId("");
+            }} 
+            disabled={isLoadingRestaurants}
           >
-            <option value="" disabled>
-              Select a restaurant
-            </option>
-            {restaurants.items.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Restaurant" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {isLoadingRestaurants && !isFetchingNextPageRestaurants ? (
+                  <SelectItem value="loading" disabled>
+                    Loading restaurants...
+                  </SelectItem>
+                ) : restaurants?.pages.map((page) =>
+                  page.items.map((restaurant: any) => (
+                    <SelectItem key={restaurant.id} value={restaurant.id}>
+                      {restaurant.name}
+                    </SelectItem>
+                  ))
+                )}
+                
+                {hasNextPageRestaurants && (
+                  <Button 
+                    className="bg-white w-full p-1 text-center text-gray-600 active:opacity-80 hover:bg-gray-50" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fetchNextPageRestaurants();
+                    }}
+                    disabled={isFetchingNextPageRestaurants}
+                  >
+                    {isFetchingNextPageRestaurants ? 'Loading more...' : 'Load More'}
+                  </Button>
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Category Select */}
@@ -229,31 +253,43 @@ function EditItem() {
           >
             Category
           </label>
-          <select
-            id="categoryId"
-            value={categoryId || ""}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
+          <Select 
+            value={categoryId || ""} 
+            onValueChange={(value) => setCategoryId(value)} 
             disabled={!restaurantId || isLoadingCategories}
           >
-            <option value="" disabled>
-              {isLoadingCategories
-                ? "Loading categories..."
-                : "Select a category"}
-            </option>
-            {categories && categories.items?.length > 0 ? (
-              categories.items.map((category: any) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))
-            ) : (
-              <option value="" disabled>
-                No categories available
-              </option>
-            )}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {isLoadingCategories && !isFetchingNextPage ? (
+                  <SelectItem value="loading" disabled>
+                    Loading categories...
+                  </SelectItem>
+                ) : categories?.pages.map((page) =>
+                  page.items.map((category: any) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))
+                )}
+                
+                {hasNextPage && (
+                  <Button 
+                    className="bg-white w-full p-1 text-center text-gray-600 active:opacity-80 hover:bg-gray-50" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fetchNextPage();
+                    }}
+                    disabled={isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? 'Loading more...' : 'Load More'}
+                  </Button>
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Upload Image */}

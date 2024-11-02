@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
@@ -12,6 +12,8 @@ import "react-tooltip/dist/react-tooltip.css";
 import exportCSVFile from "json-to-csv-export";
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type DealType = {
   id: string;
@@ -30,7 +32,6 @@ const Deals = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [selectedDeals, setSelectedDeals] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [headers, setHeaders] = useState<string[]>([]);
   const itemsPerPage = 10;
 
@@ -38,28 +39,42 @@ const Deals = () => {
 
   const {
     data: dealsData,
-    isPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
     isError,
     refetch,
     isRefetching,
-  } = useQuery({
-    queryKey: ["deals", selectedRestaurant, currentPage],
-    queryFn: async () => {
+  } = useInfiniteQuery({
+    queryKey: ["deals", selectedRestaurant],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams();
-      params.append("page", currentPage.toString());
+      params.append("page", pageParam.toString());
       if (selectedRestaurant) {
         params.append("restaurantId", selectedRestaurant);
       }
       const response = await axiosInstance.get(`/deal`, { params });
-      console.log("response", response.data);
-      return await response.data;
+      return response.data;
+    },
+    getNextPageParam: (lastPage, pages) => {
+      const totalPages = Math.ceil(lastPage.totalItems / itemsPerPage);
+      const nextPage = pages.length + 1;
+      return nextPage <= totalPages ? nextPage : undefined;
     },
     refetchOnWindowFocus: false,
   });
 
+  const deals = dealsData?.pages.flatMap(page => page.items) ?? [];
+
+  const filteredDeals = deals.filter((deal: DealType) =>
+    deal.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleExport = () => {
     const dataToConvert = {
-      data: dealsData.items,
+      data: deals,
       filename: "deals",
       delimiter: ",",
       headers,
@@ -75,13 +90,28 @@ const Deals = () => {
     refetch();
   };
 
-  const { data: restaurants } = useQuery({
+  const {
+    data: restaurantsData,
+    fetchNextPage: fetchNextRestaurants,
+    hasNextPage: hasNextRestaurants,
+    isFetchingNextPage: isFetchingNextRestaurants
+  } = useInfiniteQuery({
     queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams();
+      params.append("page", pageParam.toString());
+      const res = await axiosInstance.get("/restaurant", { params });
       return res.data;
     },
+    getNextPageParam: (lastPage, pages) => {
+      const totalPages = Math.ceil(lastPage.totalItems / itemsPerPage);
+      const nextPage = pages.length + 1;
+      return nextPage <= totalPages ? nextPage : undefined;
+    },
   });
+
+  const restaurants = restaurantsData?.pages.flatMap(page => page.items) ?? [];
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
@@ -119,47 +149,11 @@ const Deals = () => {
     updatePublishedMutation.mutate({ id, published: !currentStatus });
   };
 
-  const filteredData = dealsData?.items?.filter((deal: DealType) =>
-    deal.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const currentData = filteredData?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedRestaurant, searchQuery]);
-
-  useEffect(() => {
-    if (dealsData?.items?.length > 0) {
-      setHeaders(Object.keys(dealsData.items[0]));
-    }
-  }, [dealsData]);
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    setSelectedDeals([]);
-  };
-
-  const handleSelectAll = () => {
-    if (selectedDeals.length === currentData.length) {
-      setSelectedDeals([]);
-    } else {
-      const allIds = currentData.map((deal: DealType) => deal.id);
-      setSelectedDeals(allIds);
-    }
-  };
-
-  const handleSelectDeal = (id: string) => {
-    setSelectedDeals((prevSelectedDeals) =>
-      prevSelectedDeals.includes(id)
-        ? prevSelectedDeals.filter((dealId) => dealId !== id)
-        : [...prevSelectedDeals, id]
-    );
-  };
+    queryClient.invalidateQueries({ 
+      queryKey: ["deals", selectedRestaurant]
+    });
+  }, [selectedRestaurant, queryClient]);
 
   const handleDeleteClick = (deal: DealType) => {
     setSelectedDeal(deal);
@@ -182,7 +176,24 @@ const Deals = () => {
     setShowDeleteManyPopup(true);
   };
 
-  if (isPending) {
+  const handleSelectAll = () => {
+    if (selectedDeals.length === filteredDeals?.length) {
+      setSelectedDeals([]);
+    } else {
+      const allIds = filteredDeals?.map((deal: DealType) => deal.id) || [];
+      setSelectedDeals(allIds);
+    }
+  };
+
+  const handleSelectDeal = (id: string) => {
+    setSelectedDeals((prevSelectedDeals) =>
+      prevSelectedDeals.includes(id)
+        ? prevSelectedDeals.filter((dealId) => dealId !== id)
+        : [...prevSelectedDeals, id]
+    );
+  };
+
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -230,18 +241,36 @@ const Deals = () => {
             />
           </div>
 
-          <select
-            value={selectedRestaurant}
-            onChange={(e) => setSelectedRestaurant(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-2">
+            <Select
+              value={selectedRestaurant}
+              onValueChange={(value) => setSelectedRestaurant(value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All Restaurants" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Restaurants</SelectItem>
+                {restaurants?.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))}
+                {hasNextRestaurants && (
+                  <Button
+                    className="w-full text-center text-gray-600"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fetchNextRestaurants();
+                    }}
+                    disabled={isFetchingNextRestaurants}
+                  >
+                    {isFetchingNextRestaurants ? "Loading..." : "Load More"}
+                  </Button>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="gap-2 flex items-start justify-center">
@@ -316,7 +345,7 @@ const Deals = () => {
         </div>
       </div>
 
-      {currentData && currentData.length === 0 ? (
+      {filteredDeals && filteredDeals.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500 text-lg font-medium">No Deals available</p>
         </div>
@@ -328,7 +357,7 @@ const Deals = () => {
                 <th scope="col" className="px-6 py-3 w-4">
                   <input
                     type="checkbox"
-                    checked={selectedDeals.length === currentData?.length}
+                    checked={selectedDeals.length === filteredDeals?.length}
                     onChange={handleSelectAll}
                   />
                 </th>
@@ -342,7 +371,7 @@ const Deals = () => {
               </tr>
             </thead>
             <tbody>
-              {currentData?.map((deal: DealType, index: number) => (
+              {filteredDeals?.map((deal: DealType, index: number) => (
                 <tr key={deal.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
@@ -351,7 +380,7 @@ const Deals = () => {
                       onChange={() => handleSelectDeal(deal.id)}
                     />
                   </td>
-                  <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                  <td className="px-6 py-4">{index + 1}</td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {highlightText(deal.title, searchQuery)}
                   </td>
@@ -389,13 +418,17 @@ const Deals = () => {
             </tbody>
           </table>
 
-          <div className="flex justify-center items-center mt-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+          {hasNextPage && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
         </>
       )}
 

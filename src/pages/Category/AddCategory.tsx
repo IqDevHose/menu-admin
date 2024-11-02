@@ -1,9 +1,11 @@
 import axiosInstance from "@/axiosInstance";
 import IconSelector from "@/components/IconSelector";
 import Spinner from "@/components/Spinner";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type CreateCategoryDto = {
   name: string;
@@ -17,17 +19,25 @@ function AddCategory() {
   const [icon, setIcon] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Fetch restaurants from the server
+  // Update to use infinite query for restaurants
   const {
     data: restaurants,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["restaurant"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/restaurant");
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const mutation = useMutation({
@@ -35,7 +45,7 @@ function AddCategory() {
       return axiosInstance.post(`/category`, newCategory);
     },
     onSuccess: () => {
-      navigate("/categories"); // Navigate back to the item list after successful addition
+      navigate("/categories");
     },
   });
 
@@ -50,9 +60,11 @@ function AddCategory() {
 
     mutation.mutate(newCategory);
   };
+
   const handleIconSelect = (title: string) => {
-    setIcon(title)
+    setIcon(title);
   };
+
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -70,10 +82,7 @@ function AddCategory() {
       <form onSubmit={handleSubmit}>
         {/* Category Name */}
         <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Category Name
           </label>
           <input
@@ -89,56 +98,36 @@ function AddCategory() {
 
         {/* Restaurant Select */}
         <div className="mb-4">
-          <label
-            htmlFor="restaurantId"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
             Restaurant
           </label>
-          <select
-            id="restaurantId"
-            value={restaurantId}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          >
-            <option value="" disabled>
-              Select a restaurant
-            </option>
-            {restaurants && restaurants?.items.length > 0 ? (
-              restaurants?.items?.map((restaurant: any) => (
-                <option key={restaurant?.id} value={restaurant?.id}>
-                  {restaurant?.name}
-                </option>
-              ))
-            ) : (
-              <option value="" disabled>
-                No restaurants available
-              </option>
-            )}
-          </select>
+          <Select value={restaurantId} onValueChange={setRestaurantId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a restaurant" />
+            </SelectTrigger>
+            <SelectContent>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPage && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPage();
+                  }}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
-
-        {/* Upload Image */}
-        {/* <div className="mb-4">
-          <label
-            htmlFor="upload-image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload Image
-          </label>
-          <input
-            type="file"
-            id="upload-image"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                setUploadImage(e.target.files[0]);
-              }
-            }}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Upload an image"
-          />
-        </div> */}
 
         {/* Submit Button */}
         <div className="flex justify-end">
@@ -150,6 +139,7 @@ function AddCategory() {
             {mutation.isPending ? "Adding... " : "Add Category"}
           </button>
         </div>
+
         <IconSelector onIconSelect={handleIconSelect} />
       </form>
     </div>

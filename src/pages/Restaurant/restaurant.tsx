@@ -1,7 +1,7 @@
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
@@ -83,28 +83,37 @@ const Restaurant = () => {
 
   const queryClient = useQueryClient();
 
-  const {data,refetch,isRefetching,isPending,isError} = useQuery({
-    queryKey: ["restaurant", currentPage],
-    queryFn: async () => {
-      const res = await axiosInstance.get(`/restaurant?page=${currentPage}`);
-      console.log(res.data)
+  const {
+    data: restaurantData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isPending,
+    isError,
+    refetch,
+    isRefetching,
+  } = useInfiniteQuery({
+    queryKey: ["restaurant"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return res.data;
     },
-    refetchOnWindowFocus: true
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
-
 
   const handleReload = async () => {
     await queryClient.invalidateQueries({ queryKey: ["restaurant"] });
-  }
-
-  // Assuming `headers` is being set in the component state
- 
+    refetch();
+  };
 
   const handleExport = () => {
-    
-    const flattenedData = data.items.map((item: any) =>
-      flattenObject(item)
+    if (!restaurantData) return;
+    const flattenedData = restaurantData.pages.flatMap(page => 
+      page.items.map((item: any) => flattenObject(item))
     );
 
     const dataToConvert = {
@@ -114,7 +123,6 @@ const Restaurant = () => {
       headers,
     };
 
-    // Export the CSV file with the renamed headers
     exportCSVFile(dataToConvert);
   };
 
@@ -123,8 +131,8 @@ const Restaurant = () => {
       await axiosInstance.delete(`/restaurant/soft-delete/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["restaurant"] });
-      setShowPopup(false); // Close the popup after successful deletion
+      refetch();
+      setShowPopup(false);
     },
   });
 
@@ -135,6 +143,7 @@ const Restaurant = () => {
       });
     },
     onSuccess: () => {
+      refetch();
       setShowDeleteManyPopup(false);
       return "Items deleted successfully";
     },
@@ -157,17 +166,41 @@ const Restaurant = () => {
   };
 
   // Filter the data based on the search query
-  const filteredData = data?.items.filter((item: any) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = restaurantData?.pages.flatMap(page => 
+    page.items.filter((item: any) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  ) || [];
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(data?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = restaurantData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPage) {
+      fetchNextPage();
+    }
   };
+
+  // Add useEffect to reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedItems([]);
+  }, [searchQuery]);
 
   // Handle select all checkbox
   const handleSelectAll = () => {
@@ -318,7 +351,7 @@ const Restaurant = () => {
 
         </div>
       </div>
-      {filteredData?.length === 0 ? (
+      {currentData.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No restaurants found.</p>
         </div>
@@ -344,7 +377,7 @@ const Restaurant = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData?.map((item: any, index: number) => (
+                {currentData.map((item: any, index: number) => (
                   <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <input
@@ -389,10 +422,22 @@ const Restaurant = () => {
             </table>
           </div>
 
+          {/* Add Load More button */}
+          {hasNextPage && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
 
           {/* Pagination Component */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-10">
+            <div className="flex justify-center items-center mt-4">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

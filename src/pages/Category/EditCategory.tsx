@@ -1,38 +1,46 @@
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
-import IconSelector from "@/components/IconSelector"; // Import IconSelector
-import { useMutation, useQuery } from "@tanstack/react-query";
+import IconSelector from "@/components/IconSelector";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type categoryType = {
   name: string | null;
   restaurantId: string | null;
-  icon?: string | null; // Use a base64 encoded string instead of a File
+  icon?: string | null;
 };
-
-
 
 function EditCategory() {
   const location = useLocation();
   const record = location.state;
   const [name, setName] = useState<string | null>(record.name);
   const [restaurantId, setRestaurantId] = useState<string | null>(record.restaurantId);
-  const [icon, setIcon] = useState<string | null>(record.icon || null); // Use icon state
+  const [icon, setIcon] = useState<string | null>(record.icon || null);
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
-  // Fetch restaurants from the server
+  // Update to use infinite query for restaurants
   const {
     data: restaurants,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["restaurant"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/restaurant");
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["restaurants"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const mutation = useMutation({
@@ -40,7 +48,7 @@ function EditCategory() {
       return axiosInstance.put(`/category/${categoryId}`, newEdit);
     },
     onSuccess: () => {
-      navigate("/categories"); // Navigate back to the category list after successful edit
+      navigate("/categories");
     },
   });
 
@@ -57,7 +65,7 @@ function EditCategory() {
   };
 
   const handleIconSelect = (selectedIcon: string) => {
-    setIcon(selectedIcon); // Set the selected icon
+    setIcon(selectedIcon);
   };
 
   if (isLoading) {
@@ -77,10 +85,7 @@ function EditCategory() {
       <form onSubmit={handleSubmit}>
         {/* Category Name */}
         <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Category Name
           </label>
           <input
@@ -96,49 +101,46 @@ function EditCategory() {
 
         {/* Restaurant Select */}
         <div className="mb-4">
-          <label
-            htmlFor="restaurantId"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
             Restaurant
           </label>
-          <select
-            id="restaurantId"
-            value={restaurantId || ""}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          >
-            <option value="" disabled>
-              Select a restaurant
-            </option>
-            {restaurants && restaurants?.items.length > 0 ? (
-              restaurants?.items.map((restaurant: any) => (
-                <option key={restaurant.id} value={restaurant.id}>
-                  {restaurant.name}
-                </option>
-              ))
-            ) : (
-              <option value="" disabled>
-                No restaurants available
-              </option>
-            )}
-          </select>
+          <Select value={restaurantId || ""} onValueChange={setRestaurantId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a restaurant" />
+            </SelectTrigger>
+            <SelectContent>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPage && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPage();
+                  }}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Icon Selector */}
         <div className="mb-4">
-          <label
-            htmlFor="icon"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="icon" className="block text-sm font-medium text-gray-700">
             Select Icon
           </label>
           <IconSelector
             onIconSelect={handleIconSelect}
-            initialIcon={icon ?? undefined} // Convert null to undefined
+            initialIcon={icon ?? undefined}
           />
-
         </div>
 
         {/* Submit Button */}
