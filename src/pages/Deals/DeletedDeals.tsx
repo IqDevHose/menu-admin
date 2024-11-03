@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { RotateCw, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import Spinner from "@/components/Spinner";
@@ -8,6 +8,8 @@ import Pagination from "@/components/Pagination";
 import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type DealType = {
   id: string;
@@ -37,25 +39,51 @@ const DeletedDeals = () => {
     data: dealsData,
     isPending,
     isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     refetch,
-  } = useQuery({
-    queryKey: ["findAll-deleted-deals", currentPage, selectedRestaurant],
-    queryFn: async () => {
+  } = useInfiniteQuery({
+    queryKey: ["findAll-deleted-deals", selectedRestaurant],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams();
-      params.append("page", String(currentPage));
-      if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
+      params.append("page", pageParam.toString());
+      if (selectedRestaurant && selectedRestaurant !== 'all') {
+        params.append("restaurantId", selectedRestaurant);
+      }
       const response = await axiosInstance.get(`/deal/findAll-deleted`, { params });
       return response.data;
     },
+    getNextPageParam: (lastPage, pages) => {
+      const totalPages = Math.ceil(lastPage.totalItems / itemsPerPage);
+      const nextPage = pages.length + 1;
+      return nextPage <= totalPages ? nextPage : undefined;
+    },
+    refetchOnWindowFocus: false,
   });
 
-  const { data: restaurants } = useQuery({
+  const {
+    data: restaurantsData,
+    fetchNextPage: fetchNextRestaurants,
+    hasNextPage: hasNextRestaurants,
+    isFetchingNextPage: isFetchingNextRestaurants
+  } = useInfiniteQuery({
     queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams();
+      params.append("page", pageParam.toString());
+      const res = await axiosInstance.get("/restaurant", { params });
       return res.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
   });
+
+  const restaurants = restaurantsData?.pages.flatMap(page => page.items) ?? [];
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -157,7 +185,9 @@ const DeletedDeals = () => {
     }
   };
 
-  const filteredData = dealsData?.items?.filter((deal: DealType) =>
+  const deals = dealsData?.pages.flatMap(page => page.items) ?? [];
+
+  const filteredData = deals.filter((deal: DealType) =>
     deal.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -166,6 +196,16 @@ const DeletedDeals = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedDeals([]);
+    
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = dealsData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPage) {
+      fetchNextPage();
+    }
   };
 
   const handleDeleteMany = () => {
@@ -175,6 +215,20 @@ const DeletedDeals = () => {
   const handleRestoreMany = () => {
     setShowRestoreManyPopup(true);
   };
+
+  const handleRestaurantChange = (value: string) => {
+    setSelectedRestaurant(value === "all" ? "" : value);
+    setCurrentPage(1);
+    setSelectedDeals([]);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedDeals([]);
+    queryClient.resetQueries({ 
+      queryKey: ["findAll-deleted-deals", selectedRestaurant]
+    });
+  }, [selectedRestaurant, searchQuery, queryClient]);
 
   if (isPending) {
     return (
@@ -223,18 +277,36 @@ const DeletedDeals = () => {
             />
           </div>
 
-          <select
-            value={selectedRestaurant}
-            onChange={(e) => setSelectedRestaurant(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-2">
+            <Select
+              value={selectedRestaurant}
+              onValueChange={handleRestaurantChange}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All Restaurants" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Restaurants</SelectItem>
+                {restaurants?.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))}
+                {hasNextRestaurants && (
+                  <Button
+                    className="w-full text-center text-gray-600"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fetchNextRestaurants();
+                    }}
+                    disabled={isFetchingNextRestaurants}
+                  >
+                    {isFetchingNextRestaurants ? "Loading..." : "Load More"}
+                  </Button>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="flex gap-4 items-start">
           {selectedDeals.length > 0 && (
@@ -328,13 +400,27 @@ const DeletedDeals = () => {
             </tbody>
           </table>
 
-          <div className="flex justify-center items-center mt-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+          {hasNextPage && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </>
       )}
 

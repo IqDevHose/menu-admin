@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { RotateCw, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
@@ -9,6 +9,8 @@ import Pagination from "@/components/Pagination"; // Import the Pagination compo
 import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type itemReviewType = {
   id: string;
@@ -39,46 +41,70 @@ const DeletedItems = () => {
     data: itemsData,
     isLoading,
     isError,
+    fetchNextPage: fetchNextPageItems,
+    hasNextPage: hasNextPageItems,
+    isFetchingNextPage: isFetchingNextPageItems,
     refetch,
-  } = useQuery({
-    queryKey: [
-      "findAll-deleted",
-      currentPage,
-      selectedCategory,
-      selectedRestaurant,
-    ],
-    queryFn: async () => {
+  } = useInfiniteQuery({
+    queryKey: ["findAll-deleted-items", selectedCategory, selectedRestaurant],
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams();
-      params.append("page", String(currentPage));
       if (selectedCategory) params.append("categoryId", selectedCategory);
       if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
-
-      // Fetching deleted items from the server
-      const item = await axiosInstance.get(`/item/findAll-deleted`, { params });
-      return item.data;
+      params.append("page", pageParam.toString());
+      
+      const response = await axiosInstance.get(`/item/findAll-deleted`, { params });
+      return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   // Fetch categories based on the selected restaurant
-  const { data: categories } = useQuery({
+  const {
+    data: categories,
+    fetchNextPage: fetchNextPageCategories,
+    hasNextPage: hasNextPageCategories,
+    isFetchingNextPage: isFetchingNextPageCategories,
+  } = useInfiniteQuery({
     queryKey: ["categories", selectedRestaurant],
-    queryFn: async () => {
-      if (!selectedRestaurant) return [];
-      const res = await axiosInstance.get(
-        `/category?restaurantId=${selectedRestaurant}`
+    queryFn: async ({ pageParam = 1 }) => {
+      if (!selectedRestaurant || selectedRestaurant === 'all') {
+        return { items: [], hasNextPage: false, nextPage: undefined };
+      }
+      const response = await axiosInstance.get(
+        `/category?restaurantId=${selectedRestaurant}&page=${pageParam}`
       );
-      return res.data;
+      return response.data;
     },
-    enabled: !!selectedRestaurant,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
+    enabled: !!selectedRestaurant && selectedRestaurant !== 'all',
   });
 
   // Fetch restaurants
-  const { data: restaurants } = useQuery({
+  const {
+    data: restaurants,
+    fetchNextPage: fetchNextPageRestaurants,
+    hasNextPage: hasNextPageRestaurants,
+    isFetchingNextPage: isFetchingNextPageRestaurants,
+  } = useInfiniteQuery({
     queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
-      return res.data;
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
+      return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   // Handle item restoration
@@ -193,15 +219,32 @@ const DeletedItems = () => {
     }
   };
 
-  const filteredData = itemsData?.items?.filter((item: itemReviewType) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = itemsData?.pages.flatMap(page => 
+    page.items.filter((item: any) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  ) || [];
 
-  const totalPages = Math.ceil(itemsData?.totalItems / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     setSelectedItems([]);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = itemsData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPageItems) {
+      fetchNextPageItems();
+    }
   };
 
   const handleDeleteMany = () => {
@@ -260,36 +303,72 @@ const DeletedItems = () => {
           </div>
 
           {/* Category Filter */}
-          <select
+          <Select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
-            disabled={!selectedRestaurant}
+            onValueChange={(value) => setSelectedCategory(value)}
+            disabled={!selectedRestaurant || selectedRestaurant === 'all'}
           >
-            <option value="">All Categories</option>
-            {categories?.items?.map((category: any) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories?.pages.map((page) =>
+                page.items.map((category: any) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPageCategories && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPageCategories();
+                  }}
+                  disabled={isFetchingNextPageCategories}
+                >
+                  {isFetchingNextPageCategories ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
 
           {/* Restaurant Filter */}
-          <select
+          <Select
             value={selectedRestaurant}
-            onChange={(e) => {
-              setSelectedRestaurant(e.target.value);
-              setSelectedCategory("");
+            onValueChange={(value) => {
+              setSelectedRestaurant(value);
+              setSelectedCategory(''); // Reset category when restaurant changes
             }}
-            className="p-2 border border-gray-300 rounded-lg"
           >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Restaurants" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Restaurants</SelectItem>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPageRestaurants && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPageRestaurants();
+                  }}
+                  disabled={isFetchingNextPageRestaurants}
+                >
+                  {isFetchingNextPageRestaurants ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex gap-4 items-start">
           {selectedItems.length > 0 && (
@@ -351,7 +430,7 @@ const DeletedItems = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData?.map((item: any, index: number) => (
+              {currentData?.map((item: any, index: number) => (
                 <tr
                   key={item.id}
                   className="bg-white border-b hover:bg-gray-50"
@@ -402,6 +481,19 @@ const DeletedItems = () => {
               onPageChange={handlePageChange}
             />
           </div>
+
+          {/* Add Load More button for items */}
+          {hasNextPageItems && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchNextPageItems()}
+                disabled={isFetchingNextPageItems}
+                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+              >
+                {isFetchingNextPageItems ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
         </>
       )}
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
@@ -10,6 +10,8 @@ import Pagination from "@/components/Pagination"; // Import the Pagination compo
 import axiosInstance from "@/axiosInstance";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 type CategoryType = {
   id: string;
   name: string;
@@ -33,34 +35,51 @@ const DeletedCategories = () => {
 
   const queryClient = useQueryClient();
 
-  // Fetch deleted categories based on current page and restaurant filter
-  const {
-    data: categoriesData,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["findAll-deleted-categories", currentPage, selectedRestaurant],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append("page", String(currentPage));
-      if (selectedRestaurant) params.append("restaurantId", selectedRestaurant);
 
-      // Fetching deleted categories from the server
-      const category = await axiosInstance.get(`/category/findAll-deleted`, {
-        params,
-      });
-      return category.data;
-    },
-  });
-
+// Fetch categories based on selected restaurant
+const {
+  data: categoryData,
+  isLoading,
+  isError,
+  fetchNextPage: fetchNextPageCategories,
+  hasNextPage: hasNextPageCategories,
+  isFetchingNextPage: isFetchingNextPageCategories,
+  refetch,
+  isRefetching,
+} = useInfiniteQuery({
+  queryKey: ["categories", selectedRestaurant],
+  queryFn: async ({ pageParam = 1 }) => {
+    const params = new URLSearchParams();
+    if (selectedRestaurant && selectedRestaurant !== 'all') {
+      params.append("restaurantId", selectedRestaurant);
+    }
+    params.append("page", pageParam.toString());
+    const response = await axiosInstance.get(`/category/findAll-deleted`, { params });
+    return response.data;
+  },
+  getNextPageParam: (lastPage) => {
+    if (!lastPage || !lastPage.hasNextPage) return undefined;
+    return lastPage.nextPage;
+  },
+  initialPageParam: 1,
+});
   // Fetch restaurants
-  const { data: restaurants } = useQuery({
+  const {
+    data: restaurants,
+    fetchNextPage: fetchNextPageRestaurants,
+    hasNextPage: hasNextPageRestaurants,
+    isFetchingNextPage: isFetchingNextPageRestaurants,
+  } = useInfiniteQuery({
     queryKey: ["restaurants"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/restaurant");
-      return res.data;
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
+      return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   // Handle category restoration
@@ -182,14 +201,34 @@ const DeletedCategories = () => {
     setShowRestoreManyPopup(true);
   };
 
-  const filteredData = categoriesData?.items?.filter((category: CategoryType) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter data based on the search query
+  const filteredData = categoryData?.pages.flatMap(page => 
+    page.items.filter((item: any) =>
+      item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  ) || [];
 
-  const totalPages = Math.ceil(categoriesData?.totalItems / itemsPerPage);
+  // Calculate total pages and slice data for the current page
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    setSelectedItems([]);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = categoryData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPageCategories) {
+      fetchNextPageCategories();
+    }
   };
 
   const handleDeleteMany = () => {
@@ -245,18 +284,40 @@ const DeletedCategories = () => {
           </div>
 
           {/* Restaurant Filter */}
-          <select
+          <Select
             value={selectedRestaurant}
-            onChange={(e) => setSelectedRestaurant(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg"
+            onValueChange={(value) => {
+              setSelectedRestaurant(value);
+              setCurrentPage(1);
+              setSelectedItems([]);
+            }}
           >
-            <option value="">All Restaurants</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Restaurants" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Restaurants</SelectItem>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPageRestaurants && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPageRestaurants();
+                  }}
+                  disabled={isFetchingNextPageRestaurants}
+                >
+                  {isFetchingNextPageRestaurants ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex gap-4 items-start">
           {selectedItems.length > 0 && (
@@ -284,89 +345,108 @@ const DeletedCategories = () => {
         </div>
       </div>
 
-      {filteredData?.length === 0 ? (
+      {currentData.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No deleted categories.</p>
         </div>
       ) : (
         <>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.length === filteredData?.length}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  #
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData?.map((category: any, index: number) => (
-                <tr
-                  key={category.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 w-4">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(category.id)}
-                      onChange={() => handleSelectItem(category.id)}
+                      checked={selectedItems.length === filteredData?.length}
+                      onChange={handleSelectAll}
                     />
-                  </td>
-                  <td className="px-6 py-4">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {highlightText(category?.name, searchQuery)}
-                  </td>
-                  <td className="px-6 py-4">{category?.description}</td>
-                  <td className="px-6 py-4 flex gap-x-4">
-                    {/* <Link to={`/categories/edit/${category?.id}`} state={category}>
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.map((category: any, index: number) => (
+                  <tr
+                    key={category.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(category.id)}
+                        onChange={() => handleSelectItem(category.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {highlightText(category?.name, searchQuery)}
+                    </td>
+                    <td className="px-6 py-4">{category?.description}</td>
+                    <td className="px-6 py-4 flex gap-x-4">
+                      {/* <Link to={`/categories/edit/${category?.id}`} state={category}>
                 <SquarePen className="text-blue-600" />
               </Link> */}
-                    <button
-                      className="font-medium text-green-600"
-                      onClick={() => handleRestoreClick(category)}
-                      data-tooltip-id="restore-tooltip"
-                      data-tooltip-content="Restore"
-                    >
-                      <RotateCw />
-                    </button>
-                    <button
-                      className="font-medium text-red-600"
-                      onClick={() => handleDeleteClick(category)}
-                      data-tooltip-id="delete-tooltip"
-                      data-tooltip-content="Delete"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <button
+                        className="font-medium text-green-600"
+                        onClick={() => handleRestoreClick(category)}
+                        data-tooltip-id="restore-tooltip"
+                        data-tooltip-content="Restore"
+                      >
+                        <RotateCw />
+                      </button>
+                      <button
+                        className="font-medium text-red-600"
+                        onClick={() => handleDeleteClick(category)}
+                        data-tooltip-id="delete-tooltip"
+                        data-tooltip-content="Delete"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          {/* Pagination Component */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-10">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
+          {currentData.length > 0 && (
+            <>
+              {/* Add Load More button */}
+              {hasNextPageCategories && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => fetchNextPageCategories()}
+                    disabled={isFetchingNextPageCategories}
+                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+                  >
+                    {isFetchingNextPageCategories ? "Loading more..." : "Load More"}
+                  </button>
+                </div>
+              )}
+
+              {/* Pagination Component */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-4">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
           )}
         </>
       )}

@@ -1,8 +1,10 @@
 import { useState, FormEvent } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosInstance";
 import Spinner from "@/components/Spinner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 function AddDeal() {
   const [title, setTitle] = useState<string>("");
@@ -13,12 +15,24 @@ function AddDeal() {
   const [expiresAt, setExpiresAt] = useState<string>("");
   const navigate = useNavigate();
 
-  const { data: restaurants, isPending: isLoadingRestaurants } = useQuery({
+  const {
+    data: restaurants,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["restaurants"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/restaurant");
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(`/restaurant?page=${pageParam}`);
       return response.data;
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.hasNextPage) return undefined;
+      return lastPage.nextPage;
+    },
+    initialPageParam: 1,
   });
 
   const mutation = useMutation({
@@ -27,7 +41,7 @@ function AddDeal() {
       return response.data;
     },
     onSuccess: (data: any) => {
-        console.log("Deal added successfully", data);
+      console.log("Deal added successfully", data);
       navigate("/deals");
     },
   });
@@ -47,13 +61,15 @@ function AddDeal() {
     mutation.mutate(dealData);
   };
 
-  if (isLoadingRestaurants) {
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
       </div>
     );
   }
+
+  if (isError) return <div>Error loading restaurants</div>;
 
   return (
     <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -107,20 +123,32 @@ function AddDeal() {
           <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
             Restaurant
           </label>
-          <select
-            id="restaurantId"
-            value={restaurantId}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          >
-            <option value="" disabled>Select a restaurant</option>
-            {restaurants?.items?.map((restaurant: any) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+          <Select value={restaurantId} onValueChange={setRestaurantId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a restaurant" />
+            </SelectTrigger>
+            <SelectContent>
+              {restaurants?.pages.map((page) =>
+                page.items.map((restaurant: any) => (
+                  <SelectItem key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                ))
+              )}
+              {hasNextPage && (
+                <Button
+                  className="w-full text-center text-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchNextPage();
+                  }}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? "Loading..." : "Load More"}
+                </Button>
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="mb-4">
@@ -153,7 +181,7 @@ function AddDeal() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 bg-indigo-600 disabled:animate-pulse disabled:bg-indigo-300 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={mutation.isPending}
           >
             {mutation.isPending ? "Adding... " : "Add Deal"}
