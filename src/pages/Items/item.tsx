@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
 import { Link } from "react-router-dom";
@@ -12,7 +16,13 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 
 import { DropdownMenuDemo } from "@/components/DropdownMenu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
 type itemReviewType = {
@@ -90,10 +100,10 @@ const Item = () => {
     queryKey: ["items", selectedCategory, selectedRestaurant],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams();
-      if (selectedRestaurant && selectedRestaurant !== 'all') {
+      if (selectedRestaurant && selectedRestaurant !== "all") {
         params.append("restaurantId", selectedRestaurant);
       }
-      if (selectedCategory && selectedCategory !== 'all') {
+      if (selectedCategory && selectedCategory !== "all") {
         params.append("categoryId", selectedCategory);
       }
       params.append("page", pageParam.toString());
@@ -136,7 +146,7 @@ const Item = () => {
   } = useInfiniteQuery({
     queryKey: ["categories", selectedRestaurant],
     queryFn: async ({ pageParam = 1 }) => {
-      if (!selectedRestaurant || selectedRestaurant === 'all') {
+      if (!selectedRestaurant || selectedRestaurant === "all") {
         return { items: [], hasNextPage: false, nextPage: undefined };
       }
       const response = await axiosInstance.get(
@@ -149,17 +159,15 @@ const Item = () => {
       return lastPage.nextPage;
     },
     initialPageParam: 1,
-    enabled: !!selectedRestaurant && selectedRestaurant !== 'all',
+    enabled: !!selectedRestaurant && selectedRestaurant !== "all",
   });
 
   const handleExport = () => {
     if (!itemsData) return;
-    const flattenedData = itemsData.pages.flatMap(page => 
-      page.items.map((item: any) =>
-        flattenObject(item)
-      )
+    const flattenedData = itemsData.pages.flatMap((page) =>
+      page.items.map((item: any) => flattenObject(item))
     );
-    const dataExcludedCategory = itemsData.pages.flatMap(page => 
+    const dataExcludedCategory = itemsData.pages.flatMap((page) =>
       page.items.map((items: any) => {
         const { category, ...rest } = items;
         return rest;
@@ -210,11 +218,12 @@ const Item = () => {
   });
 
   // Update the filter data logic to work with infinite query data
-  const filteredData = itemsData?.pages.flatMap(page => 
-    page.items.filter((item: itemReviewType) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  ) || [];
+  const filteredData =
+    itemsData?.pages.flatMap((page) =>
+      page.items.filter((item: itemReviewType) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    ) || [];
 
   // Update pagination logic
   const currentData = filteredData.slice(
@@ -273,7 +282,7 @@ const Item = () => {
 
   const handleRestaurantChange = (value: string) => {
     setSelectedRestaurant(value);
-    setSelectedCategory(''); // Reset category when restaurant changes
+    setSelectedCategory(""); // Reset category when restaurant changes
   };
 
   if (isLoading) {
@@ -331,7 +340,7 @@ const Item = () => {
           <Select
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value)}
-            disabled={!selectedRestaurant || selectedRestaurant === 'all'}
+            disabled={!selectedRestaurant || selectedRestaurant === "all"}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="All Categories" />
@@ -347,7 +356,7 @@ const Item = () => {
               )}
               {hasNextPageCategories && (
                 <Button
-                  className="w-full text-center text-gray-600"
+                  className="w-full text-center text-gray-800 bg-gray-200 hover:bg-gray-200"
                   onClick={(e) => {
                     e.preventDefault();
                     fetchNextPageCategories();
@@ -379,7 +388,7 @@ const Item = () => {
               )}
               {hasNextPageRestaurants && (
                 <Button
-                  className="w-full text-center text-gray-600"
+                  className="w-full text-center text-gray-800 bg-gray-200 hover:bg-gray-200"
                   onClick={(e) => {
                     e.preventDefault();
                     fetchNextPageRestaurants();
@@ -553,7 +562,9 @@ const Item = () => {
                 disabled={isFetchingNextPageItems}
                 className="bg-gray-800 text-white hover:bg-gray-700"
               >
-                {isFetchingNextPageItems ? "Loading more..." : "Load More Items"}
+                {isFetchingNextPageItems
+                  ? "Loading more..."
+                  : "Load More Items"}
               </Button>
             </div>
           )}
