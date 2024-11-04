@@ -48,6 +48,7 @@ import Deals from "./pages/Deals/Deals";
 import AddDeal from "./pages/Deals/AddDeal";
 import EditDeal from "./pages/Deals/EditDeal";
 import DeletedDeals from "./pages/Deals/DeletedDeals";
+import AddTranslation from "./pages/translation/add";
 
 function App() {
   return (
@@ -161,7 +162,7 @@ function App() {
             <Route path="edit/:dealId" element={<EditDeal />} />
             <Route path="trash" element={<DeletedDeals />} />
           </Route>
-
+          <Route path="/translation-add" element={<AddTranslation />} />
           {/* end sidebar */}
         </Route>
       </>

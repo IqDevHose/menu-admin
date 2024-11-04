@@ -59,6 +59,8 @@ const Sidebar = () => {
                 { to: "/questions", icon: <FileQuestion />, label: "Questions" },
                 { to: "/offers", icon: <TicketPercent />, label: "Offers" },
                 { to: "/deals", icon: <Tag />, label: "Deals" },
+                { to: "/translation-add", icon: <Tag />, label: "Translation" },
+
               ].map((item) => (
                 <li key={item.to}>
                   <NavLink
