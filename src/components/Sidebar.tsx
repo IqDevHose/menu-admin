@@ -2,7 +2,7 @@ import {
   ChartBarStacked,
   ChefHat,
   FileQuestion,
-  Globe,
+  Globe2,
   LayoutDashboard,
   MessageCircleCode,
   ShoppingBasket,
@@ -60,7 +60,7 @@ const Sidebar = () => {
                 { to: "/questions", icon: <FileQuestion />, label: "Questions" },
                 { to: "/offers", icon: <TicketPercent />, label: "Offers" },
                 { to: "/deals", icon: <Tag />, label: "Deals" },
-                { to: "/translation/add", icon: <Globe />, label: "Translation" },
+                { to: "/translation/add", icon: <Globe2 />, label: "Translation" },
 
               ].map((item) => (
                 <li key={item.to}>
