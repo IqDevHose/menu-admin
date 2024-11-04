@@ -77,8 +77,8 @@ function AddItem() {
     e.preventDefault();
 
     const itemData = {
-      name,
-      description,
+      name: name.trim(),
+      description: description.trim(),
       price: price,
       categoryId,
       image: base64Image,

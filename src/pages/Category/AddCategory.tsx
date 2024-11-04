@@ -53,7 +53,7 @@ function AddCategory() {
     e.preventDefault();
 
     const newCategory: CreateCategoryDto = {
-      name,
+      name: name.trim(),
       restaurantId,
       icon: icon || null,
     };

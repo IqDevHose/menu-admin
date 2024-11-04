@@ -56,7 +56,7 @@ function EditCategory() {
     e.preventDefault();
 
     const newEdit: categoryType = {
-      name,
+      name: name?.trim() || "",
       restaurantId,
       icon: icon || null,
     };

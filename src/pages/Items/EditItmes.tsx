@@ -113,8 +113,8 @@ function EditItem() {
     }
 
     const data = {
-      name: name || "",
-      description: description || "",
+      name: name?.trim() || "",
+      description: description?.trim() || "",
       price: price || 0,
       categoryId: categoryId || "",
       image: imageBase64,

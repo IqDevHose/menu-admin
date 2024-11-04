@@ -92,9 +92,9 @@ function AddRestaurant() {
     e.preventDefault();
 
     const restaurantData = {
-      name,
-      description,
-      accessCode,
+      name: name?.trim() || "",
+      description: description?.trim() || "",
+      accessCode: accessCode?.trim() || "",
       primary,
       secondary,
       bg,
