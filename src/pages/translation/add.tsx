@@ -24,7 +24,7 @@ const AddTranslation = () => {
 
     const handleAddTranslation = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        const translationData = { key, value, language };
+        const translationData = { key: key.trim(), value: value.trim(), language };
 
         try {
             mutation.mutate(translationData);
