@@ -162,7 +162,10 @@ function App() {
             <Route path="edit/:dealId" element={<EditDeal />} />
             <Route path="trash" element={<DeletedDeals />} />
           </Route>
-          <Route path="/translation-add" element={<AddTranslation />} />
+          <Route path="/translation/*">
+            <Route index element={<AddTranslation />} />
+            <Route path="add" element={<AddTranslation />} />
+          </Route>
           {/* end sidebar */}
         </Route>
       </>
