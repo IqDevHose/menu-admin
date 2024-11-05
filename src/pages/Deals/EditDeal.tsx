@@ -12,6 +12,7 @@ function EditDeal() {
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [published, setPublished] = useState<boolean>(false);
   const [expiresAt, setExpiresAt] = useState<string>("");
+  const [image, setImage] = useState<string>("");
   const navigate = useNavigate();
 
   const { data: deal, isLoading: isLoadingDeal } = useQuery({
@@ -38,6 +39,7 @@ function EditDeal() {
       setRestaurantId(deal.restaurantId);
       setPublished(deal.published);
       setExpiresAt(new Date(deal.expiresAt).toISOString().slice(0, 16));
+      setImage(deal.image || "");
     }
   }, [deal]);
 
@@ -50,6 +52,18 @@ function EditDeal() {
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImage(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -60,6 +74,7 @@ function EditDeal() {
       restaurantId,
       published,
       expiresAt: new Date(expiresAt).toISOString(),
+      image,
     };
 
     mutation.mutate(dealData);
@@ -105,6 +120,33 @@ function EditDeal() {
             placeholder="Enter deal description"
             required
           />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            Deal Image
+          </label>
+          <input
+            type="file"
+            id="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="mt-1 block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-indigo-50 file:text-indigo-700
+              hover:file:bg-indigo-100"
+          />
+          {image && (
+            <div className="mt-2">
+              <img
+                src={image}
+                alt="Deal preview"
+                className="w-32 h-32 object-cover rounded-md"
+              />
+            </div>
+          )}
         </div>
 
         <div className="mb-4">
