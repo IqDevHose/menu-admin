@@ -16,6 +16,14 @@ import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type customerReviewType = {
   id: string;
@@ -65,12 +73,13 @@ const extractHeaders = (data: DataItem[]): string[] => {
 
 const CustomerReview = () => {
   const [showChildPopup, setShowChildPopup] = useState(false);
-  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteManyDialogOpen, setDeleteManyDialogOpen] = useState(false);
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<customerReviewType | null>(
     null
   );
   const [selectedChildData, setSelectedChildData] = useState<any[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
   const [selectedCustomerReview, setSelectedCustomerReview] =
     useState<customerReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
@@ -182,7 +191,7 @@ const CustomerReview = () => {
     // Function to handle star click
     const handleStarClick = () => {
       setSelectedChildData(ratings); // Pass the entire rating array to the popup
-      setShowChildPopup(true);
+      setRatingDialogOpen(true);
     };
 
     // Display multiple stars based on the average rating
@@ -232,7 +241,7 @@ const CustomerReview = () => {
     },
     onSuccess: () => {
       refetch();
-      setShowPopup(false);
+      setShowChildPopup(false);
     },
   });
 
@@ -244,14 +253,14 @@ const CustomerReview = () => {
     },
     onSuccess: () => {
       refetch();
-      setShowDeleteManyPopup(false);
+      setShowChildPopup(false);
       return "Items deleted successfully";
     },
   });
 
   const handleDeleteClick = (item: customerReviewType) => {
     setSelectedCustomerReview(item);
-    setShowPopup(true);
+    setDeleteDialogOpen(true);
   };
 
   const confirmDeleteMany = () => {
@@ -311,7 +320,7 @@ const CustomerReview = () => {
   };
 
   const handleDeleteMany = () => {
-    setShowDeleteManyPopup(true);
+    setDeleteManyDialogOpen(true);
   };
 
   // Add useEffect to reset page when filters change
@@ -596,51 +605,74 @@ const CustomerReview = () => {
         </>
       )}
 
-      {showDeleteManyPopup && (
-        <Popup
-          onClose={() => setShowDeleteManyPopup(false)}
-          onConfirm={confirmDeleteMany}
-          loading={deleteMutation.isPending}
-          confirmText="Delete"
-          loadingText="Deleting..."
-          cancelText="Cancel"
-          confirmButtonVariant="red"
-        >
-          <p>
-            Are you sure you want to delete{" "}
-            {selectedItems && selectedItems.length + " review/s"}?
-          </p>
-        </Popup>
-      )}
+      <Dialog open={deleteManyDialogOpen} onOpenChange={setDeleteManyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Reviews</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {selectedItems.length} review(s)?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteManyDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteMany}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Delete Confirmation Popup */}
-      {showPopup && (
-        <Popup
-          onClose={() => setShowPopup(false)}
-          onConfirm={confirmDelete}
-          loading={mutation.isPending}
-          confirmText="Delete"
-          loadingText="Deleting..."
-          cancelText="Cancel"
-          confirmButtonVariant="red"
-        >
-          <p>Are you sure you want to delete {selectedItem?.name}?</p>
-        </Popup>
-      )}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Review</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {selectedCustomerReview?.name}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* popup for customer review rating */}
-      {showChildPopup && (
-        <Popup
-          onClose={() => setShowChildPopup(false)}
-          loading={query.isLoading}
-          confirmText="Close"
-          showOneBtn={true}
-          onConfirm={() => setShowChildPopup(false)}
-          confirmButtonVariant="red"
-        >
+      <Dialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rating Details</DialogTitle>
+          </DialogHeader>
           <RatingPopup data={selectedChildData} />
-        </Popup>
-      )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRatingDialogOpen(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
