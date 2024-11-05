@@ -13,6 +13,7 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Importing the styles
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { iconOptions } from "@/utils/data";
 
 type categoryReviewType = {
   id: string;
@@ -235,6 +236,12 @@ const handleExport = () => {
     setShowDeleteManyPopup(true);
   };
 
+  const getIconComponent = (iconName?: string) => {
+    if (!iconName) return null;
+    const icon = iconOptions.find(option => option.title === iconName);
+    return icon ? icon.value : null;
+  };
+
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -447,7 +454,9 @@ const handleExport = () => {
                       {highlightText(item?.name || "", searchQuery)}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {item?.icon}
+                      <span className="text-lg">
+                        {getIconComponent(item?.icon)}
+                      </span>
                     </td>
                     <td className="px-6 py-4">{item?._count?.items || 0}</td>
                     <td className="px-6 py-4 flex gap-x-4">
