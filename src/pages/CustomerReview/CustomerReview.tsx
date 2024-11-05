@@ -275,15 +275,19 @@ const CustomerReview = () => {
     }
   };
 
-  // Filter the data based on the search query
+  // Filter data based on the search query
   const filteredData = customerReviewData?.pages.flatMap(page => 
     page.items.filter((item: any) =>
       item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     )
   ) || [];
 
-  // Calculate the total number of pages
+  // Calculate total pages and slice data for the current page
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -488,7 +492,7 @@ const CustomerReview = () => {
         </div>
       </div>
 
-      {filteredData?.length === 0 ? (
+      {currentData.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500">No customer reviews found.</p>
         </div>
@@ -530,7 +534,7 @@ const CustomerReview = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData?.map((item: any) => (
+                {currentData.map((item: any) => (
                   <tr
                     key={item.id}
                     className="bg-white border-b hover:bg-gray-50"
@@ -581,26 +585,32 @@ const CustomerReview = () => {
             </table>
           </div>
 
-          {hasNextPageReviews && (
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => fetchNextPageReviews()}
-                disabled={isFetchingNextPageReviews}
-                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
-              >
-                {isFetchingNextPageReviews ? "Loading more..." : "Load More"}
-              </button>
-            </div>
-          )}
+          {currentData.length > 0 && (
+            <>
+              {/* Add Load More button */}
+              {hasNextPageReviews && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => fetchNextPageReviews()}
+                    disabled={isFetchingNextPageReviews}
+                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+                  >
+                    {isFetchingNextPageReviews ? "Loading more..." : "Load More"}
+                  </button>
+                </div>
+              )}
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-4">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
+              {/* Pagination Component */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-4">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
           )}
         </>
       )}

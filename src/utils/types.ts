@@ -72,7 +72,3 @@ export interface LoginData {
   userName: string;
   password: string;
 }
-
-export type iconSelectorPropsT = {
-  onIconSelect: (title:string) => void
-}
