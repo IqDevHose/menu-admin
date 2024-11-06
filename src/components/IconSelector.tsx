@@ -9,7 +9,10 @@ import {
 import { iconSelectorPropsT, selectedIconT } from "@/utils/types";
 import { iconOptions } from "@/utils/data";
 
-export function IconSelector({ onIconSelect, initialIcon }: iconSelectorPropsT) {
+export function IconSelector({
+  onIconSelect,
+  initialIcon,
+}: iconSelectorPropsT) {
   const [selectedIcon, setSelectedIcon] = useState<selectedIconT | null>(null);
 
   // Set the initial selected icon if it exists (useful for editing cases)
@@ -27,7 +30,7 @@ export function IconSelector({ onIconSelect, initialIcon }: iconSelectorPropsT) 
           {selectedIcon ? selectedIcon.value : "Choose Icon ✨"}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 grid grid-cols-4 gap-2 p-4">
+      <DropdownMenuContent className="w-60 grid grid-cols-4  gap-2 p-4 h-[400px] overflow-y-scroll  ">
         {iconOptions.map((icon) => (
           <DropdownMenuItem
             key={icon.title}
