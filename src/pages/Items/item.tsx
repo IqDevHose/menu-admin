@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination"; // Import the Pagination component
@@ -73,16 +73,22 @@ const extractHeaders = (data: DataItem[]): string[] => {
 };
 
 const Item = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
   const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
   const [selectedItem, setSelectedItem] = useState<itemReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || ""
+  );
+  const [selectedRestaurant, setSelectedRestaurant] = useState(
+    searchParams.get("restaurant") || ""
+  );
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
   const [currentPage, setCurrentPage] = useState(1);
   const [headers, setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
+  const queryParams = new URLSearchParams();
 
   const queryClient = useQueryClient();
 
@@ -239,6 +245,7 @@ const Item = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+
     setSelectedItems([]);
   };
 
@@ -283,6 +290,9 @@ const Item = () => {
   const handleRestaurantChange = (value: string) => {
     setSelectedRestaurant(value);
     setSelectedCategory(""); // Reset category when restaurant changes
+    queryParams.set("category", "");
+    queryParams.set("restaurant", value);
+    setSearchParams(queryParams);
   };
 
   if (isLoading) {
@@ -339,7 +349,13 @@ const Item = () => {
           {/* Updated Category Filter */}
           <Select
             value={selectedCategory}
-            onValueChange={(value) => setSelectedCategory(value)}
+            onValueChange={(value) => {
+              setSelectedCategory(value);
+              queryParams.set("category", value);
+              queryParams.set("restaurant", selectedRestaurant);
+
+              setSearchParams(queryParams);
+            }}
             disabled={!selectedRestaurant || selectedRestaurant === "all"}
           >
             <SelectTrigger className="w-[200px]">
