@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "../../utils/utils";
 import Pagination from "@/components/Pagination";
@@ -26,14 +26,21 @@ type DealType = {
 };
 
 const Deals = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
   const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<DealType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState("");
+  const [selectedRestaurant, setSelectedRestaurant] = useState(
+    searchParams.get("restaurant") || "all"
+  );
   const [selectedDeals, setSelectedDeals] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page") || "1")
+  );
   const itemsPerPage = 10;
+  const queryParams = new URLSearchParams();
 
   const queryClient = useQueryClient();
 
@@ -153,6 +160,14 @@ const Deals = () => {
     queryClient.invalidateQueries({ 
       queryKey: ["deals", selectedRestaurant]
     });
+    
+    queryParams.set("page", "1");
+    if (selectedRestaurant && selectedRestaurant !== "all") {
+      queryParams.set("restaurant", selectedRestaurant);
+    } else {
+      queryParams.delete("restaurant");
+    }
+    setSearchParams(queryParams);
   }, [selectedRestaurant, queryClient]);
 
   const handleDeleteClick = (deal: DealType) => {
@@ -192,6 +207,46 @@ const Deals = () => {
         : [...prevSelectedDeals, id]
     );
   };
+
+  const handleRestaurantChange = (value: string) => {
+    setSelectedRestaurant(value);
+    setCurrentPage(1);
+    setSelectedDeals([]);
+    
+    queryParams.set("page", "1");
+    if (value !== "all") {
+      queryParams.set("restaurant", value);
+    } else {
+      queryParams.delete("restaurant");
+    }
+    setSearchParams(queryParams);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedDeals([]);
+    
+    queryParams.set("page", newPage.toString());
+    if (selectedRestaurant && selectedRestaurant !== "all") {
+      queryParams.set("restaurant", selectedRestaurant);
+    }
+    setSearchParams(queryParams);
+    
+    // Calculate if we need to fetch more data
+    const totalItemsNeeded = newPage * itemsPerPage;
+    const currentTotalItems = dealsData?.pages.reduce(
+      (total, page) => total + page.items.length,
+      0
+    ) || 0;
+
+    if (totalItemsNeeded > currentTotalItems && hasNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  const totalPages = dealsData?.pages[0]?.totalItems 
+    ? Math.ceil(dealsData.pages[0].totalItems / itemsPerPage) 
+    : 0;
 
   if (isLoading) {
     return (
@@ -244,7 +299,7 @@ const Deals = () => {
           <div className="flex flex-col gap-2">
             <Select
               value={selectedRestaurant}
-              onValueChange={(value) => setSelectedRestaurant(value === "all" ? "" : value)}
+              onValueChange={handleRestaurantChange}
             >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="All Restaurants" />
@@ -460,6 +515,16 @@ const Deals = () => {
             Are you sure you want to delete {selectedDeals.length} deal(s)?
           </p>
         </Popup>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
       )}
     </div>
   );

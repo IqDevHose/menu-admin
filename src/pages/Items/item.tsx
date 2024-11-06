@@ -85,7 +85,9 @@ const Item = () => {
     searchParams.get("restaurant") || ""
   );
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page") || "1")
+  );
   const [headers, setHeaders] = useState<string[]>();
   const itemsPerPage = 10;
   const queryParams = new URLSearchParams();
@@ -241,12 +243,28 @@ const Item = () => {
   // Reset the current page to 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
+    queryParams.set("page", "1");
+    if (selectedRestaurant) {
+      queryParams.set("restaurant", selectedRestaurant);
+    }
+    if (selectedCategory) {
+      queryParams.set("category", selectedCategory);
+    }
+    setSearchParams(queryParams);
   }, [selectedCategory, selectedRestaurant, searchQuery]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-
     setSelectedItems([]);
+    
+    queryParams.set("page", newPage.toString());
+    if (selectedRestaurant) {
+      queryParams.set("restaurant", selectedRestaurant);
+    }
+    if (selectedCategory) {
+      queryParams.set("category", selectedCategory);
+    }
+    setSearchParams(queryParams);
   };
 
   const handleSelectAll = () => {
@@ -292,6 +310,7 @@ const Item = () => {
     setSelectedCategory(""); // Reset category when restaurant changes
     queryParams.set("category", "");
     queryParams.set("restaurant", value);
+    queryParams.set("page", "1"); // Reset to page 1 when restaurant changes
     setSearchParams(queryParams);
   };
 

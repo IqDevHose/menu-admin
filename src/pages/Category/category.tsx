@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { Plus, RotateCw, SquarePen, Trash2 } from "lucide-react";
 import Popup from "@/components/Popup";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import Spinner from "@/components/Spinner";
 import { highlightText } from "@/utils/utils";
@@ -57,15 +57,20 @@ const extractHeaders = (data: DataCategory[]): string[] => {
 };
 
 const Category = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
-  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false); // State to manage popup visibility
-  const [selectedCategory, setSelectedCategory] =
-    useState<categoryReviewType | null>(null);
+  const [showDeleteManyPopup, setShowDeleteManyPopup] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<categoryReviewType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState("all"); // State to manage selected restaurant
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to manage selected items for checkbox selection
+  const [selectedRestaurant, setSelectedRestaurant] = useState(
+    searchParams.get("restaurant") || "all"
+  );
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page") || "1")
+  );
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const itemsPerPage = 10;
+  const queryParams = new URLSearchParams();
 
   const queryClient = useQueryClient();
   const [headers, setHeaders] = useState<string[]>([]);
@@ -215,6 +220,12 @@ const handleExport = () => {
     setCurrentPage(newPage);
     setSelectedItems([]);
     
+    queryParams.set("page", newPage.toString());
+    if (selectedRestaurant && selectedRestaurant !== "all") {
+      queryParams.set("restaurant", selectedRestaurant);
+    }
+    setSearchParams(queryParams);
+
     // Calculate if we need to fetch more data
     const totalItemsNeeded = newPage * itemsPerPage;
     const currentTotalItems = categoryData?.pages.reduce(
@@ -229,7 +240,13 @@ const handleExport = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-    setSelectedItems([]);
+    queryParams.set("page", "1");
+    if (selectedRestaurant && selectedRestaurant !== "all") {
+      queryParams.set("restaurant", selectedRestaurant);
+    } else {
+      queryParams.delete("restaurant");
+    }
+    setSearchParams(queryParams);
   }, [selectedRestaurant, searchQuery]);
 
   const handleDeleteMany = () => {
@@ -240,6 +257,10 @@ const handleExport = () => {
     if (!iconName) return null;
     const icon = iconOptions.find(option => option.title === iconName);
     return icon ? icon.value : null;
+  };
+
+  const handleRestaurantChange = (value: string) => {
+    setSelectedRestaurant(value);
   };
 
   if (isLoading) {
@@ -294,11 +315,7 @@ const handleExport = () => {
           {/* Restaurant Filter */}
           <Select
             value={selectedRestaurant}
-            onValueChange={(value) => {
-              setSelectedRestaurant(value);
-              setCurrentPage(1);
-              setSelectedItems([]);
-            }}
+            onValueChange={handleRestaurantChange}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="All Restaurants" />
