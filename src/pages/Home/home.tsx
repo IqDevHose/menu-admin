@@ -69,11 +69,21 @@ const Home: React.FC = () => {
     enabled: selectedRestaurant !== 'all',
   });
 
+  const ratingsByMonthQuery = useQuery({
+    queryKey: ['ratingsByMonth', selectedRestaurant],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `/dashboard/ratings-by-month${selectedRestaurant !== 'all' ? `?restaurantId=${selectedRestaurant}` : ''}`
+      );
+      return response.data;
+    },
+  });
+
   const handleRestaurantChange = (value: string) => {
     setSelectedRestaurant(value);
   };
 
-  if (statsQuery.isLoading || avgRatingsQuery.isLoading || restaurantStatsQuery.isLoading || customerReviewQuery.isLoading) {
+  if (statsQuery.isLoading || avgRatingsQuery.isLoading || restaurantStatsQuery.isLoading || customerReviewQuery.isLoading || ratingsByMonthQuery.isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -81,7 +91,7 @@ const Home: React.FC = () => {
     );
   }
 
-  if (statsQuery.isError || avgRatingsQuery.isError || restaurantStatsQuery.isError || customerReviewQuery.isError) {
+  if (statsQuery.isError || avgRatingsQuery.isError || restaurantStatsQuery.isError || customerReviewQuery.isError || ratingsByMonthQuery.isError) {
     return <div>Error loading statistics.</div>;
   }
 
@@ -126,15 +136,7 @@ const Home: React.FC = () => {
       ? totalItems
       : specificRestaurantData.itemsCount || 0;
 
-  // Example data for the line chart (replace with real data)
-  const lineChartData = [
-    { date: '2023-01', averageRating: 3.5 },
-    { date: '2023-02', averageRating: 8.0 },
-    { date: '2023-03', averageRating: 4.2 },
-    { date: '2023-04', averageRating: 3.9 },
-    { date: '2023-05', averageRating: 4.5 },
-    { date: '2023-06', averageRating: 4.3 },
-  ];
+  const lineChartData = ratingsByMonthQuery.data || [];
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -226,11 +228,28 @@ const Home: React.FC = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={lineChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+                    }}
+                  />
+                  <YAxis domain={[0, 5]} /> {/* Assuming ratings are from 0-5 */}
+                  <Tooltip 
+                    formatter={(value) => [`${Number(value).toFixed(2)}`, 'Average Rating']}
+                    labelFormatter={(label) => {
+                      const date = new Date(label);
+                      return `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+                    }}
+                  />
                   <Legend />
-                  <Line type="monotone" dataKey="averageRating" stroke="#82ca9d" />
+                  <Line 
+                    type="monotone" 
+                    dataKey="averageRating" 
+                    stroke="#82ca9d" 
+                    name="Average Rating"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Card>
