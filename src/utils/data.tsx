@@ -99,6 +99,7 @@ import {
   GiTomato,
   GiCoconuts,
   GiClaymoreExplosive,
+  GiSandwich,
 } from "react-icons/gi";
 import {
   MdFoodBank,
@@ -121,6 +122,7 @@ import { BiSolidDish } from "react-icons/bi";
 import { SlEnergy } from "react-icons/sl";
 import { GiCooler } from "react-icons/gi";
 import { RiDrinks2Fill } from "react-icons/ri";
+import { PiHamburgerFill } from "react-icons/pi";
 
 export const iconOptions = [
   { title: "Utensils", value: <FaUtensils className="h-4 w-4" /> },
@@ -161,12 +163,9 @@ export const iconOptions = [
   { title: "Moving Truck", value: <FaTruckMoving className="h-4 w-4" /> },
   { title: "Soup", value: <TbSoupFilled className="h-4 w-4" /> },
   { title: "Gift", value: <FaGift className="h-4 w-4" /> },
-  { title: "Blender", value: <FaBlender className="h-4 w-4" /> },
   { title: "Hot Mug", value: <FaMugHot className="h-4 w-4" /> },
   { title: "Hot Dog", value: <FaHotdog className="h-4 w-4" /> },
-  { title: "Avocado", value: <GiAvocado className="h-4 w-4" /> },
   { title: "Bacon", value: <FaBacon className="h-4 w-4" /> },
-  { title: "Strawberry", value: <GiStrawberry className="h-4 w-4" /> },
   { title: "Cake", value: <TbCake className="h-4 w-4" /> },
   { title: "Meat", value: <GiMeat className="h-4 w-4" /> },
   { title: "Grapes", value: <GiGrapes className="h-4 w-4" /> },
@@ -183,8 +182,6 @@ export const iconOptions = [
   { title: "Cash Register", value: <FaCashRegister className="h-4 w-4" /> },
   { title: "Shopping Cart", value: <FaShoppingCart className="h-4 w-4" /> },
   { title: "Bread Slice", value: <FaBreadSlice className="h-4 w-4" /> },
-  { title: "Pepper Hot", value: <FaPepperHot className="h-4 w-4" /> },
-  { title: "Drumstick Bite", value: <FaDrumstickBite className="h-4 w-4" /> },
   { title: "Sausage", value: <TbSausage className="h-4 w-4" /> },
   { title: "Bottle", value: <TbBottle className="h-4 w-4" /> },
   { title: "Shisha", value: <GiSmokingPipe className="h-4 w-4" /> },
@@ -194,20 +191,16 @@ export const iconOptions = [
   { title: "Chicken", value: <GiChickenOven className="h-4 w-4" /> },
   { title: "Juice", value: <GiManualJuicer className="h-4 w-4" /> },
   { title: "Kids Meal", value: <MdChildCare className="h-4 w-4" /> },
-  { title: "Bottle", value: <FaBottleWater className="h-4 w-4" /> },
+  { title: "Bottle 2", value: <FaBottleWater className="h-4 w-4" /> },
   { title: "Dish", value: <BiSolidDish className="h-4 w-4" /> },
   { title: "Energy", value: <SlEnergy className="h-4 w-4" /> },
   { title: "Cool Off", value: <GiCooler className="h-4 w-4" /> },
   { title: "Soft Drinks", value: <RiDrinks2Fill className="h-4 w-4" /> },
   { title: "Mixed Drinks", value: <FaWineBottle className="h-4 w-4" /> },
-  { title: "Apple", value: <FaAppleAlt className="h-4 w-4" /> },
+  { title: "Apple 2", value: <FaAppleAlt className="h-4 w-4" /> },
   { title: "Blender", value: <FaBlender className="h-4 w-4" /> },
-  { title: "Carrot", value: <FaCarrot className="h-4 w-4" /> },
   { title: "Cookie", value: <FaCookie className="h-4 w-4" /> },
   { title: "Drumstick Bite", value: <FaDrumstickBite className="h-4 w-4" /> },
-  { title: "Fish", value: <FaFish className="h-4 w-4" /> },
-  { title: "Ice Cream", value: <FaIceCream className="h-4 w-4" /> },
-  { title: "Lemon", value: <FaLemon className="h-4 w-4" /> },
   { title: "Pepper Hot", value: <FaPepperHot className="h-4 w-4" /> },
   { title: "Wine Glass", value: <FaWineGlassAlt className="h-4 w-4" /> },
   { title: "Martini Glass", value: <FaGlassMartiniAlt className="h-4 w-4" /> },
@@ -243,18 +236,19 @@ export const iconOptions = [
   { title: "Coffee Cup", value: <TbCoffee className="h-4 w-4" /> },
   { title: "Milk Bottle", value: <TbMilk className="h-4 w-4" /> },
   { title: "Ice Cream Cone", value: <TbIceCream2 className="h-4 w-4" /> },
-  { title: "Bottle", value: <TbBottle className="h-4 w-4" /> },
   { title: "Chopsticks", value: <TbBowlChopsticks className="h-4 w-4" /> },
-  { title: "Apple", value: <TbApple className="h-4 w-4" /> },
+  { title: "Apple 3", value: <TbApple className="h-4 w-4" /> },
   { title: "Cup", value: <TbCup className="h-4 w-4" /> },
 
   { title: "Food Bank", value: <MdFoodBank className="h-4 w-4" /> },
   { title: "Fast Food", value: <MdFastfood className="h-4 w-4" /> },
-  { title: "Ice Cream", value: <MdIcecream className="h-4 w-4" /> },
+  { title: "Ice Cream 2", value: <MdIcecream className="h-4 w-4" /> },
   { title: "Pizza Slice", value: <MdLocalPizza className="h-4 w-4" /> },
   { title: "Wine Bar", value: <MdOutlineWineBar className="h-4 w-4" /> },
   { title: "Ramen", value: <MdRamenDining className="h-4 w-4" /> },
   { title: "Set Meal", value: <MdOutlineSetMeal className="h-4 w-4" /> },
+  { title: "GiSandwich", value: <GiSandwich className="h-4 w-4" /> },
+  { title: "burger", value: <PiHamburgerFill className="h-4 w-4" /> },
 ];
 
 export const getIconByTitle = (title: string) => {
